@@ -12,18 +12,21 @@ def run():
 	robotName = rospy.get_param('~robot_name', 'Robot1')
 	print robotName
 
-	# Control the car.
+	# Create the publisher to control the robot.
 	topicName = "/" + robotName + "/commands/velocity"
 	velPub = rospy.Publisher(topicName, Twist)
 
+	# Wait while the world is totally spawned.
+	rospy.sleep(5.0)
 
+	print "start"
 	while not rospy.is_shutdown():
 		vel = Twist()
-		vel.linear.x = 1.10
-		print("publicando publicando mic mic.")
+		vel.linear.x = 1.00
+		vel.angular.z = -1.50		
 		velPub.publish(vel)
 
-		rospy.sleep(0.10)
+		rospy.sleep(0.50)
 
 
 if __name__ == '__main__':
