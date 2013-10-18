@@ -29,7 +29,7 @@
 			cam_info_topic="camera/camera_info" update_rate="10" res_x="320" res_y="240" 
 			image_format="R8G8B8" hfov="90">
 		<!-- Rotated 45 degress pointing to the floor -->
-	    <origin xyz="0.16 0.0 0.17" rpy="0 0.7854 0"/>
+	    <origin xyz="0.155 0.0 0.185" rpy="0 0.7854 0"/>
     </xacro:generic_camera>
 
 </robot>

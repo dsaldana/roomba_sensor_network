@@ -39,6 +39,34 @@
     </link>
   </xacro:macro>
   
+  <xacro:macro name="stack_middle_pole" params="parent number x_loc y_loc z_loc">  
+    <joint name="pole_middle_${number}_joint" type="fixed">
+      <origin xyz="${x_loc} ${y_loc} ${z_loc}" rpy="0 0 0" />
+      <parent link="${parent}"/>
+      <child link="pole_middle_${number}_link"/>
+    </joint>
+    <link name="pole_middle_${number}_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 ${M_PI} 0"/>
+        <geometry>
+          <mesh filename="package://turtlebot_description/meshes/stacks/hexagons/pole_middle.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <cylinder length="0.0608" radius=".006"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="0.001"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
+                 iyy="0.0001" iyz="0.0"
+                 izz="0.0001"/>
+      </inertial>
+    </link>
+  </xacro:macro>
   
   <!-- 
     Stack macro - all the components relative transforms are made with respect 
@@ -80,6 +108,7 @@
       </inertial>
     </link>
     
-    
+    <stack_middle_pole parent="${parent}" number="0" x_loc= "0.145" y_loc= "0.0" z_loc="0.1650"/>
+
   </xacro:macro>
 </robot>
