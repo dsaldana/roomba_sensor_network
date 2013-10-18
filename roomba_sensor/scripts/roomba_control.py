@@ -10,7 +10,7 @@ def run():
 
 
 	# Control the car.
-    velPub = rospy.Publisher("/robot1/cmd_vel_mux/input/teleop", Twist)
+    velPub = rospy.Publisher("/Robot1/commands/velocity", Twist)
 
 
     while not rospy.is_shutdown():
