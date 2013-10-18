@@ -9,21 +9,27 @@
 	<xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_library.urdf.xacro" />
 	<xacro:include filename="$(find turtlebot_ds)/urdf/stacks/hexagon.urdf.xacro" />
 
+	<!-- Robot base -->
 	<kobuki/>
 
+	<!-- Hexagon base -->
 	<stack_hexagon parent="base_link"/>
   
 
-	<!-- Hokuyo UTM-30LX mounted upside down below the quadrotor body -->
+	<!-- Hokuyo UTM-30LX -->
     <xacro:include filename="$(find hector_sensors_description)/urdf/hokuyo_utm30lx.urdf.xacro" />
-    <xacro:hokuyo_utm30lx name="laser0" parent="base_link" ros_topic="scan" update_rate="40" ray_count="1081" min_angle="-135" max_angle="135">
-      <origin xyz="0.0 0.0 0.18" rpy="0 0 0"/>
+    <xacro:hokuyo_utm30lx name="laser0" parent="base_link" ros_topic="scan" 
+			update_rate="40" ray_count="1081" min_angle="-135" max_angle="135">
+    		<origin xyz="0.0 0.0 0.18" rpy="0 0 0"/>
     </xacro:hokuyo_utm30lx>
     
     <!-- Forward facing camera -->
     <xacro:include filename="$(find hector_sensors_description)/urdf/generic_camera.urdf.xacro" />
-    <xacro:generic_camera name="front_cam" parent="base_link" ros_topic="camera/image" cam_info_topic="camera/camera_info" update_rate="10" res_x="320" res_y="240" image_format="R8G8B8" hfov="90">
-      <origin xyz="0.16 0.0 0.17" rpy="0 0.7854 0"/>
+    <xacro:generic_camera name="front_cam" parent="base_link" ros_topic="camera/image" 
+			cam_info_topic="camera/camera_info" update_rate="10" res_x="320" res_y="240" 
+			image_format="R8G8B8" hfov="90">
+		<!-- Rotated 45 degress pointing to the floor -->
+	    <origin xyz="0.16 0.0 0.17" rpy="0 0.7854 0"/>
     </xacro:generic_camera>
 
 </robot>
