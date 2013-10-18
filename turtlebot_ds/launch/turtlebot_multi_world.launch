@@ -29,6 +29,10 @@
 	    <arg name="init_pose" value="-x -1 -y 1 -z 0" />
 	    <arg name="robot_name"  value="Robot2" />
 	  </include>
+
+	  <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
+		<param name="robot_name" value="Robot2"/>
+	  </node>
   </group>
 
   <group ns="robot3">
@@ -37,6 +41,10 @@
 	    <arg name="init_pose" value="-x 1 -y -1 -z 0" />
 	    <arg name="robot_name"  value="Robot3" />
 	  </include>
+
+      <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
+		<param name="robot_name" value="Robot3"/>
+	  </node>
   </group>
 
   <group ns="robot4">
@@ -45,6 +53,10 @@
 	    <arg name="init_pose" value="-x 1 -y 1 -z 0" />
 	    <arg name="robot_name"  value="Robot4" />
 	  </include>
+
+      <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
+		<param name="robot_name" value="Robot4"/>
+	  </node>
   </group>	
 
   
