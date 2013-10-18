@@ -17,6 +17,10 @@
 	    <arg name="init_pose" value="-x -1 -y -1 -z 0" />
 	    <arg name="robot_name"  value="Robot1" />
 	  </include>
+
+	  <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
+		<param name="robot_name" value="Robot1"/>
+	  </node>
   </group>
 
   <group ns="robot2">
