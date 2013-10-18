@@ -1,7 +1,5 @@
 <launch>
-  <arg name="base"/>
-  <arg name="stacks"/>
-  <arg name="3d_sensor"/>
+  <arg name="base"/>  
   <arg name="init_pose"/>
   <arg name="robot_name"/>
   <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find turtlebot_ds)/robots/kobukids.urdf.xacro'" />
