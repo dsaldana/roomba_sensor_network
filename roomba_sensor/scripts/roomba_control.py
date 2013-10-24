@@ -7,12 +7,7 @@ from geometry_msgs.msg import Point32
 
 import random
 
-# For plotting
-import numpy as np
-import matplotlib.pyplot as plt
 # Gazebo
-#import roslib; roslib.load_manifest('gazebo')
-#from gazebo.srv import *
 import gazebo_msgs.srv
 
 
@@ -58,11 +53,6 @@ def run():
 		particles.append(p)
 		
 
-
-	# Draw the particles
-	#area = np.pi * (150 * w)
-	#plt.scatter(x, y, s=area, alpha=0.5)
-	#plt.show()
 	############ End Particle initialization #####
 
 	# Wait while the world is totally spawned.
@@ -85,6 +75,17 @@ def run():
 
 		# Publish particles
 		msg_parts = Polygon()
+
+		particles = []
+		for i in range(N):
+			p = Point32()
+			# Position
+			p.x = random.random() * mapLX + mapX1
+			p.y = random.random() * mapLY + mapY1
+			# weight
+			p.z = 1.0 / N
+			particles.append(p)
+
 		msg_parts.points = particles
 		partPub.publish(msg_parts)
 

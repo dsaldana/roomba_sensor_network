@@ -13,3 +13,6 @@ Required ROS Packages
 
 Run
 $ roslaunch turtlebot_ds turtlebot_multi_world.launch
+
+To see the particles for robot 1
+$ rosrun roomba_sensor particle_drawer.py
