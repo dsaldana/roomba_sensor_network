@@ -55,14 +55,14 @@ def run():
 	rospy.sleep(5.0)
 	print "wait for service"
 	rospy.wait_for_service('/gazebo/get_model_state')
-	
+	getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+
 	######## Control Loop ###########
-	print "start"
+	print "Start!"
 	while not rospy.is_shutdown():
 		# Robot position
-		try:
-			getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
-			resp = getPosition("Robot1","world")
+		try:			
+			resp = getPosition(robotName,"world")
 			print "position [",resp.pose.position.x,",", resp.pose.position.y, "]"
 
 		except rospy.ServiceException, e:
