@@ -3,9 +3,14 @@ import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 
+
 # For plotting
 import numpy as np
 import matplotlib.pyplot as plt
+# Gazebo
+#import roslib; roslib.load_manifest('gazebo')
+#from gazebo.srv import *
+import gazebo_msgs.srv
 
 
 def run():
@@ -24,16 +29,16 @@ def run():
 	#TODO this code must be out of this file
 	########## Initialize Particles ##############
 	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
-	mapX1 = -40
-	mapX2 = 40
-	mapY1 = -30
-	mapY2 = 30
+	mapX1 = -10
+	mapX2 = 10
+	mapY1 = -10
+	mapY2 = 10
 	#Map size
 	mapLX = mapX2-mapX1
 	mapLY = mapY2-mapY1
 
 	# number of particles
-	N = 50
+	N = 1000
 	# Sparce the initial particles
 	x = np.random.rand(N) * mapLX + mapX1
 	y = np.random.rand(N) * mapLY + mapY1
@@ -48,13 +53,27 @@ def run():
 
 	# Wait while the world is totally spawned.
 	rospy.sleep(5.0)
+	print "wait for service"
+	rospy.wait_for_service('/gazebo/get_model_state')
 	
+	######## Control Loop ###########
 	print "start"
 	while not rospy.is_shutdown():
+		# Robot position
+		try:
+			getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+			resp = getPosition("Robot1","world")
+			print "position [",resp.pose.position.x,",", resp.pose.position.y, "]"
+
+		except rospy.ServiceException, e:
+			print "Service call failed: %s"%e
+		# TODO Get info from other robots.
+
+		# Control
 		vel = Twist()
 		vel.linear.x = 1.00
 		vel.angular.z = -1.50		
-		#velPub.publish(vel)
+		velPub.publish(vel)
 
 		rospy.sleep(0.50)
 
