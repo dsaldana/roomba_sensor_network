@@ -30,7 +30,7 @@ def run():
 	velPub = rospy.Publisher(topicName, Twist)
 
 	# Create a publisher for the particles
-	partPub = rospy.Publisher(robotName+"/particles", Polygon)
+	partPub = rospy.Publisher("particles", Polygon)
 
 
 	#TODO this code must be out of this file

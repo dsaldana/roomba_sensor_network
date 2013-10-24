@@ -11,7 +11,7 @@
   
 
   <!--Robots -->
-  <group ns="robot1">
+  <group ns="Robot1">
 	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
 	    <arg name="base" value="create"/>
 	    <arg name="init_pose" value="-x -1 -y -1 -z 0" />
