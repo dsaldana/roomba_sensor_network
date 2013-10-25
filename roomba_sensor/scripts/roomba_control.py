@@ -15,49 +15,28 @@ import copy
 
 def resample(particles):
 	print "resampling..."
-	# Normalize Z
-	sum = 0
-	for p in particles:
-		sum = sum + p.z
-	print sum
-	for p in particles:
-		p.z = p.z / sum
-
-	sum = 0
-	for p in particles:
-		sum = sum + p.z
-	print "1=", sum
-
 	
+	N = len(particles)
+	index =  int(random.random() * N)
+	
+	# weights
+	w = [0] * N
+	for i in range(N):
+		w[i] = particles[i].z
+
 	# resampled particles
-	resampledPrs = []
-	for i in range(len(particles)):
-		ran = random.random()
-		s = 0
-		for p in particles:
-			s = p.z + s			
-			if ran < s:
-				resampledPrs.append(copy.deepcopy(p))
-				break
+	rp = [0] * N
 
-	# Normalize resampled particles
-	print "numRes=", len(resampledPrs)
-	sum = 0
-	for p in resampledPrs:
-		sum = sum + p.z
-		#print p.z
-	#print "--"
-	for i in range(len(resampledPrs)):		
-		resampledPrs[i].z = resampledPrs[i].z / sum
-		#print p.z
-
-	#sum = 0
-	#for i in range(len(resampledPrs)):	
-	#	sum = sum + resampledPrs[i].z
-	#print "new1=",sum,"\n"
-
-
-	return resampledPrs
+	# resample
+	beta = 0.0
+	mx = max (w)
+	for i in range(N):
+		beta += random.random() * 2.0 * mx
+		while beta > w[index]:
+			beta -= w[index]
+			index = (index + 1) % N
+		rp[i] = copy.deepcopy(particles[index])	
+	return rp
 
 
 def run():
