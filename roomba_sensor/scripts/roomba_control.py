@@ -11,7 +11,53 @@ import random
 # Gazebo
 import gazebo_msgs.srv
 
-execfile('lib/resampler.py')
+import copy
+
+def resample(particles):
+	print "resampling..."
+	# Normalize Z
+	sum = 0
+	for p in particles:
+		sum = sum + p.z
+	print sum
+	for p in particles:
+		p.z = p.z / sum
+
+	sum = 0
+	for p in particles:
+		sum = sum + p.z
+	print "1=", sum
+
+	
+	# resampled particles
+	resampledPrs = []
+	for i in range(len(particles)):
+		ran = random.random()
+		s = 0
+		for p in particles:
+			s = p.z + s			
+			if ran < s:
+				resampledPrs.append(copy.deepcopy(p))
+				break
+
+	# Normalize resampled particles
+	print "numRes=", len(resampledPrs)
+	sum = 0
+	for p in resampledPrs:
+		sum = sum + p.z
+		#print p.z
+	#print "--"
+	for i in range(len(resampledPrs)):		
+		resampledPrs[i].z = resampledPrs[i].z / sum
+		#print p.z
+
+	#sum = 0
+	#for i in range(len(resampledPrs)):	
+	#	sum = sum + resampledPrs[i].z
+	#print "new1=",sum,"\n"
+
+
+	return resampledPrs
 
 
 def run():
@@ -42,7 +88,7 @@ def run():
 	mapLY = mapY2 - mapY1
 
 	# number of particles
-	N = 100
+	N = 10000
 	# Sparce the initial particles
 	particles = []
 	for i in range(N):
@@ -79,21 +125,27 @@ def run():
 			print "Service call failed: %s" %e
 		# TODO Get info from other robots.
 
-		
+		# Move the particles
+		for p in particles:
+			mov = 0.4
+			p.x = p.x + mov * random.random() - mov / 2.0
+			p.y = p.y + mov * random.random() - mov / 2.0
 		
 		# Update particles
 		for p in particles:
 			# If the particles in the robot area.
-			r = 3
+			r = 1
 			if sqrt((robotX - p.x)**2 + (robotY - p.y)**2) < r:
 				p.z = p.z * 0.1
-				print "lugar errado da particula",p.z
+				#print "lugar errado da particula",p.z
+			if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
+				p.z = p.z * 0.1
 
 			# TODO If the anomaly was sensed
 
 		# TODO resampling
 		particles = resample(particles)
-		# TODO move the particles
+		
 		
 
 		# Publish particles
