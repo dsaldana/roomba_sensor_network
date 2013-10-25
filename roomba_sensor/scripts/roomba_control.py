@@ -56,10 +56,10 @@ def img_callback(img):
 
 	for i in xrange(mat.rows):
 		for j in xrange(mat.cols/2):
-			if(mat[i, j] == 255):
+			if(mat[i, j] > 230):
 				pl += 1
 		for j in xrange(mat.cols/2, mat.cols):				
-			if(mat[i, j] == 255):
+			if(mat[i, j] > 230):
 				pr += 1
 	
 	total = mat.rows * mat.cols * 1.0
