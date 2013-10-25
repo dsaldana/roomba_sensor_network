@@ -11,41 +11,8 @@ import random
 # Gazebo
 import gazebo_msgs.srv
 
+execfile('lib/resampler.py')
 
-def resampling(particles):
-	print "resampling..."
-	# Normalize Z
-	sum = 0
-	for p in particles:
-		sum = sum + p.z
-	print sum
-	for p in particles:
-		p.z = p.z / sum
-
-	sum = 0
-	for p in particles:
-		sum = sum + p.z
-	print sum
-
-	# resampled particles
-	resampledPrs = []
-	for i in range(len(particles)):
-		ran = random.random()
-		s = 0
-		for p in particles:
-			s = p.z + s			
-			if ran < s:
-				resampledPrs.append(p)
-				break
-
-	# Normalize Z
-	print "numRes=", len(resampledPrs)
-	sum = 0
-	for p in resampledPrs:
-		sum = sum + p.z
-	print "nrom res=", sum
-
-	return resampledPrs
 
 def run():
 	######### Initialization ##################
@@ -119,13 +86,13 @@ def run():
 			# If the particles in the robot area.
 			r = 3
 			if sqrt((robotX - p.x)**2 + (robotY - p.y)**2) < r:
-				p.z = p.z * 0.001
-				print "lugar errado da particula"
+				p.z = p.z * 0.1
+				print "lugar errado da particula",p.z
 
 			# TODO If the anomaly was sensed
 
 		# TODO resampling
-		particles = resampling(particles)
+		particles = resample(particles)
 		# TODO move the particles
 		
 
