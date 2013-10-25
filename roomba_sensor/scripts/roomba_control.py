@@ -134,8 +134,8 @@ def run():
 
 		# Control
 		vel = Twist()
-		vel.linear.x = 1.00
-		vel.angular.z = -1.50		
+		vel.linear.x = 0.500
+		vel.angular.z = -0.750		
 		velPub.publish(vel)
 
 		rospy.sleep(0.50)
