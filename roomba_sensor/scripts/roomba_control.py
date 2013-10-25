@@ -4,8 +4,13 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
-from math import sqrt
 
+# Image
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
+
+
+from math import sqrt
 import random
 
 # Gazebo
@@ -39,6 +44,27 @@ def resample(particles):
 	return rp
 
 
+def img_callback(img):
+	#print "image", img.height, "x", img.width," ", len(img.data)," enc=",img.encoding, " step=",img.step
+	#OpenCV matrix
+	mat = CvBridge().imgmsg_to_cv(img, "mono8")
+	
+	# How many white pixels in the left
+	pl = 0
+	# How many white pixels in the right
+	pr = 0
+
+	for i in xrange(mat.rows):
+		for j in xrange(mat.cols/2):
+			if(mat[i, j] == 255):
+				pl += 1
+		for j in xrange(mat.cols/2, mat.cols):				
+			if(mat[i, j] == 255):
+				pr += 1
+	
+	total = mat.rows * mat.cols * 1.0
+	print "blancos ", pl/total , ",", pr/total
+
 def run():
 	######### Initialization ##################
 	# Node roombaControl
@@ -54,7 +80,10 @@ def run():
 
 	# Create a publisher for the particles
 	partPub = rospy.Publisher("particles", Polygon)
-
+	
+	# Camera
+	topicName = "/" + robotName + "/front_cam/camera/image"
+	image_sub = rospy.Subscriber(topicName, Image, img_callback)
 
 	########## Initialize Particles ##############
 	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
@@ -136,7 +165,7 @@ def run():
 		vel = Twist()
 		vel.linear.x = 0.500
 		vel.angular.z = -0.750		
-		velPub.publish(vel)
+		#velPub.publish(vel)
 
 		rospy.sleep(0.50)
 
