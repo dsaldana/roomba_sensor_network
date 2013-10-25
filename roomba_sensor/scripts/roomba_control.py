@@ -79,16 +79,16 @@ def run():
 
 	########## Initialize Particles ##############
 	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
-	mapX1 = -10
-	mapX2 = 10
-	mapY1 = -10
-	mapY2 = 10
+	mapX1 = -5
+	mapX2 = 5
+	mapY1 = -5
+	mapY2 = 5
 	#Map size
 	mapLX = mapX2 - mapX1
 	mapLY = mapY2 - mapY1
 
 	# number of particles
-	N = 10000
+	N = 5000
 	# Sparce the initial particles
 	particles = []
 	for i in range(N):
@@ -134,7 +134,7 @@ def run():
 		# Update particles
 		for p in particles:
 			# If the particles in the robot area.
-			r = 1
+			r = 0.5
 			if sqrt((robotX - p.x)**2 + (robotY - p.y)**2) < r:
 				p.z = p.z * 0.1
 				#print "lugar errado da particula",p.z
