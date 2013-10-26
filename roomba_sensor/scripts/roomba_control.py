@@ -163,8 +163,12 @@ def run():
 		for p in particles:
 			# If the particles in the robot area.
 			r = 0.5 # radio to cover
-			#if sqrt((camX - p.x)**2 + (camY - p.y)**2) < r:
-				#p.z = 2* p.z * sensedValue + 0.01
+			if sqrt((camX - p.x)**2 + (camY - p.y)**2) < r:
+				if(sensedValue == 0):
+					p.z *= 0.1
+				else:
+					p.z *= 1.1 * sensedValue 
+				
 				#print "lugar errado da particula",p.z
 			if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
 				p.z = p.z * 0.1
