@@ -11,12 +11,17 @@ from cv_bridge import CvBridge, CvBridgeError
 
 
 from math import sqrt
+from math import degrees
+from math import cos
+from math import sin
 import random
 
 # Gazebo
 import gazebo_msgs.srv
 
 import copy
+
+sensedValue = 0
 
 def resample(particles):
 	print "resampling..."
@@ -41,10 +46,14 @@ def resample(particles):
 			beta -= w[index]
 			index = (index + 1) % N
 		rp[i] = copy.deepcopy(particles[index])	
+
+	for p in rp:
+		p.z /=mx
 	return rp
 
 
 def img_callback(img):
+	global sensedValue
 	#print "image", img.height, "x", img.width," ", len(img.data)," enc=",img.encoding, " step=",img.step
 	#OpenCV matrix
 	mat = CvBridge().imgmsg_to_cv(img, "mono8")
@@ -63,7 +72,10 @@ def img_callback(img):
 				pr += 1
 	
 	total = mat.rows * mat.cols * 1.0
-	print "blancos ", pl/total , ",", pr/total
+	#print "blancos ", pl/total , ",", pr/total
+	
+	sensedValue = (pl+pr) / total
+	print "sensedValue=", sensedValue
 
 def run():
 	######### Initialization ##################
@@ -127,10 +139,18 @@ def run():
 			resp = getPosition(robotName,"world")
 			robotX = resp.pose.position.x
 			robotY = resp.pose.position.y
-			#print "position [",resp.pose.position.x,",", resp.pose.position.y, "]"
-
+			robotT = resp.pose.orientation.z
+			#print "position ", degrees(resp.pose.orientation.z)
 		except rospy.ServiceException, e:
-			print "Service call failed: %s" %e
+			print "Service call to gazebo failed: %s" %e
+
+		# Camera area
+		d = 0.5
+		camX = robotX + d * cos(robotT)
+		camY = robotY + d * sin(robotT)
+		#print "robot", [robotX,robotY], " cam", [camX, camY]
+		print sensedValue
+
 		# TODO Get info from other robots.
 
 		# Move the particles
@@ -142,9 +162,9 @@ def run():
 		# Update particles
 		for p in particles:
 			# If the particles in the robot area.
-			r = 0.5
-			if sqrt((robotX - p.x)**2 + (robotY - p.y)**2) < r:
-				p.z = p.z * 0.1
+			r = 0.5 # radio to cover
+			#if sqrt((camX - p.x)**2 + (camY - p.y)**2) < r:
+				#p.z = 2* p.z * sensedValue + 0.01
 				#print "lugar errado da particula",p.z
 			if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
 				p.z = p.z * 0.1
