@@ -234,40 +234,7 @@
       </collision>
     </link>
 
-    <turtlebot_standoff_2in parent="standoff_2in_0_link" number="4" x_loc="0" y_loc="0" z_loc="0.05715"/>
-    <turtlebot_standoff_2in parent="standoff_2in_1_link" number="5" x_loc="0" y_loc="0" z_loc="0.05715"/>
-    <turtlebot_standoff_2in parent="standoff_2in_2_link" number="6" x_loc="0" y_loc="0" z_loc="0.05715"/>
-    <turtlebot_standoff_2in parent="standoff_2in_3_link" number="7" x_loc="0" y_loc="0" z_loc="0.05715"/>
-
-    <joint name="plate_2_joint" type="fixed">
-      <origin xyz="0 0 0.0572008" rpy="0 0 0" />
-      <parent link="plate_1_link"/>
-      <child link="plate_2_link" />
-    </joint>
-
-    <link name="plate_2_link">
-      <inertial>
-        <mass value="0.01" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-          iyy="0.001" iyz="0.0"
-          izz="0.001" />
-      </inertial>
-
-      <visual>
-        <origin xyz=" 0 0 0 " rpy="0 0 0" />
-        <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/circles/plate_1_logo.dae"/>
-        </geometry>
-      </visual>
-
-      <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-        <geometry>
-          <box size="0.314856 0.314856 0.006401"/>
-        </geometry>
-      </collision>
-    </link>
+    <turtlebot_standoff_2in parent="standoff_2in_0_link" number="4" x_loc="0.0815" y_loc="-0.132" z_loc="0.05715"/>
 
     
 
