@@ -6,15 +6,19 @@
 -->    
 <robot name="turtlebot" xmlns:xacro="http://ros.org/wiki/xacro">
 
-	<xacro:include filename="$(find turtlebot_description)/urdf/turtlebot_library.urdf.xacro" />
+	 <!-- Bases -->
+	<xacro:include filename="$(find turtlebot_ds)/urdf/kobuki.urdf.xacro" />
+  	<!-- Stacks -->
+  	<xacro:include filename="$(find turtlebot_description)/urdf/stacks/circles.urdf.xacro"/>
 	<xacro:include filename="$(find turtlebot_ds)/urdf/stacks/hexagon.urdf.xacro" />
 
-	<!-- Robot base -->
+	<!-- Robot base <create/> -->
 	<kobuki/>
+	
 
-	<!-- Hexagon base -->
-	<stack_hexagon parent="base_link"/>
-  
+	<!-- Hexagon base <stack_hexagon parent="base_link"/> -->
+	
+ 	 <stack_circles parent="base_link"/>
 
 	<!-- Hokuyo UTM-30LX -->
     <xacro:include filename="$(find hector_sensors_description)/urdf/hokuyo_utm30lx.urdf.xacro" />
