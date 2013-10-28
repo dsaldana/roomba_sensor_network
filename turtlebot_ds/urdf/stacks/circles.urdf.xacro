@@ -269,42 +269,10 @@
       </collision>
     </link>
 
-    <turtlebot_standoff_kinect parent="plate_2_link" number="0" x_loc="-0.1024382" y_loc="0.098" z_loc="0.0032004"/>
-    <turtlebot_standoff_kinect parent="plate_2_link" number="1" x_loc="-0.1024382" y_loc="-0.098" z_loc="0.0032004"/>
+    
 
-    <turtlebot_standoff_8in parent="standoff_2in_4_link" number="0" x_loc="0" y_loc="0" z_loc="0.05715"/>
-    <turtlebot_standoff_8in parent="standoff_2in_5_link" number="1" x_loc="0" y_loc="0" z_loc="0.05715"/>
-    <turtlebot_standoff_8in parent="standoff_2in_6_link" number="2" x_loc="0" y_loc="0" z_loc="0.05715"/>
-    <turtlebot_standoff_8in parent="standoff_2in_7_link" number="3" x_loc="0" y_loc="0" z_loc="0.05715"/>
+   
 
-    <joint name="plate_3_joint" type="fixed">
-      <origin xyz="-0.01316 0 0.2063496" rpy="0 0 0" />
-      <parent link="plate_2_link"/>
-      <child link="plate_3_link" />
-    </joint>
-
-    <link name="plate_3_link">
-      <inertial>
-        <mass value="0.01" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
-          iyy="0.0001" iyz="0.0"
-          izz="0.0001" />
-      </inertial>
   
-      <visual>
-        <origin xyz=" 0 0 0 " rpy="0 0 0" />
-        <geometry>
-          <mesh filename="package://turtlebot_description/meshes/stacks/circles/plate_2_logo.dae"/>
-        </geometry>
-      </visual>
-
-      <collision>
-        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
-        <geometry>
-          <box size="0.288 0.315 0.006401"/>
-        </geometry>
-      </collision>
-    </link>
   </xacro:macro>
 </robot>
