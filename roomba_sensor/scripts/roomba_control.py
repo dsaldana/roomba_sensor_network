@@ -56,8 +56,8 @@ def resample(particles):
 
 def robot_comm(msg):
 	# Message from the same robot
-	#if (msg.robot_id == robotName):
-	#	return
+	if (msg.robot_id == robotName):
+		return
 	# Update a list of values
 	print msg
 
