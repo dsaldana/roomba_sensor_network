@@ -175,7 +175,7 @@ def run():
 
 			# TODO If the anomaly was sensed
 
-		# TODO resampling
+		# Resampling
 		particles = resample(particles)
 		
 		
@@ -186,6 +186,7 @@ def run():
 		partPub.publish(msg_parts)
 
 		# Control
+		# TODO control states: explore, track, and
 		vel = Twist()
 		vel.linear.x = 0.500
 		vel.angular.z = -0.750		
