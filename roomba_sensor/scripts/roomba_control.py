@@ -4,6 +4,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
+from roomba_comm.msg import SensedValue
 
 # Image
 from sensor_msgs.msg import Image
@@ -22,6 +23,8 @@ import gazebo_msgs.srv
 import copy
 
 sensedValue = 0
+
+robotName = "r0"
 
 def resample(particles):
 	print "resampling..."
@@ -50,6 +53,13 @@ def resample(particles):
 	for p in rp:
 		p.z /=mx
 	return rp
+
+def robot_comm(msg):
+	# Message from the same robot
+	#if (msg.robot_id == robotName):
+	#	return
+	# Update a list of values
+	print msg
 
 
 def img_callback(img):
@@ -83,6 +93,7 @@ def run():
 	rospy.init_node('roomba_control')
 
 	# Robot's name is an argument
+	global robotName
 	robotName = rospy.get_param('~robot_name', 'Robot1')
 	print robotName
 
@@ -96,6 +107,12 @@ def run():
 	# Camera
 	topicName = "/" + robotName + "/front_cam/camera/image"
 	image_sub = rospy.Subscriber(topicName, Image, img_callback)
+
+	# Robot communication
+	# Subscriber for robot communication
+	rospy.Subscriber("robotCom", SensedValue, robot_comm)
+	# Sensor's publisher
+	sensorPub = rospy.Publisher("robotCom", SensedValue)
 
 	########## Initialize Particles ##############
 	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
@@ -151,7 +168,13 @@ def run():
 		#print "robot", [robotX,robotY], " cam", [camX, camY]
 		print sensedValue
 
-		# TODO Get info from other robots.
+		# Send the info to other robots.
+		smsg = SensedValue()
+		smsg.x = camX
+		smsg.y = camY
+		smsg.robot_id = robotName
+		smsg.value = sensedValue
+		sensorPub.publish(smsg)
 
 		# Move the particles
 		for p in particles:
