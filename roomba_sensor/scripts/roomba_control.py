@@ -116,13 +116,18 @@ def run():
 
 	########## Initialize Particles ##############
 	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
-	mapX1 = -5
-	mapX2 = 5
-	mapY1 = -5
-	mapY2 = 5
+	mapX1 = -5.0
+	mapX2 = 5.0
+	mapY1 = -5.0
+	mapY2 = 5.0
 	#Map size
 	mapLX = mapX2 - mapX1
 	mapLY = mapY2 - mapY1
+	# Grid size		
+	gn = 20 # Number of rows
+	gdx = mapLX / gn # delta x
+	gm = 20 # Number of columns
+	gdy = mapLY / gm # delta y
 
 	# number of particles
 	N = 5000
@@ -179,8 +184,13 @@ def run():
 		# Move the particles
 		for p in particles:
 			mov = 0.4
+			# TODO change by a normal fuction
 			p.x = p.x + mov * random.random() - mov / 2.0
 			p.y = p.y + mov * random.random() - mov / 2.0
+	
+
+		# Particle position in grid n rows and m columns
+		grid=[[0 for x in xrange(gm)] for x in xrange(gn)]
 		
 		# Update particles
 		for p in particles:
@@ -190,17 +200,26 @@ def run():
 				if(sensedValue == 0):
 					p.z *= 0.1
 				else:
+					# If the anomaly was sensed
 					p.z *= 1.1 * sensedValue 
 				
 				#print "lugar errado da particula",p.z
 			if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
 				p.z = p.z * 0.1
 
-			# TODO If the anomaly was sensed
+			# Particle in grid
+			if(p.x > mapX1 and p.x < mapX2 and p.y > mapY1 and p.y < mapY2):
+				i = int((p.y- mapY1) / gdy)
+				j = int((p.x- mapX1) / gdx)
+				#print "i,j",[i,j], ",",[p.y,p.x]
+				grid[i][j] += 1
+			
 
 		# Resampling
 		particles = resample(particles)
 		
+		#for r in grid:
+		#	print r
 		
 
 		# Publish particles
@@ -208,6 +227,7 @@ def run():
 		msg_parts.points = particles
 		partPub.publish(msg_parts)
 
+		
 		# Control
 		# TODO control states: explore, track, and
 		vel = Twist()
