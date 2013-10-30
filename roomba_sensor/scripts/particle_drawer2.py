@@ -9,6 +9,7 @@ from geometry_msgs.msg import Point32
 import numpy as np
 import sys
 import pygame
+import time
 
 
 # Window size
@@ -50,22 +51,35 @@ def callback(particles):
 
 	# margin
 	mx = width / 10.0
-	my = height/ 10.0
+	my = height / 10.0
 	# Draw the grid
-	dx = (width- 2.0 * mx) / gm
-	dy = (height - 2.0 * my) / gn
+	ax = width - 2.0 * mx # area for x
+	ay = height - 2.0 * my # area for y
+	dx = (ax) / gm #Delta x
+	dy = (ay) / gn #Delta y
 
-	pygame.draw.line(window, (0, 0, 250), (mx, my), (width-mx, height-my))
 
 	# Draw rows
-	color = (150, 150, 150)
+	color = (170, 170, 170)
 	for i in range(gn + 1):
 		hr = my + i * dy
-		pygame.draw.line(window, color , (mx, hr ), (width-mx, hr))
-
+		pygame.draw.line(window, color , (mx, hr ), (width - mx, hr))
+	# Draw columns
 	for j in range(gm + 1):
 		hc = mx + j * dx
-		pygame.draw.line(window, color, ( hc ,my), (hc, height-my))
+		pygame.draw.line(window, color, ( hc ,my), (hc, height - my))
+	
+	# Draw zeros
+	pygame.draw.line(window, (0, 0, 250), (mx/2, my+dy*gn/2), (width-mx/2, my+dy*gn/2))
+	pygame.draw.line(window, (0, 0, 250), (mx+dx*gm/2, my/2), (mx+dx*gm/2, height-my/2))
+		
+	# Draw the particles
+	pcolor = (255,0,0)
+	for i in range(N):
+		x2 = mx + (x[i] - mapX1) * ax / mapLX
+		y2 = my + (-y[i] - mapY1) * ay / mapLY
+		pygame.draw.circle(window, pcolor, (int(x2),int(y2)), 2, 0)
+
 
 	#area = np.pi * ( np.array(w))
 	#plt.cla()
@@ -85,9 +99,10 @@ if __name__ == '__main__':
 		
 		# Window
 		while True: 
-		   for event in pygame.event.get(): 
-			  if event.type == pygame.QUIT: 
-				  sys.exit(0) 
+			time.sleep(0.1)
+			for event in pygame.event.get(): 
+				if event.type == pygame.QUIT: 
+					sys.exit(0) 
 			  #else: 
 				  #print event 
 

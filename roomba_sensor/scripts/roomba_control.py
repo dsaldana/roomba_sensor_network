@@ -85,7 +85,7 @@ def img_callback(img):
 	#print "blancos ", pl/total , ",", pr/total
 	
 	sensedValue = (pl+pr) / total
-	print "sensedValue=", sensedValue
+	#print "sensedValue=", sensedValue
 
 def run():
 	######### Initialization ##################
@@ -170,8 +170,7 @@ def run():
 		d = 0.5
 		camX = robotX + d * cos(robotT)
 		camY = robotY + d * sin(robotT)
-		#print "robot", [robotX,robotY], " cam", [camX, camY]
-		print sensedValue
+		print "robot", [robotX,robotY], " cam", [camX, camY]," sv=",sensedValue
 
 		# Send the info to other robots.
 		smsg = SensedValue()
