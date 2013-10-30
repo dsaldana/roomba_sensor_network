@@ -11,10 +11,7 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 
-from math import sqrt
-from math import degrees
-from math import cos
-from math import sin
+from math import *
 import random
 
 # Gazebo
@@ -86,6 +83,14 @@ def img_callback(img):
 	
 	sensedValue = (pl+pr) / total
 	#print "sensedValue=", sensedValue
+
+def validateIndex(ni,nj,grid):
+	if(ni < 0 or ni >= len(grid)):
+		return False
+	if (nj < 0 or nj >= len(grid[0])):
+		return False
+	return True
+	
 
 def run():
 	######### Initialization ##################
@@ -227,12 +232,42 @@ def run():
 		partPub.publish(msg_parts)
 
 		##### Plan in grid ####
-		F = [[0 for x in xrange(gm)] for x in xrange(gn)]
+		F = [[-1 for i in xrange(gm)] for j in xrange(gn)]
+		D = [[-1 for i in xrange(gm)] for j in xrange(gn)]
+
 		# sensor position in grid
 		spi = int((camY - mapY1) / gdy)
 		spj = int((camX - mapX1) / gdx)
-
+		print "sensor pos", [spi, spj]
 		# BFS
+		D[spi][spj] = 0
+		
+		l = []
+		# The current position
+		l.append([spi, spj])
+	
+		while (len(l) > 0):
+			print "while",len(l)>0, l
+			[i,j] = l.pop(0)
+			# Possible movements[up, right, left, down]
+			mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
+
+			for [ni,nj] in mvs:
+				if validateIndex(ni,nj,grid):
+					# Not visited node
+					if (D[ni][nj] < 0):
+						D[ni][nj] = D[i][j] + 1
+						F[ni][nj] = grid[ni][nj] * exp( -D[ni][nj] / 10.0)						
+						l.append([ni, nj])
+
+			print " lll",len(l)
+		
+		print "fin while"	
+		
+
+		for c in D:	
+			print c
+		#print "F", F
 		
 
 		# Control
@@ -242,7 +277,7 @@ def run():
 		vel.angular.z = -0.750		
 		#velPub.publish(vel)
 
-		rospy.sleep(0.50)
+		rospy.sleep(5.50)
 
 
 if __name__ == '__main__':
