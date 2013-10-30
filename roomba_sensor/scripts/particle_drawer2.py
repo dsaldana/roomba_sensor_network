@@ -7,17 +7,17 @@ from geometry_msgs.msg import Point32
 
 # For plotting
 import numpy as np
-from Tkinter import *
+import sys
+import pygame
 
 
 # Window size
 width = 800
-height = 800
+height = 600
 
 # Window	
-master = Tk()
-wc = Canvas(master, width=width, height=height)
-wc.pack()
+pygame.init() 
+window = pygame.display.set_mode((width, height)) 
 
 # From roomba_cotrol
 mapX1 = -5.0
@@ -46,29 +46,38 @@ def callback(particles):
 		w[i] = particles.points[i].z
 		
 	# Draw the canvas
-	wc.create_rectangle(0, 0, width, height, fill="white")
-	wc.create_line(0, 0, width, height/2)
-	# Draw the particles
+	window.fill((255, 255, 255))
+	pygame.draw.line(window, (0, 0, 0), (0, 0), (width, height/2))
+	# margin
+	mx = width / 10
+	my = height / 10
+	# Draw the grid
+	
 
 
 	#area = np.pi * ( np.array(w))
 	#plt.cla()
 	#plt.scatter(np.array(x), np.array(y), s=area, alpha=0.5)	
 	#plt.draw()
-
+	
+	pygame.display.flip() 
 
 if __name__ == '__main__':
 	try:
 		# Node roombaControl
-		rospy.init_node('particle_drawer', anonymous=True)
-
+		rospy.init_node('particle_drawer', anonymous=True)		
 
 		# Suscribe
 		robotName = rospy.get_param('~robot_name', 'Robot1')
 		rospy.Subscriber("particles", Polygon, callback)
-
-		mainloop()
-
+		
+		# Window
+		while True: 
+		   for event in pygame.event.get(): 
+			  if event.type == pygame.QUIT: 
+				  sys.exit(0) 
+			  #else: 
+				  #print event 
 
 	except rospy.ROSInterruptException:
 		pass
