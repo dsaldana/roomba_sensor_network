@@ -187,7 +187,7 @@ def run():
 
 		# Move the particles
 		for p in particles:
-			mov = 0.3
+			mov = 0.2
 			# TODO change by a normal fuction
 			p.x = p.x + random.normalvariate(0, mov)
 			p.y = p.y + random.normalvariate(0, mov)
@@ -236,18 +236,27 @@ def run():
 		D = [[-1 for i in xrange(gm)] for j in xrange(gn)]
 
 		# sensor position in grid
+		print [camY,mapY1, gdy]
 		spi = int((camY - mapY1) / gdy)
 		spj = int((camX - mapX1) / gdx)
-		print "sensor pos", [spi, spj]
-		# BFS
+		
+		if(spi > gm-1):
+			spi = gm-1
+		if(spj > gn-1):
+			spj = gn-1
+		if(spi < 0):
+			spi = 0
+		if (spj < 0):
+			spj = 0
+
+		# BFS		
 		D[spi][spj] = 0
 		
 		l = []
 		# The current position
 		l.append([spi, spj])
 	
-		while (len(l) > 0):
-			print "while",len(l)>0, l
+		while (len(l) > 0):			
 			[i,j] = l.pop(0)
 			# Possible movements[up, right, left, down]
 			mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
@@ -257,27 +266,47 @@ def run():
 					# Not visited node
 					if (D[ni][nj] < 0):
 						D[ni][nj] = D[i][j] + 1
-						F[ni][nj] = grid[ni][nj] * exp( -D[ni][nj] / 10.0)						
+						F[ni][nj] = grid[ni][nj] * exp( -D[ni][nj])						
 						l.append([ni, nj])
+			
+		maxi=-1
+		maxj=-1
+		maxv=-1					
+		#for i in range(len(F)):
+		#	for j in range(len(F[0])):
+		#		if(F[i][j] > maxv):
+		#			maxi = i
+		#			maxj = j
+		#			maxv = F[i][j]
+		mvs = [[spi - 1, spj], [spi,spj+1], [spi, spj-1], [spi+1,spj]]
+		for [i,j] in mvs:
+			if validateIndex(i, j, grid) and F[i][j] > maxv:
+				maxi = i
+				maxj = j
+				maxv = F[i][j]
 
-			print " lll",len(l)
+		print "sensor", [spi, spj]," target=",[maxi, maxj]
+		#for c in F:	
+		#	print c
 		
-		print "fin while"	
-		
+		# Grid to coordinates
+		targetX =  mapX1 + gdx * maxj + gdx / 2
+		targetY =  mapY1 + gdy * maxi + gdy / 2
 
-		for c in D:	
-			print c
-		#print "F", F
-		
+
+		[targetX, targetY] = [3,3]
 
 		# Control
+		theta = atan((camY-targetY) / (camX-targetX))
+		print "from ",[camX, camY]," to ", [targetX, targetY]," vz=", degrees(theta-camY)," dif=", (camY-theta)
+
 		# TODO control states: explore, track, and
 		vel = Twist()
-		vel.linear.x = 0.500
-		vel.angular.z = -0.750		
+		vel.linear.x = 0
+		vel.angular.z = (camY-theta)/10
 		#velPub.publish(vel)
 
-		rospy.sleep(5.50)
+		rospy.sleep(0.50)
 
 
 if __name__ == '__main__':
