@@ -182,10 +182,10 @@ def run():
 
 		# Move the particles
 		for p in particles:
-			mov = 0.4
+			mov = 0.3
 			# TODO change by a normal fuction
-			p.x = p.x + mov * random.random() - mov / 2.0
-			p.y = p.y + mov * random.random() - mov / 2.0
+			p.x = p.x + random.normalvariate(0, mov)
+			p.y = p.y + random.normalvariate(0, mov)
 	
 
 		# Particle position in grid n rows and m columns
