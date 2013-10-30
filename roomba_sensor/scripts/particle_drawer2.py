@@ -47,13 +47,25 @@ def callback(particles):
 		
 	# Draw the canvas
 	window.fill((255, 255, 255))
-	pygame.draw.line(window, (0, 0, 0), (0, 0), (width, height/2))
-	# margin
-	mx = width / 10
-	my = height / 10
-	# Draw the grid
-	
 
+	# margin
+	mx = width / 10.0
+	my = height/ 10.0
+	# Draw the grid
+	dx = (width- 2.0 * mx) / gm
+	dy = (height - 2.0 * my) / gn
+
+	pygame.draw.line(window, (0, 0, 250), (mx, my), (width-mx, height-my))
+
+	# Draw rows
+	color = (150, 150, 150)
+	for i in range(gn + 1):
+		hr = my + i * dy
+		pygame.draw.line(window, color , (mx, hr ), (width-mx, hr))
+
+	for j in range(gm + 1):
+		hc = mx + j * dx
+		pygame.draw.line(window, color, ( hc ,my), (hc, height-my))
 
 	#area = np.pi * ( np.array(w))
 	#plt.cla()
