@@ -227,7 +227,15 @@ def run():
 		msg_parts.points = particles
 		partPub.publish(msg_parts)
 
+		##### Plan in grid ####
+		F = [[0 for x in xrange(gm)] for x in xrange(gn)]
+		# sensor position in grid
+		spi = int((camY - mapY1) / gdy)
+		spj = int((camX - mapX1) / gdx)
+
+		# BFS
 		
+
 		# Control
 		# TODO control states: explore, track, and
 		vel = Twist()
