@@ -21,7 +21,7 @@
         args="load cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
 
     <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
-    <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
+    <remap from="cmd_vel_mux/output" to="/$(arg robot_name)/commands/velocity"/>
   </node>
 
   <!-- Bumper/cliff to pointcloud -->
