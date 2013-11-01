@@ -188,9 +188,9 @@ def run():
 		# Move the particles
 		for p in particles:
 			mov = 0.2
-			# TODO change by a normal fuction
-			p.x = p.x + random.normalvariate(0, mov)
-			p.y = p.y + random.normalvariate(0, mov)
+			# Normal fuction
+			p.x = random.normalvariate(p.x, mov)
+			p.y = random.normalvariate(p.y, mov)
 	
 
 		# Particle position in grid n rows and m columns

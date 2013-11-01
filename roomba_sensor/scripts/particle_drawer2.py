@@ -76,7 +76,7 @@ def callback(particles):
 	# Draw the particles
 	pcolor = (255,0,0)
 	for i in range(N):
-		x2 = mx + (x[i] - mapX1) * ax / mapLX
+		x2 = mx + (-x[i] - mapX1) * ax / mapLX
 		y2 = my + (-y[i] - mapY1) * ay / mapLY
 		pygame.draw.circle(window, pcolor, (int(x2),int(y2)), 2, 0)
 

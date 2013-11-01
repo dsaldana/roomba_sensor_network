@@ -8,7 +8,7 @@
     <arg name="debug" value="false"/>
 
 	<!-- $(find turtlebot_ds)/worlds/simple.world -->
-    <arg name="world_name" value="$(find turtlebot_gazebo)/worlds/empty.world"/>
+    <arg name="world_name" value="$(find turtlebot_ds)/worlds/simple.world"/>
   </include>
   
 
@@ -22,7 +22,7 @@
 
 	  
   </group>
-  <!--
+ <!--
   <group ns="Robot2">
 	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
 	    <arg name="base" value="create"/>
@@ -59,12 +59,12 @@
 	  </node>
   </group>	
 
-  
+-->  
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="30.0" />
   </node>
   
-	-->
+
 
   <!-- TODO erase this Fake laser -->
   <node pkg="nodelet" type="nodelet" name="laserscan_nodelet_manager" args="manager"/>
