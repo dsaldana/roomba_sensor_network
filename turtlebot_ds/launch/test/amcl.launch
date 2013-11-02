@@ -1,0 +1,10 @@
+<launch>
+	
+		
+	  <include file="$(find turtlebot_navigation)/launch/amcl_demo.launch">
+	    <arg name="map_file" value="$(find turtlebot_ds)/maps/barracs.yaml"/>
+	  </include>
+
+	<group ns="Robot1">
+	</group>
+</launch>
