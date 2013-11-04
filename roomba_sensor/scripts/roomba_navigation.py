@@ -15,8 +15,8 @@ import gazebo_msgs.srv
 
 import copy
 
-#from roomba_sensor import Sensor
-import roomba_sensor.hello
+from roomba_sensor.sensor import Sensor
+#import roomba_sensor.hello
 
 goal = Point32()
 
@@ -26,8 +26,8 @@ def goal_callback(point):
 	print "new target ", goal
 
 def run():
-	#a = Sensor()
-	roomba_sensor.hello.say('my friend!')
+	a = Sensor()
+	#roomba_sensor.hello.say('my friend!')
 	return	
 	######### Initialization ##################
 	# Robot's name is an argument
