@@ -26,9 +26,10 @@ def goal_callback(point):
 	print "new target ", goal
 
 def run():
-	a = Sensor()
+	#a = Sensor()
+	#print a.p
 	#roomba_sensor.hello.say('my friend!')
-	return	
+		
 	######### Initialization ##################
 	# Robot's name is an argument
 	global robotName
@@ -43,7 +44,8 @@ def run():
 
 	print "wait for service"
 	rospy.wait_for_service('/gazebo/get_model_state')
-	
+	getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+
 	# Robot position
 	robotX = float("inf")
 	robotY = float("inf")
@@ -55,16 +57,34 @@ def run():
 			resp = getPosition(robotName,"world")
 			robotX = resp.pose.position.x
 			robotY = resp.pose.position.y
-			robotT = resp.pose.orientation.z
+			# the reference for the angle is the y axes.
+			robotT = resp.pose.orientation.z 
 			#print "position ", degrees(resp.pose.orientation.z)
 		except rospy.ServiceException, e:
 			print "Service call to gazebo failed: %s" %e
 
+		[sX, sY, sT] = [robotX, robotY, robotT]
 
+		# Orientation
+		x = goal.x - sX 
+		y = goal.y - sY
+		# the reference for the angle is the y axes.
+		t = atan(y/x)	
+		if x < 0:
+			t+= pi
+		if t > pi:
+			t-= 2*pi
+
+		print [x,y]
+		print [robotX, robotY, degrees( robotT)]
+		print "angle: ", degrees(t), " diff: ", degrees(t-robotT)
+		
 		vel = Twist()
 		vel.linear.x = 0
-		vel.angular.z = (camY-theta)/10
+		#vel.angular.z = (camY-theta)/10
 		#velPub.publish(vel)
+
+
 
 		rospy.sleep(0.50)
 
