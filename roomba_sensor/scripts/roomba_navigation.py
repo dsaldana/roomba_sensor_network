@@ -26,12 +26,11 @@ goal = Point32()
 goal.x=-1
 goal.y=-1
 
-def cut_angle(angle):	
-	#angle %= pi
+def cut_angle(angle):		
 	while angle > pi:
 		angle -= 2*pi
-	while -angle < -pi:
-		angle -= 2*pi
+	while angle < -pi:
+		angle += 2*pi
 	return angle
 
 
@@ -89,32 +88,24 @@ def run():
 		# Orientation
 		x = goal.x - sX 
 		y = goal.y - sY
-		# the reference for the angle is the y axes.
+		# the reference for the angle is the x axes.
 		t = atan(y/x) 
 		if  x < 0:
-			print "...."
 			t += pi
 		t = cut_angle(t)
 
-		#print [x,y], " to "
-
 		controlT = t - sT
-		controlT = cut_angle(controlT)
-	
-		#if controlT < 0:
-		#	controlT += 2*pi
-		#controlT = controlT%pi
-		#print controlT, " .", controlT%pi
-
-		print  [robotX, robotY, robotT]
- #		print "angle: ", degrees(t), " diff: ", degrees(sT)
+		controlT = cut_angle(controlT)		
 		
+		# Euclidean distance
+		d = sqrt(x*x + y*y)
+
+		print  "distance=",d," teta: ", degrees(controlT)
+
 		vel = Twist()
-		vel.linear.x = 0
+		vel.linear.x = d/5
 		vel.angular.z = (controlT) / 1
 		velPub.publish(vel)
-
-
 
 		rospy.sleep(0.50)
 
