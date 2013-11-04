@@ -19,6 +19,16 @@ from roomba_sensor.sensor import Sensor
 #import roomba_sensor.hello
 
 goal = Point32()
+goal.x=-1
+goal.y=-1
+
+def cut_angle(angle):	
+	if angle > pi:
+		angle -= 2*pi
+	if -angle < -pi:
+		angle += 2*pi
+	return angle
+
 
 def goal_callback(point):
 	global goal
@@ -26,6 +36,9 @@ def goal_callback(point):
 	print "new target ", goal
 
 def run():
+	# Node roomba navigation
+	rospy.init_node('roomba_navigation')
+
 	#a = Sensor()
 	#print a.p
 	#roomba_sensor.hello.say('my friend!')
@@ -58,7 +71,7 @@ def run():
 			robotX = resp.pose.position.x
 			robotY = resp.pose.position.y
 			# the reference for the angle is the y axes.
-			robotT = resp.pose.orientation.z 
+			robotT = resp.pose.orientation.z * pi
 			#print "position ", degrees(resp.pose.orientation.z)
 		except rospy.ServiceException, e:
 			print "Service call to gazebo failed: %s" %e
@@ -69,20 +82,25 @@ def run():
 		x = goal.x - sX 
 		y = goal.y - sY
 		# the reference for the angle is the y axes.
-		t = atan(y/x)	
-		if x < 0:
-			t+= pi
-		if t > pi:
-			t-= 2*pi
+		t = atan(y/x) 
+		#if (y<0):
+		#	t += pi
+		t = cut_angle(t)
 
+		
 		print [x,y]
-		print [robotX, robotY, degrees( robotT)]
-		print "angle: ", degrees(t), " diff: ", degrees(t-robotT)
+		controlT = t - robotT
+		controlT = cut_angle(controlT)
+	
+		#if controlT < 0:
+		#	controlT += 2*pi
+
+		print "angle: ", degrees(t), " diff: ", degrees(controlT)
 		
 		vel = Twist()
 		vel.linear.x = 0
-		#vel.angular.z = (camY-theta)/10
-		#velPub.publish(vel)
+		vel.angular.z = (controlT) / 3
+		velPub.publish(vel)
 
 
 
