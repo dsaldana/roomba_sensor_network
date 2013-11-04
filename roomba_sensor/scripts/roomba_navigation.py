@@ -10,6 +10,10 @@ from roomba_comm.msg import SensedValue
 from math import *
 import random
 
+import tf
+from tf.transformations import euler_from_quaternion
+
+
 # Gazebo
 import gazebo_msgs.srv
 
@@ -23,10 +27,11 @@ goal.x=-1
 goal.y=-1
 
 def cut_angle(angle):	
-	if angle > pi:
+	#angle %= pi
+	while angle > pi:
 		angle -= 2*pi
-	if -angle < -pi:
-		angle += 2*pi
+	while -angle < -pi:
+		angle -= 2*pi
 	return angle
 
 
@@ -70,9 +75,12 @@ def run():
 			resp = getPosition(robotName,"world")
 			robotX = resp.pose.position.x
 			robotY = resp.pose.position.y
-			# the reference for the angle is the y axes.
-			robotT = resp.pose.orientation.z 
-			print "position ", (resp.pose.orientation)
+			# the reference for the angle is the y axes.			
+			quat=[resp.pose.orientation.w, resp.pose.orientation.x,resp.pose.orientation.y,resp.pose.orientation.z]
+			euler = euler_from_quaternion(quat)
+			robotT =  cut_angle(-euler[0] + pi)
+
+
 		except rospy.ServiceException, e:
 			print "Service call to gazebo failed: %s" %e
 
@@ -83,25 +91,28 @@ def run():
 		y = goal.y - sY
 		# the reference for the angle is the y axes.
 		t = atan(y/x) 
-		if  x<0:
+		if  x < 0:
 			print "...."
 			t += pi
 		t = cut_angle(t)
 
 		#print [x,y], " to "
 
-		controlT = t - robotT
+		controlT = t - sT
 		controlT = cut_angle(controlT)
 	
 		#if controlT < 0:
 		#	controlT += 2*pi
+		#controlT = controlT%pi
+		#print controlT, " .", controlT%pi
 
-		#print "angle: ", degrees(t), " diff: ", degrees(controlT)
+		print  [robotX, robotY, robotT]
+ #		print "angle: ", degrees(t), " diff: ", degrees(sT)
 		
 		vel = Twist()
 		vel.linear.x = 0
-		vel.angular.z = (controlT) / 3
-		#velPub.publish(vel)
+		vel.angular.z = (controlT) / 1
+		velPub.publish(vel)
 
 
 
