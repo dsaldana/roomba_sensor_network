@@ -100,7 +100,7 @@ def run():
 	# Robot's name is an argument
 	global robotName
 	robotName = rospy.get_param('~robot_name', 'Robot1')
-	print robotName
+	#print robotName
 
 	# Create the Publisher to control the robot.
 	topicName = "/" + robotName + "/commands/velocity"
@@ -156,12 +156,11 @@ def run():
 	rospy.wait_for_service('/gazebo/get_model_state')
 	getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
 
+
 	######## Control Loop ###########
 	print "Start!"
 	while not rospy.is_shutdown():
-		# Robot position
-		robotX = float("inf")
-		robotY = float("inf")
+		# Get robot position from gazebo
 		try:			
 			resp = getPosition(robotName,"world")
 			robotX = resp.pose.position.x
