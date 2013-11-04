@@ -71,8 +71,8 @@ def run():
 			robotX = resp.pose.position.x
 			robotY = resp.pose.position.y
 			# the reference for the angle is the y axes.
-			robotT = resp.pose.orientation.z * pi
-			#print "position ", degrees(resp.pose.orientation.z)
+			robotT = resp.pose.orientation.z 
+			print "position ", (resp.pose.orientation)
 		except rospy.ServiceException, e:
 			print "Service call to gazebo failed: %s" %e
 
@@ -83,24 +83,25 @@ def run():
 		y = goal.y - sY
 		# the reference for the angle is the y axes.
 		t = atan(y/x) 
-		#if (y<0):
-		#	t += pi
+		if  x<0:
+			print "...."
+			t += pi
 		t = cut_angle(t)
 
-		
-		print [x,y]
+		#print [x,y], " to "
+
 		controlT = t - robotT
 		controlT = cut_angle(controlT)
 	
 		#if controlT < 0:
 		#	controlT += 2*pi
 
-		print "angle: ", degrees(t), " diff: ", degrees(controlT)
+		#print "angle: ", degrees(t), " diff: ", degrees(controlT)
 		
 		vel = Twist()
 		vel.linear.x = 0
 		vel.angular.z = (controlT) / 3
-		velPub.publish(vel)
+		#velPub.publish(vel)
 
 
 
