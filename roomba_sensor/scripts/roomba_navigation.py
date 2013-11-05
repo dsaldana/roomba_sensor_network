@@ -11,7 +11,7 @@ from math import *
 import random
 
 import tf
-from tf.transformations import euler_from_quaternion
+
 
 
 # Gazebo
@@ -20,18 +20,13 @@ import gazebo_msgs.srv
 import copy
 
 from roomba_sensor.sensor import Sensor
-#import roomba_sensor.hello
+from roomba_sensor.roomba import RoombaGazebo
+from roomba_sensor.util import cut_angle
 
 goal = Point32()
-goal.x=-1
-goal.y=-1
+goal.x = -1
+goal.y = -1
 
-def cut_angle(angle):		
-	while angle > pi:
-		angle -= 2*pi
-	while angle < -pi:
-		angle += 2*pi
-	return angle
 
 
 def goal_callback(point):
@@ -59,31 +54,15 @@ def run():
 	topicName = "/" + robotName + "/goal"
 	rospy.Subscriber(topicName, Point32, goal_callback)
 
-	print "wait for service"
-	rospy.wait_for_service('/gazebo/get_model_state')
-	getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+	# Object to get information from Gazebo
+	robot = RoombaGazebo(robotName)
 
-	# Robot position
-	robotX = float("inf")
-	robotY = float("inf")
 
 	######## Control Loop ###########
 	print "Start!"
 	while not rospy.is_shutdown():
-		try:			
-			resp = getPosition(robotName,"world")
-			robotX = resp.pose.position.x
-			robotY = resp.pose.position.y
-			# the reference for the angle is the y axes.			
-			quat=[resp.pose.orientation.w, resp.pose.orientation.x,resp.pose.orientation.y,resp.pose.orientation.z]
-			euler = euler_from_quaternion(quat)
-			robotT =  cut_angle(-euler[0] + pi)
 
-
-		except rospy.ServiceException, e:
-			print "Service call to gazebo failed: %s" %e
-
-		[sX, sY, sT] = [robotX, robotY, robotT]
+		[sX, sY, sT] = robot.getPosition()
 
 		# Orientation
 		x = goal.x - sX 
