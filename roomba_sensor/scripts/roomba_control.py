@@ -119,6 +119,9 @@ def run():
 	# Sensor's publisher
 	sensorPub = rospy.Publisher("robotCom", SensedValue)
 
+	# Goal Navigator
+	navPub = rospy.Publisher("/" + robotName + "/goal", Point32)
+
 	########## Initialize Particles ##############
 	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
 	mapX1 = -5.0
@@ -186,7 +189,7 @@ def run():
 
 		# Move the particles
 		for p in particles:
-			mov = 0.2
+			mov = 0.1
 			# Normal fuction
 			p.x = random.normalvariate(p.x, mov)
 			p.y = random.normalvariate(p.y, mov)
@@ -235,7 +238,7 @@ def run():
 		D = [[-1 for i in xrange(gm)] for j in xrange(gn)]
 
 		# sensor position in grid
-		print [camY,mapY1, gdy]
+		# print [camY,mapY1, gdy]
 		spi = int((camY - mapY1) / gdy)
 		spj = int((camX - mapX1) / gdx)
 		
@@ -268,9 +271,9 @@ def run():
 						F[ni][nj] = grid[ni][nj] * exp( -D[ni][nj])						
 						l.append([ni, nj])
 			
-		maxi=-1
-		maxj=-1
-		maxv=-1					
+		maxi =- 1
+		maxj =- 1
+		maxv =- 1					
 		#for i in range(len(F)):
 		#	for j in range(len(F[0])):
 		#		if(F[i][j] > maxv):
@@ -284,7 +287,7 @@ def run():
 				maxj = j
 				maxv = F[i][j]
 
-		print "sensor", [spi, spj]," target=",[maxi, maxj]
+		# print "sensor", [spi, spj]," target=",[maxi, maxj]
 		#for c in F:	
 		#	print c
 		
@@ -293,17 +296,23 @@ def run():
 		targetY =  mapY1 + gdy * maxi + gdy / 2
 
 
-		[targetX, targetY] = [3,3]
+		#[targetX, targetY] = [3.0, 3.0]
 
 		# Control
 		theta = atan((camY-targetY) / (camX-targetX))
 		print "from ",[camX, camY]," to ", [targetX, targetY]," vz=", degrees(theta-camY)," dif=", (camY-theta)
 
 		# TODO control states: explore, track, and
-		vel = Twist()
-		vel.linear.x = 0
-		vel.angular.z = (camY-theta)/10
+		# vel = Twist()
+		# vel.linear.x = 0
+		# vel.angular.z = (camY-theta)/10
 		#velPub.publish(vel)
+		p = Point32()
+		# Grid to cartesian plane.
+		p.x = targetX
+		p.y = targetY
+
+		navPub.publish(p)
 
 		rospy.sleep(0.50)
 

@@ -37,7 +37,7 @@ def cut_angle(angle):
 def goal_callback(point):
 	global goal
 	goal = point
-	print "new target ", goal
+	print "new target ", [goal.x, goal.y]
 
 def run():
 	# Node roomba navigation
@@ -57,7 +57,7 @@ def run():
 	velPub = rospy.Publisher(topicName, Twist)
 		
 	topicName = "/" + robotName + "/goal"
-	image_sub = rospy.Subscriber(topicName, Point32, goal_callback)
+	rospy.Subscriber(topicName, Point32, goal_callback)
 
 	print "wait for service"
 	rospy.wait_for_service('/gazebo/get_model_state')
@@ -103,7 +103,7 @@ def run():
 		print  "distance=",d," teta: ", degrees(controlT)
 
 		vel = Twist()
-		vel.linear.x = d/5
+		vel.linear.x = d / 5
 		vel.angular.z = (controlT) / 1
 		velPub.publish(vel)
 
