@@ -10,13 +10,6 @@ from roomba_comm.msg import SensedValue
 from math import *
 import random
 
-import tf
-
-
-
-# Gazebo
-import gazebo_msgs.srv
-
 import copy
 
 from roomba_sensor.sensor import Sensor

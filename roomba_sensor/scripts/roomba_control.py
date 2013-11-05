@@ -15,7 +15,8 @@ from math import *
 import random
 
 # Gazebo
-import gazebo_msgs.srv
+from roomba_sensor.roomba import RoombaGazebo
+
 
 import copy
 
@@ -48,7 +49,7 @@ def resample(particles):
 		rp[i] = copy.deepcopy(particles[index])	
 
 	for p in rp:
-		p.z /=mx
+		p.z /= mx
 	return rp
 
 def robot_comm(msg):
@@ -153,30 +154,21 @@ def run():
 
 	############ End Particle initialization #####
 
-	# Wait while the world is totally spawned.
-	#rospy.sleep(5.0)
-	print "wait for service"
-	rospy.wait_for_service('/gazebo/get_model_state')
-	getPosition = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+	# Object to get information from Gazebo
+	robot = RoombaGazebo(robotName)
+	
 
 
 	######## Control Loop ###########
 	print "Start!"
 	while not rospy.is_shutdown():
 		# Get robot position from gazebo
-		try:			
-			resp = getPosition(robotName,"world")
-			robotX = resp.pose.position.x
-			robotY = resp.pose.position.y
-			robotT = resp.pose.orientation.z
-			#print "position ", degrees(resp.pose.orientation.z)
-		except rospy.ServiceException, e:
-			print "Service call to gazebo failed: %s" %e
+		[robotX, robotY, robotT] = robot.getPosition()
 
-		# Camera area
-		d = 0.5
-		camX = robotX + d * cos(robotT)
-		camY = robotY + d * sin(robotT)
+		# Camera position
+		[camX, camY, camT] = robot.getSensorPosition()
+
+		
 		print "robot", [robotX,robotY], " cam", [camX, camY]," sv=",sensedValue
 
 		# Send the info to other robots.

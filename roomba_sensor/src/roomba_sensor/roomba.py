@@ -7,16 +7,18 @@ from tf.transformations import euler_from_quaternion
 
 from math import *
 from roomba_sensor.util import cut_angle
-import math
+
 
 class RoombaGazebo:
+	# Distance from robot to camera.
+	d = 0.5
 	
-	positionServer = None
-	robotName = None
+
 
 	def __init__(self, robotName):
 		print "RoombaGazebo"
 		self.robotName = robotName
+		self.positionServer = None
 		self.load()
 
 
@@ -38,7 +40,7 @@ class RoombaGazebo:
 				resp.pose.orientation.z]
 
 			euler = euler_from_quaternion(quat)
-			robotT =  cut_angle(-euler[0] + math.pi)
+			robotT =  cut_angle(-euler[0] + pi)
 
 			return [robotX, robotY, robotT]
 
@@ -46,6 +48,14 @@ class RoombaGazebo:
 			print "Service call to gazebo failed: %s" %e
 
 
+	def getSensorPosition(self):
+		[robotX, robotY, robotT] = self.getPosition()
+
+		camX = robotX + self.d * cos(robotT)
+		camY = robotY + self.d * sin(robotT)
+
+		return [camX, camY, robotT]
+		
 
 
 
