@@ -18,7 +18,7 @@ from roomba_sensor.map import *
 from math import *
 
 # Window size
-width = 800
+width = 750
 height = 600
 
 # Window	
@@ -43,8 +43,8 @@ def callback(particles):
 	window.fill((255, 255, 255))
 
 	# margin
-	mx = width / 10.0
-	my = height / 10.0
+	mx = width / 12.0
+	my = height / 12.0
 	# Draw the grid
 	ax = width - 2.0 * mx # area for x
 	ay = height - 2.0 * my # area for y
@@ -88,10 +88,6 @@ def callback(particles):
 		(x2, y2),
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
 
-	#area = np.pi * ( np.array(w))
-	#plt.cla()
-	#plt.scatter(np.array(x), np.array(y), s=area, alpha=0.5)	
-	#plt.draw()
 	
 	pygame.display.flip() 
 
