@@ -23,7 +23,12 @@ from roomba_sensor.map import *
 
 
 
+# Sensed value by the camera
 sensedValue = 0
+# How many white pixels in the left
+sensedLeft = 0
+# How many white pixels in the right
+sensedRight = 0
 
 robotName = "r0"
 
@@ -39,6 +44,8 @@ def robot_comm(msg):
 # Callback for camera sensor.
 def img_callback(img):
 	global sensedValue	
+	global sensedRight
+	global sensedRight
 	#OpenCV matrix
 	mat = CvBridge().imgmsg_to_cv(img, "mono8")
 	
@@ -57,8 +64,10 @@ def img_callback(img):
 	
 	total = mat.rows * mat.cols * 1.0	
 	sensedValue = (pl + pr) / total
+	sensedLeft = (pl * 2) / total
+	sensedRight = (pr * 2) / total
 	
-
+# Validate if one position in grid is valid.
 def validateIndex(ni, nj, grid):
 	if(ni < 0 or ni >= len(grid)):
 		return False
@@ -161,49 +170,66 @@ def run():
 		if (spj < 0):
 			spj = 0
 
-		##### Planning: Bread First Search #########
-		D[spi][spj] = 0
+
+
+		# Where to navigate
+		goalX = None
+		goalY = None
+
+		######## Exploring #############
+		if (sensedValue == 0.0):
+			# Planning: Bread First Search #
+			D[spi][spj] = 0
+			
+			l = []
+			# The current position
+			l.append([spi, spj])
 		
-		l = []
-		# The current position
-		l.append([spi, spj])
-	
-		while (len(l) > 0):			
-			[i,j] = l.pop(0)
-			# Possible movements[up, right, left, down]
-			mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
+			while (len(l) > 0):			
+				[i,j] = l.pop(0)
+				# Possible movements[up, right, left, down]
+				mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
 
-			for [ni,nj] in mvs:
-				if validateIndex(ni,nj,grid):
-					# Not visited node
-					if (D[ni][nj] < 0):
-						D[ni][nj] = D[i][j] + 1
-						F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
-						l.append([ni, nj])
-		
-		# Find maximum force in grid
-		maxi = -1
-		maxj = -1
-		maxv = -1					
+				for [ni,nj] in mvs:
+					if validateIndex(ni,nj,grid):
+						# Not visited node
+						if (D[ni][nj] < 0):
+							D[ni][nj] = D[i][j] + 1
+							F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
+							l.append([ni, nj])
+			
+			# Find maximum force in grid
+			maxi = -1
+			maxj = -1
+			maxv = -1					
 
-		mvs = [[spi - 1, spj], [spi,spj+1], [spi, spj-1], [spi+1,spj]]
-		for [i,j] in mvs:
-			if validateIndex(i, j, grid) and F[i][j] > maxv:
-				maxi = i
-				maxj = j
-				maxv = F[i][j]
+			mvs = [[spi - 1, spj], [spi,spj+1], [spi, spj-1], [spi+1,spj]]
+			for [i,j] in mvs:
+				if validateIndex(i, j, grid) and F[i][j] > maxv:
+					maxi = i
+					maxj = j
+					maxv = F[i][j]
 
 
-		
-		# Grid to coordinates
-		targetX =  mapX1 + gdx * maxj + gdx / 2
-		targetY =  mapY1 + gdy * maxi + gdy / 2
+			
+			# Grid to coordinates
+			goalX =  mapX1 + gdx * maxj + gdx / 2
+			goalY =  mapY1 + gdy * maxi + gdy / 2
 
+		else:
+			######## Tracking ############
+			da = 0.5
+			alpha = pi / 20
+			controlP = (sensedLeft - 1) - sensedRight
 
+			goalX = robotX + da * cos(alpha * controlP)
+			goalY = robotY + da * sin(alpha * controlP)
+			print "From ",[robotX,robotY], " to ", [goalX, goalY]," ",[controlP, alpha * controlP]
 
+		# Publish goal to navigate
 		p = Point32()
-		p.x = targetX
-		p.y = targetY
+		p.x = goalX
+		p.y = goalY
 		navPub.publish(p)
 
 		rospy.sleep(0.1)

@@ -40,8 +40,7 @@ class ParticleFilter:
 			p.y = random.normalvariate(p.y, self.sd_mov)
 
 
-	def resample(self):
-		print "resampling..."
+	def resample(self):		
 				
 		index =  int(random.random() * self.N)
 		
