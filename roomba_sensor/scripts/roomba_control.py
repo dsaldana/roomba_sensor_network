@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
+from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
@@ -23,12 +24,17 @@ from roomba_sensor.map import *
 
 
 
+# Sensed value by the camera
 sensedValue = 0
+# How many white pixels in the left
+sensedLeft = 0
+# How many white pixels in the right
+sensedRight = 0
 
 robotName = "r0"
 
 
-
+# Callback for robot communication.
 def robot_comm(msg):
 	# Message from the same robot
 	if (msg.robot_id == robotName):
@@ -36,10 +42,11 @@ def robot_comm(msg):
 	# Update a list of values
 	print msg
 
-
+# Callback for camera sensor.
 def img_callback(img):
-	global sensedValue
-	#print "image", img.height, "x", img.width," ", len(img.data)," enc=",img.encoding, " step=",img.step
+	global sensedValue	
+	global sensedRight
+	global sensedRight
 	#OpenCV matrix
 	mat = CvBridge().imgmsg_to_cv(img, "mono8")
 	
@@ -56,12 +63,12 @@ def img_callback(img):
 			if(mat[i, j] > 230):
 				pr += 1
 	
-	total = mat.rows * mat.cols * 1.0
-	#print "blancos ", pl/total , ",", pr/total
+	total = mat.rows * mat.cols * 1.0	
+	sensedValue = (pl + pr) / total
+	sensedLeft = (pl * 2) / total
+	sensedRight = (pr * 2) / total
 	
-	sensedValue = (pl+pr) / total
-	#print "sensedValue=", sensedValue
-
+# Validate if one position in grid is valid.
 def validateIndex(ni, nj, grid):
 	if(ni < 0 or ni >= len(grid)):
 		return False
@@ -99,13 +106,11 @@ def run():
 
 	# Goal Navigator
 	navPub = rospy.Publisher("/" + robotName + "/goal", Point32)
+	# Tracker navigator
+	trackPub = rospy.Publisher("/" + robotName + "/tracking", Float32)
 
-	########## Initialize Particles ##############
-
-	pf = ParticleFilter()
-		
-
-	############ End Particle initialization #####
+	# Initialize Particles 
+	pf = ParticleFilter()		
 
 	# Object to get information from Gazebo
 	robot = RoombaGazebo(robotName)
@@ -120,8 +125,7 @@ def run():
 
 		# Camera position
 		[camX, camY, camT] = robot.getSensorPosition()
-		
-		#print "robot", [robotX,robotY], " cam", [camX, camY]," sv=", sensedValue
+				
 
 		# Send the info to other robots.
 		smsg = SensedValue()
@@ -131,38 +135,21 @@ def run():
 		smsg.value = sensedValue
 		sensorPub.publish(smsg)
 
-		# Move the particles simulation the anomaly's dynamics
+		# Particle filter: move the particles for simulating the anomaly's dynamics
 		pf.move_particles()
 	
-
-
 		
-
+		# Particle filter: updade based on sensor value.
 		pf.update_particles([[camX, camY, sensedValue]])
-		# # Update particles
-		# for p in particles:
-		# 	# If the particles in the robot area.
-		# 	r = 0.5 # radio to cover
-		# 	if sqrt((camX - p.x)**2 + (camY - p.y)**2) < r:
-		# 		if(sensedValue == 0):
-		# 			p.z *= 0.1
-		# 		else:
-		# 			# If the anomaly was sensed
-		# 			p.z *= 1.1 * sensedValue 
-				
-		# 		#print "lugar errado da particula",p.z
-		# 	if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
-		# 		p.z = p.z * 0.1
-
+		
+		# Get a matrix with the number of particles for each cell.
 		grid = pf.particles_in_grid()
 			
 
-		# Resampling
+		# Particle filter: Resampling.
 		pf.resample()
 		
-		#for r in grid:
-		#	print r
-		
+
 
 		# Publish particles
 		msg_parts = Polygon()
@@ -173,8 +160,7 @@ def run():
 		F = [[-1 for i in xrange(gm)] for j in xrange(gn)]
 		D = [[-1 for i in xrange(gm)] for j in xrange(gn)]
 
-		# sensor position in grid
-		# print [camY,mapY1, gdy]
+		# Convert sensor position to grid cell
 		spi = int((camY - mapY1) / gdy)
 		spj = int((camX - mapX1) / gdx)
 		
@@ -187,72 +173,68 @@ def run():
 		if (spj < 0):
 			spj = 0
 
-		# BFS		
-		D[spi][spj] = 0
-		
-		l = []
-		# The current position
-		l.append([spi, spj])
-	
-		while (len(l) > 0):			
-			[i,j] = l.pop(0)
-			# Possible movements[up, right, left, down]
-			mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
 
-			for [ni,nj] in mvs:
-				if validateIndex(ni,nj,grid):
-					# Not visited node
-					if (D[ni][nj] < 0):
-						D[ni][nj] = D[i][j] + 1
-						F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
-						l.append([ni, nj])
+
+		# Where to navigate
+		goalX = None
+		goalY = None
+
+		######## Exploring #############
+		if (sensedValue == 0):
+			# Planning: Bread First Search #
+			D[spi][spj] = 0
 			
-		maxi = -1
-		maxj = -1
-		maxv = -1					
-		#for i in range(len(F)):
-		#	for j in range(len(F[0])):
-		#		if(F[i][j] > maxv):
-		#			maxi = i
-		#			maxj = j
-		#			maxv = F[i][j]
-		mvs = [[spi - 1, spj], [spi,spj+1], [spi, spj-1], [spi+1,spj]]
-		for [i,j] in mvs:
-			if validateIndex(i, j, grid) and F[i][j] > maxv:
-				maxi = i
-				maxj = j
-				maxv = F[i][j]
-
-		# print "sensor", [spi, spj]," target=",[maxi, maxj]
-		#for c in F:	
-		#	print c
+			l = []
+			# The current position
+			l.append([spi, spj])
 		
-		# Grid to coordinates
-		targetX =  mapX1 + gdx * maxj + gdx / 2
-		targetY =  mapY1 + gdy * maxi + gdy / 2
+			while (len(l) > 0):			
+				[i,j] = l.pop(0)
+				# Possible movements[up, right, left, down]
+				mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
+
+				for [ni,nj] in mvs:
+					if validateIndex(ni,nj,grid):
+						# Not visited node
+						if (D[ni][nj] < 0):
+							D[ni][nj] = D[i][j] + 1
+							F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
+							l.append([ni, nj])
+			
+			# Find maximum force in grid
+			maxi = -1
+			maxj = -1
+			maxv = -1					
+
+			mvs = [[spi - 1, spj], [spi,spj+1], [spi, spj-1], [spi+1,spj]]
+			for [i,j] in mvs:
+				if validateIndex(i, j, grid) and F[i][j] > maxv:
+					maxi = i
+					maxj = j
+					maxv = F[i][j]
 
 
-		#[targetX, targetY] = [3.0, 3.0]
+			
+			# Grid to coordinates
+			goalX =  mapX1 + gdx * maxj + gdx / 2
+			goalY =  mapY1 + gdy * maxi + gdy / 2
 
-		# Control
-		theta = atan((camY-targetY) / (camX - targetX))
-		#print "from ",[camX, camY]," to ", [targetX, targetY]," vz=",
-		#	 degrees(theta-camY)," dif=", (camY-theta)
-		print "goal ", [targetX, targetY], " F=", F[maxi][maxj]," em ", [maxi,maxj]
+			# Publish goal to navigate
+			p = Point32()
+			p.x = goalX
+			p.y = goalY
+			navPub.publish(p)
 
-		# TODO control states: explore, track, and
-		# vel = Twist()
-		# vel.linear.x = 0
-		# vel.angular.z = (camY-theta)/10
-		#velPub.publish(vel)
-		p = Point32()
-		# Grid to cartesian plane.
-		p.x = targetX
-		p.y = targetY
+		else:
+			######## Tracking ############
+			da = 0.5
+			alpha = pi 
+			controlP = (sensedLeft - 1) + sensedRight
+			print "control", controlP
+			trackPub.publish(controlP)
 
-		navPub.publish(p)
 
-		rospy.sleep(0.50)
+		rospy.sleep(0.1)
 
 
 if __name__ == '__main__':

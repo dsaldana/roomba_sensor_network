@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
+from std_msgs.msg import Float32
+
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
@@ -20,12 +22,22 @@ goal = Point32()
 goal.x = -1
 goal.y = -1
 
+# state
+traking = False
 
+def tracking_callback(sensedData):
+	global traking
+	global sensedValue
+	sensedValue = sensedData
+	traking = True
+	print "Tracking ", sensedValue
 
 def goal_callback(point):
 	global goal
+	global traking
+	traking = False
 	goal = point
-	print "new target ", [goal.x, goal.y]
+	print "new goal ", [goal.x, goal.y]
 
 def run():
 	# Node roomba navigation
@@ -47,6 +59,10 @@ def run():
 	topicName = "/" + robotName + "/goal"
 	rospy.Subscriber(topicName, Point32, goal_callback)
 
+	# Tracking callback
+	topicName = "/" + robotName + "/tracking"
+	rospy.Subscriber(topicName, Float32, tracking_callback)
+
 	# Object to get information from Gazebo
 	robot = RoombaGazebo(robotName)
 
@@ -54,32 +70,44 @@ def run():
 	######## Control Loop ###########
 	print "Start!"
 	while not rospy.is_shutdown():
-
-		[sX, sY, sT] = robot.getPosition()
-
-		# Orientation
-		x = goal.x - sX 
-		y = goal.y - sY
-		# the reference for the angle is the x axes.
-		t = atan(y/x) 
-		if  x < 0:
-			t += pi
-		t = cut_angle(t)
-
-		controlT = t - sT
-		controlT = cut_angle(controlT)		
 		
-		# Euclidean distance
-		d = sqrt(x*x + y*y)
+		if(traking):
+			### Tracking ###
+			lin_vel = 0.3
+			max_angle = pi / 3
 
-		print  "distance=",d," teta: ", degrees(controlT)
+			vel = Twist()
+			vel.linear.x = lin_vel
+			vel.angular.z = sensedValue.data * max_angle
+			velPub.publish(vel)
 
-		vel = Twist()
-		vel.linear.x = d / 5
-		vel.angular.z = (controlT) / 1
-		velPub.publish(vel)
+		else:
+			### Navigate ###
+			[sX, sY, sT] = robot.getPosition()
 
-		rospy.sleep(0.50)
+			# Orientation
+			x = goal.x - sX 
+			y = goal.y - sY
+			# the reference for the angle is the x axes.
+			t = atan(y / x) 
+			if  x < 0:
+				t += pi
+			t = cut_angle(t)
+
+			controlT = t - sT
+			controlT = cut_angle(controlT)		
+			
+			# Euclidean distance
+			d = sqrt(x*x + y*y)
+
+			print  "distance=",d," teta: ", degrees(controlT)
+
+			vel = Twist()
+			vel.linear.x = d / 5
+			vel.angular.z = (controlT) / 1
+			velPub.publish(vel)
+
+		rospy.sleep(0.20)
 
 
 if __name__ == '__main__':
