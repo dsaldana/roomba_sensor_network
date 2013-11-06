@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import rospy
 from std_msgs.msg import String
+from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
@@ -105,6 +106,8 @@ def run():
 
 	# Goal Navigator
 	navPub = rospy.Publisher("/" + robotName + "/goal", Point32)
+	# Tracker navigator
+	trackPub = rospy.Publisher("/" + robotName + "/tracking", Float32)
 
 	# Initialize Particles 
 	pf = ParticleFilter()		
@@ -177,7 +180,7 @@ def run():
 		goalY = None
 
 		######## Exploring #############
-		if (sensedValue == 0.0):
+		if (sensedValue == 0):
 			# Planning: Bread First Search #
 			D[spi][spj] = 0
 			
@@ -216,21 +219,20 @@ def run():
 			goalX =  mapX1 + gdx * maxj + gdx / 2
 			goalY =  mapY1 + gdy * maxi + gdy / 2
 
+			# Publish goal to navigate
+			p = Point32()
+			p.x = goalX
+			p.y = goalY
+			navPub.publish(p)
+
 		else:
 			######## Tracking ############
 			da = 0.5
-			alpha = pi / 20
-			controlP = (sensedLeft - 1) - sensedRight
+			alpha = pi 
+			controlP = (sensedLeft - 1) + sensedRight
+			print "control", controlP
+			trackPub.publish(controlP)
 
-			goalX = robotX + da * cos(alpha * controlP)
-			goalY = robotY + da * sin(alpha * controlP)
-			print "From ",[robotX,robotY], " to ", [goalX, goalY]," ",[controlP, alpha * controlP]
-
-		# Publish goal to navigate
-		p = Point32()
-		p.x = goalX
-		p.y = goalY
-		navPub.publish(p)
 
 		rospy.sleep(0.1)
 
