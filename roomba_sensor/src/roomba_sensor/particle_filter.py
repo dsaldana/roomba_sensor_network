@@ -13,7 +13,7 @@ class ParticleFilter:
 	N = 5000
 
 	# Particle movement (standard deviation)
-	sd_mov = 0.1
+	sd_mov = 0.05
 
 	# radio to cover
 	r = 0.5

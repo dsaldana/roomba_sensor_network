@@ -120,9 +120,8 @@ def run():
 
 		# Camera position
 		[camX, camY, camT] = robot.getSensorPosition()
-
 		
-		print "robot", [robotX,robotY], " cam", [camX, camY]," sv=", sensedValue
+		#print "robot", [robotX,robotY], " cam", [camX, camY]," sv=", sensedValue
 
 		# Send the info to other robots.
 		smsg = SensedValue()
@@ -205,7 +204,7 @@ def run():
 					# Not visited node
 					if (D[ni][nj] < 0):
 						D[ni][nj] = D[i][j] + 1
-						F[ni][nj] = grid[ni][nj] * exp( -D[ni][nj])						
+						F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
 						l.append([ni, nj])
 			
 		maxi = -1
@@ -237,7 +236,9 @@ def run():
 
 		# Control
 		theta = atan((camY-targetY) / (camX - targetX))
-		print "from ",[camX, camY]," to ", [targetX, targetY]," vz=", degrees(theta-camY)," dif=", (camY-theta)
+		#print "from ",[camX, camY]," to ", [targetX, targetY]," vz=",
+		#	 degrees(theta-camY)," dif=", (camY-theta)
+		print "goal ", [targetX, targetY], " F=", F[maxi][maxj]," em ", [maxi,maxj]
 
 		# TODO control states: explore, track, and
 		# vel = Twist()

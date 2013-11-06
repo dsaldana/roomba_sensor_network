@@ -7,7 +7,7 @@ mapY2 = 5.0
 mapLX = mapX2 - mapX1
 mapLY = mapY2 - mapY1
 # Grid size		
-gn = 20 # Number of rows
+gn = 10 # Number of rows
 gdx = mapLX / gn # delta x
-gm = 20 # Number of columns
+gm = 10 # Number of columns
 gdy = mapLY / gm # delta y

@@ -72,13 +72,13 @@ def callback(particles):
 	# Draw the particles
 	pcolor = (255,0,0)
 	for i in range(N):
-		x2 = mx + (-x[i] - mapX1) * ax / mapLX
+		x2 = mx + (x[i] - mapX1) * ax / mapLX
 		y2 = my + (-y[i] - mapY1) * ay / mapLY
 		pygame.draw.circle(window, pcolor, (int(x2), int(y2)), 2, 0)
 
 	# Get robot position from gazebo
 	[robotX, robotY, robotT] = robot.getPosition()
-	x2 = mx + (-robotX - mapX1) * ax / mapLX
+	x2 = mx + (robotX - mapX1) * ax / mapLX
 	y2 = my + (-robotY - mapY1) * ay / mapLY
 
 	
@@ -86,7 +86,7 @@ def callback(particles):
 	pygame.draw.circle(window, (0, 0, 170), (int(x2), int(y2)), rd, 0)
 	pygame.draw.line(window, (255, 248, 0), 
 		(x2, y2),
-		(x2 - rd * cos(robotT), y2 - rd * sin(robotT)), 2)
+		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
 
 	#area = np.pi * ( np.array(w))
 	#plt.cla()
