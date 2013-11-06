@@ -16,7 +16,10 @@ import random
 
 # Gazebo
 from roomba_sensor.roomba import RoombaGazebo
+from roomba_sensor.particle_filter import ParticleFilter
 
+# Map configuration
+from roomba_sensor.map import *
 
 import copy
 
@@ -24,33 +27,7 @@ sensedValue = 0
 
 robotName = "r0"
 
-def resample(particles):
-	print "resampling..."
-	
-	N = len(particles)
-	index =  int(random.random() * N)
-	
-	# weights
-	w = [0] * N
-	for i in range(N):
-		w[i] = particles[i].z
 
-	# resampled particles
-	rp = [0] * N
-
-	# resample
-	beta = 0.0
-	mx = max (w)
-	for i in range(N):
-		beta += random.random() * 2.0 * mx
-		while beta > w[index]:
-			beta -= w[index]
-			index = (index + 1) % N
-		rp[i] = copy.deepcopy(particles[index])	
-
-	for p in rp:
-		p.z /= mx
-	return rp
 
 def robot_comm(msg):
 	# Message from the same robot
@@ -85,7 +62,7 @@ def img_callback(img):
 	sensedValue = (pl+pr) / total
 	#print "sensedValue=", sensedValue
 
-def validateIndex(ni,nj,grid):
+def validateIndex(ni, nj, grid):
 	if(ni < 0 or ni >= len(grid)):
 		return False
 	if (nj < 0 or nj >= len(grid[0])):
@@ -124,32 +101,8 @@ def run():
 	navPub = rospy.Publisher("/" + robotName + "/goal", Point32)
 
 	########## Initialize Particles ##############
-	# The map is represented by a rectangle from (x1,y1) to (x2,y2)
-	mapX1 = -5.0
-	mapX2 = 5.0
-	mapY1 = -5.0
-	mapY2 = 5.0
-	#Map size
-	mapLX = mapX2 - mapX1
-	mapLY = mapY2 - mapY1
-	# Grid size		
-	gn = 20 # Number of rows
-	gdx = mapLX / gn # delta x
-	gm = 20 # Number of columns
-	gdy = mapLY / gm # delta y
 
-	# number of particles
-	N = 5000
-	# Sparce the initial particles
-	particles = []
-	for i in range(N):
-		p = Point32()
-		# Position
-		p.x = random.random() * mapLX + mapX1
-		p.y = random.random() * mapLY + mapY1
-		# weight
-		p.z = 1.0 / N
-		particles.append(p)
+	pf = ParticleFilter()
 		
 
 	############ End Particle initialization #####
@@ -169,7 +122,7 @@ def run():
 		[camX, camY, camT] = robot.getSensorPosition()
 
 		
-		print "robot", [robotX,robotY], " cam", [camX, camY]," sv=",sensedValue
+		print "robot", [robotX,robotY], " cam", [camX, camY]," sv=", sensedValue
 
 		# Send the info to other robots.
 		smsg = SensedValue()
@@ -179,42 +132,34 @@ def run():
 		smsg.value = sensedValue
 		sensorPub.publish(smsg)
 
-		# Move the particles
-		for p in particles:
-			mov = 0.1
-			# Normal fuction
-			p.x = random.normalvariate(p.x, mov)
-			p.y = random.normalvariate(p.y, mov)
+		# Move the particles simulation the anomaly's dynamics
+		pf.move_particles()
 	
 
-		# Particle position in grid n rows and m columns
-		grid=[[0 for x in xrange(gm)] for x in xrange(gn)]
-		
-		# Update particles
-		for p in particles:
-			# If the particles in the robot area.
-			r = 0.5 # radio to cover
-			if sqrt((camX - p.x)**2 + (camY - p.y)**2) < r:
-				if(sensedValue == 0):
-					p.z *= 0.1
-				else:
-					# If the anomaly was sensed
-					p.z *= 1.1 * sensedValue 
-				
-				#print "lugar errado da particula",p.z
-			if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
-				p.z = p.z * 0.1
 
-			# Particle in grid
-			if(p.x > mapX1 and p.x < mapX2 and p.y > mapY1 and p.y < mapY2):
-				i = int((p.y- mapY1) / gdy)
-				j = int((p.x- mapX1) / gdx)
-				#print "i,j",[i,j], ",",[p.y,p.x]
-				grid[i][j] += 1
+		
+
+		pf.update_particles([[camX, camY, sensedValue]])
+		# # Update particles
+		# for p in particles:
+		# 	# If the particles in the robot area.
+		# 	r = 0.5 # radio to cover
+		# 	if sqrt((camX - p.x)**2 + (camY - p.y)**2) < r:
+		# 		if(sensedValue == 0):
+		# 			p.z *= 0.1
+		# 		else:
+		# 			# If the anomaly was sensed
+		# 			p.z *= 1.1 * sensedValue 
+				
+		# 		#print "lugar errado da particula",p.z
+		# 	if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
+		# 		p.z = p.z * 0.1
+
+		grid = pf.particles_in_grid()
 			
 
 		# Resampling
-		particles = resample(particles)
+		pf.resample()
 		
 		#for r in grid:
 		#	print r
@@ -222,7 +167,7 @@ def run():
 
 		# Publish particles
 		msg_parts = Polygon()
-		msg_parts.points = particles
+		msg_parts.points = pf.particles
 		partPub.publish(msg_parts)
 
 		##### Plan in grid ####
@@ -263,9 +208,9 @@ def run():
 						F[ni][nj] = grid[ni][nj] * exp( -D[ni][nj])						
 						l.append([ni, nj])
 			
-		maxi =- 1
-		maxj =- 1
-		maxv =- 1					
+		maxi = -1
+		maxj = -1
+		maxv = -1					
 		#for i in range(len(F)):
 		#	for j in range(len(F[0])):
 		#		if(F[i][j] > maxv):
@@ -291,7 +236,7 @@ def run():
 		#[targetX, targetY] = [3.0, 3.0]
 
 		# Control
-		theta = atan((camY-targetY) / (camX-targetX))
+		theta = atan((camY-targetY) / (camX - targetX))
 		print "from ",[camX, camY]," to ", [targetX, targetY]," vz=", degrees(theta-camY)," dif=", (camY-theta)
 
 		# TODO control states: explore, track, and

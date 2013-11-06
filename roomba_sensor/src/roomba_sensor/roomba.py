@@ -7,7 +7,7 @@ from tf.transformations import euler_from_quaternion
 
 from math import *
 from roomba_sensor.util import cut_angle
-
+from roomba_sensor.particle_filter import ParticleFilter
 
 class RoombaGazebo:
 	# Distance from robot to camera.
