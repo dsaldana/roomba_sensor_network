@@ -11,6 +11,11 @@ import sys
 import pygame
 import time
 
+# Gazebo
+from roomba_sensor.roomba import RoombaGazebo
+# Map configuration
+from roomba_sensor.map import *
+from math import *
 
 # Window size
 width = 800
@@ -20,19 +25,7 @@ height = 600
 pygame.init() 
 window = pygame.display.set_mode((width, height)) 
 
-# From roomba_cotrol
-mapX1 = -5.0
-mapX2 = 5.0
-mapY1 = -5.0
-mapY2 = 5.0
-#Map size
-mapLX = mapX2 - mapX1
-mapLY = mapY2 - mapY1
-# Grid size		
-gn = 20 # Number of rows
-gdx = mapLX / gn # delta x
-gm = 20 # Number of columns
-gdy = mapLY / gm # delta y
+
 
 
 def callback(particles):
@@ -70,16 +63,30 @@ def callback(particles):
 		pygame.draw.line(window, color, ( hc ,my), (hc, height - my))
 	
 	# Draw zeros
-	pygame.draw.line(window, (0, 0, 250), (mx/2, my+dy*gn/2), (width-mx/2, my+dy*gn/2))
-	pygame.draw.line(window, (0, 0, 250), (mx+dx*gm/2, my/2), (mx+dx*gm/2, height-my/2))
+	pygame.draw.line(window, (0, 0, 250), (mx / 2, my + dy * gn / 2),
+		(width - mx / 2, my + dy * gn / 2))
+	pygame.draw.line(window, (0, 0, 250), 
+		(mx + dx * gm / 2, my / 2),
+		(mx + dx * gm / 2, height - my / 2))
 		
 	# Draw the particles
 	pcolor = (255,0,0)
 	for i in range(N):
 		x2 = mx + (-x[i] - mapX1) * ax / mapLX
 		y2 = my + (-y[i] - mapY1) * ay / mapLY
-		pygame.draw.circle(window, pcolor, (int(x2),int(y2)), 2, 0)
+		pygame.draw.circle(window, pcolor, (int(x2), int(y2)), 2, 0)
 
+	# Get robot position from gazebo
+	[robotX, robotY, robotT] = robot.getPosition()
+	x2 = mx + (-robotX - mapX1) * ax / mapLX
+	y2 = my + (-robotY - mapY1) * ay / mapLY
+
+	
+	rd = 8
+	pygame.draw.circle(window, (0, 0, 170), (int(x2), int(y2)), rd, 0)
+	pygame.draw.line(window, (255, 248, 0), 
+		(x2, y2),
+		(x2 - rd * cos(robotT), y2 - rd * sin(robotT)), 2)
 
 	#area = np.pi * ( np.array(w))
 	#plt.cla()
@@ -89,6 +96,7 @@ def callback(particles):
 	pygame.display.flip() 
 
 if __name__ == '__main__':
+	global robot
 	try:
 		# Node roombaControl
 		rospy.init_node('particle_drawer', anonymous=True)		
@@ -97,6 +105,9 @@ if __name__ == '__main__':
 		robotName = rospy.get_param('~robot_name', 'Robot1')
 		rospy.Subscriber("particles", Polygon, callback)
 		
+		# Object to get information from Gazebo
+		robot = RoombaGazebo(robotName)
+
 		# Window
 		while True: 
 			time.sleep(0.1)

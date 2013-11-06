@@ -21,7 +21,7 @@ from roomba_sensor.particle_filter import ParticleFilter
 # Map configuration
 from roomba_sensor.map import *
 
-import copy
+
 
 sensedValue = 0
 
