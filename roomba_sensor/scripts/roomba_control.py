@@ -45,7 +45,7 @@ def robot_comm(msg):
 # Callback for camera sensor.
 def img_callback(img):
 	global sensedValue	
-	global sensedRight
+	global sensedLeft
 	global sensedRight
 	#OpenCV matrix
 	mat = CvBridge().imgmsg_to_cv(img, "mono8")
@@ -180,7 +180,7 @@ def run():
 		goalY = None
 
 		######## Exploring #############
-		if (sensedValue == 0):
+		if (False):
 			# Planning: Bread First Search #
 			D[spi][spj] = 0
 			
@@ -227,11 +227,9 @@ def run():
 			navPub.publish(p)
 
 		else:
-			######## Tracking ############
-			da = 0.5
-			alpha = pi 
+			######## Tracking ############			
 			controlP = (sensedLeft - 1) + sensedRight
-			print "control", controlP
+			print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
 			trackPub.publish(controlP)
 
 
