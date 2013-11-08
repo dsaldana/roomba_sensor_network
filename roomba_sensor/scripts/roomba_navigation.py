@@ -25,9 +25,11 @@ goal.y = -1
 # state
 traking = False
 
+# Sensed value is between 0 e 1
 def tracking_callback(sensedData):
 	global traking
 	global sensedValue
+
 	sensedValue = sensedData
 	traking = True
 	print "Tracking ", sensedValue
@@ -69,20 +71,23 @@ def run():
 
 	######## Control Loop ###########
 	print "Start!"
+	old_val = -1
 	while not rospy.is_shutdown():
 		
 		if(traking):
-			### Tracking ###
+			###### Tracking ######
 			lin_vel = 0.3
-			max_angle = pi / 2
-
+			P = pi / 2
+			D = pi / 8
 			vel = Twist()
 			vel.linear.x = lin_vel
-			vel.angular.z = sensedValue.data * max_angle
+			vel.angular.z = sensedValue.data * P + (sensedValue.data - old_val) * D
 			velPub.publish(vel)
 
+			old_val = sensedValue.data
+
 		else:
-			### Navigate ###
+			###### Navigation ######
 			[sX, sY, sT] = robot.getPosition()
 
 			# Orientation
