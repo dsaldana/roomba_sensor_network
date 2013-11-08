@@ -78,10 +78,11 @@ def run():
 			###### Tracking ######
 			lin_vel = 0.3
 			P = pi / 2
-			D = pi / 8
+			D = 2 * pi 
+
 			vel = Twist()
 			vel.linear.x = lin_vel
-			vel.angular.z = sensedValue.data * P + (sensedValue.data - old_val) * D
+			vel.angular.z = -(sensedValue.data * P + (sensedValue.data - old_val) * D)
 			velPub.publish(vel)
 
 			old_val = sensedValue.data
