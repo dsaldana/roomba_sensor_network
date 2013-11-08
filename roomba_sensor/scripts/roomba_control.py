@@ -55,18 +55,20 @@ def img_callback(img):
 	# How many white pixels in the right
 	pr = 0
 
-	for i in xrange(mat.rows):
+	threshold_value = 230
+
+	for i in [int(mat.rows / 2)]:
 		for j in xrange(mat.cols/2):
-			if(mat[i, j] > 230):
+			if(mat[i, j] > threshold_value):
 				pl += 1
 		for j in xrange(mat.cols/2, mat.cols):				
-			if(mat[i, j] > 230):
+			if(mat[i, j] > threshold_value):
 				pr += 1
 	
 	total = mat.rows * mat.cols * 1.0	
 	sensedValue = (pl + pr) / total
-	sensedLeft = (pl * 2) / total
-	sensedRight = (pr * 2) / total
+	sensedLeft = (pl * 2) / (mat.rows)
+	sensedRight = (pr * 2) / (mat.rows)
 	
 # Validate if one position in grid is valid.
 def validateIndex(ni, nj, grid):
