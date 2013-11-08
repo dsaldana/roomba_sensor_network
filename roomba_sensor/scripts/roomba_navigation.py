@@ -76,9 +76,9 @@ def run():
 		
 		if(traking):
 			###### Tracking ######
-			lin_vel = 0.3
-			P = pi / 2
-			D = pi 
+			lin_vel = 0.2
+			P = pi / 4
+			D = pi / 2
 
 			vel = Twist()
 			vel.linear.x = lin_vel

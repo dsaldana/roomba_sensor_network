@@ -67,8 +67,8 @@ def img_callback(img):
 	
 	total = mat.rows * mat.cols * 1.0	
 	sensedValue = (pl + pr) / total
-	sensedLeft = (pl * 2) / (mat.rows)
-	sensedRight = (pr * 2) / (mat.rows)
+	sensedLeft = (pl * 2.0) / (mat.rows)
+	sensedRight = (pr * 2.0) / (mat.rows)
 	
 # Validate if one position in grid is valid.
 def validateIndex(ni, nj, grid):
