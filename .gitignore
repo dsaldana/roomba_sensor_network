@@ -1,3 +1,5 @@
+/roomba_sensor/launch/cam.launch~
+/roomba_sensor/launch/cam2.launch~
 /roomba_sensor/src/roomba_sensor/sensor.py~
 /turtlebot_ds/launch/includes/move_base.launch~
 /roomba_sensor/src/roomba_sensor/hello.py~

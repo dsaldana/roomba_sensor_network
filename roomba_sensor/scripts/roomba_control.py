@@ -140,24 +140,24 @@ def run():
 	
 		
 		# Particle filter: updade based on sensor value.
-		pf.update_particles([[camX, camY, sensedValue]])
-		
-		# Get a matrix with the number of particles for each cell.
-		grid = pf.particles_in_grid()
-			
+		pf.update_particles([[camX, camY, sensedValue]])			
 
 		# Particle filter: Resampling.
 		pf.resample()
 		
-
-
 		# Publish particles
 		msg_parts = Polygon()
 		msg_parts.points = pf.particles
 		partPub.publish(msg_parts)
 
+
 		##### Plan in grid ####
+		# Get a matrix with the number of particles for each cell.
+		grid = pf.particles_in_grid()
+
+		# Force matrix
 		F = [[-1 for i in xrange(gm)] for j in xrange(gn)]
+		# Distance matrix
 		D = [[-1 for i in xrange(gm)] for j in xrange(gn)]
 
 		# Convert sensor position to grid cell
@@ -200,6 +200,7 @@ def run():
 							D[ni][nj] = D[i][j] + 1
 							F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
 							l.append([ni, nj])
+							#TODO take into acount the other robots.
 			
 			# Find maximum force in grid
 			maxi = -1
@@ -215,7 +216,7 @@ def run():
 
 
 			
-			# Grid to coordinates
+			# Grid position to continuous coordinates
 			goalX =  mapX1 + gdx * maxj + gdx / 2
 			goalY =  mapY1 + gdy * maxi + gdy / 2
 
