@@ -94,6 +94,11 @@ def run():
 			# Orientation
 			x = goal.x - sX 
 			y = goal.y - sY
+
+			if(x == 0):
+				rospy.sleep(0.20)
+				continue
+
 			# the reference for the angle is the x axes.
 			t = atan(y / x) 
 			if  x < 0:

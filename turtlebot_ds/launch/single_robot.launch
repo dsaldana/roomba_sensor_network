@@ -16,19 +16,13 @@
 
   <!--Robots -->
   <group ns="Robot1">
-		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    	<arg name="base" value="create"/>
-	    	<arg name="init_pose" value="-x -1 -y -1 -z 0" />
-	    	<arg name="robot_name"  value="Robot1" />
-		</include>
+	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
+	    <arg name="base" value="create"/>
+	    <arg name="init_pose" value="-x -1 -y -1 -z 0" />
+	    <arg name="robot_name"  value="Robot1" />
+	  </include>
 
-	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
-			<param name="robot_name" value="Robot1"/>
-	  	</node>
-		
-		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
-			<param name="robot_name" value="Robot1"/>
-	  	</node>
+	
   </group>
 
  <!--
