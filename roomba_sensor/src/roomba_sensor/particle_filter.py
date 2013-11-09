@@ -3,6 +3,9 @@ from geometry_msgs.msg import Point32
 
 
 from roomba_sensor.map import *
+from roomba_sensor.util import cut_angle
+
+
 from math import *
 
 import random
@@ -17,6 +20,12 @@ class ParticleFilter:
 
 	# radio to cover
 	r = 0.5
+
+	# PF weights
+	weight_tracking_left = 1.03
+	weight_tracking_right = 0.01
+	weight_out_of_map = 0.01
+	weight_sensed_zero = 0.1
 
 	def __init__(self):
 		
@@ -71,7 +80,7 @@ class ParticleFilter:
 
 	# Update particle weights based on sensed values
 	def update_particles(self, sensedVals):
-		for [senX, senY, senVal] in sensedVals:			  
+		for [senX, senY, senT, senVal] in sensedVals:			  
 
 			# Update particles
 			for p in self.particles:
@@ -79,14 +88,22 @@ class ParticleFilter:
 			
 				if sqrt((senX - p.x)**2 + (senY - p.y)**2) < self.r:
 					if(senVal == 0):
-						p.z *= 0.1
+						p.z *= self.weight_sensed_zero
 					else:
 						# If the anomaly was sensed
-						p.z *= 1 
+						# The robot follows the anomaly in counterclock
+						# direction. Then, at left has anomaly and at
+						# right has nothing.											
+						left = self.evaluateSide([senX, senY], [p.x, p.y], senT)
+						if left:
+							p.z *= self.weight_tracking_left 
+						else:
+							p.z *= self.weight_tracking_right 
+
 					
 					#print "lugar errado da particula",p.z
 				if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
-					p.z = p.z * 0.1
+					p.z = p.z * self.weight_out_of_map
 
 	def particles_in_grid(self):
 		# Particle position in grid n rows and m columns
@@ -99,3 +116,31 @@ class ParticleFilter:
 				#print "i,j",[i,j], ",",[p.y,p.x]
 				grid[i][j] += 1
 		return grid
+
+
+	# Evaluate if the particle is in the right or left of
+	# the robot.
+	# r: robot position
+	# p: particle position
+	# t: robot orientation
+	def evaluateSide(self, r, p, t):
+		# Normal vector of robot
+		#r2 = [r[0] + cos(t), r[1] + sin(t)] - r
+		# Normal vector of particle
+		p2 = [p[0] - r[0], p[1] - r[1]]
+		#p2 /= sqrt(dotproduct(p2,p2))
+
+		#teta = degrees(acos(-dotproduct(r2,p2)))
+
+
+		pteta = atan(p2[1] / p2[0])
+		if(p2[0] < 0):
+			pteta += pi
+
+		pteta = cut_angle(pteta)
+
+		result = cut_angle(pteta - t)
+
+		return (result>0)
+
+

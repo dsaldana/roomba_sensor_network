@@ -142,7 +142,7 @@ def run():
 	
 		
 		# Particle filter: updade based on sensor value.
-		pf.update_particles([[camX, camY, sensedValue]])			
+		pf.update_particles([[camX, camY, camT, sensedValue]])			
 
 		# Particle filter: Resampling.
 		pf.resample()
@@ -200,7 +200,7 @@ def run():
 						# Not visited node
 						if (D[ni][nj] < 0):
 							D[ni][nj] = D[i][j] + 1
-							F[ni][nj] = grid[ni][nj] * exp( - 0.5 * D[ni][nj])						
+							F[ni][nj] = grid[ni][nj] * exp( - 0.1 * D[ni][nj])						
 							l.append([ni, nj])
 							#TODO take into acount the other robots.
 			
