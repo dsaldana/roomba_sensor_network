@@ -22,7 +22,7 @@ class ParticleFilter:
 	r = 0.5
 
 	# PF weights
-	weight_tracking_left = 1.03
+	weight_tracking_left = 2.03
 	weight_tracking_right = 0.01
 	weight_out_of_map = 0.01
 	weight_sensed_zero = 0.1
@@ -72,7 +72,7 @@ class ParticleFilter:
 			rp[i] = copy.deepcopy(self.particles[index])	
 
 		for p in rp:
-			p.z /= mx
+			p.z = 1.0 / self.N
 
 		self.particles = rp
 		#return rp
