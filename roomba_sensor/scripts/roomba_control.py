@@ -33,14 +33,16 @@ sensedRight = 0
 
 robotName = "r0"
 
+robot_msgs = {}
 
 # Callback for robot communication.
 def robot_comm(msg):
 	# Message from the same robot
-	if (msg.robot_id == robotName):
-		return
+	#if (msg.robot_id == robotName):
+	#	return
 	# Update a list of values
-	print msg
+	robot_msgs[msg.robot_id] = msg
+	
 
 # Callback for camera sensor.
 def img_callback(img):
@@ -102,9 +104,9 @@ def run():
 
 	# Robot communication
 	# Subscriber for robot communication
-	rospy.Subscriber("robotCom", SensedValue, robot_comm)
+	rospy.Subscriber("/robotCom", SensedValue, robot_comm)
 	# Sensor's publisher
-	sensorPub = rospy.Publisher("robotCom", SensedValue)
+	sensorPub = rospy.Publisher("/robotCom", SensedValue)
 
 	# Goal Navigator
 	navPub = rospy.Publisher("/" + robotName + "/goal", Point32)
@@ -133,6 +135,7 @@ def run():
 		smsg = SensedValue()
 		smsg.x = camX
 		smsg.y = camY
+		smsg.theta = camT
 		smsg.robot_id = robotName
 		smsg.value = sensedValue
 		sensorPub.publish(smsg)
@@ -141,8 +144,13 @@ def run():
 		pf.move_particles()
 	
 		
+		# Sensed values
+		samples = []
+		for msg in robot_msgs.values():
+			samples.append([msg.x, msg.y,  msg.theta, msg.value])			
+		
 		# Particle filter: updade based on sensor value.
-		pf.update_particles([[camX, camY, camT, sensedValue]])			
+		pf.update_particles(samples)			
 
 		# Particle filter: Resampling.
 		pf.resample()
