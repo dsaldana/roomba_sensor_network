@@ -182,7 +182,7 @@ def run():
 		goalY = None
 
 		######## Exploring #############
-		if (False):
+		if (sensedValue == 0):
 			# Planning: Bread First Search #
 			D[spi][spj] = 0
 			

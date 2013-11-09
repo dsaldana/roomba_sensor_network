@@ -13,7 +13,7 @@ class ParticleFilter:
 	N = 5000
 
 	# Particle movement (standard deviation)
-	sd_mov = 0.05
+	sd_mov = 0.1
 
 	# radio to cover
 	r = 0.5
@@ -82,7 +82,7 @@ class ParticleFilter:
 						p.z *= 0.1
 					else:
 						# If the anomaly was sensed
-						p.z *= 1.1 * senVal 
+						p.z *= 1 
 					
 					#print "lugar errado da particula",p.z
 				if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
