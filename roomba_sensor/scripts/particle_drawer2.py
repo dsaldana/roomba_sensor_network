@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
 		# Suscribe
 		robotName = rospy.get_param('~robot_name', 'Robot1')
-		rospy.Subscriber("particles", Polygon, callback)
+		rospy.Subscriber("/" + robotName + "/particles", Polygon, callback)
 		
 		# Object to get information from Gazebo
 		robot = RoombaGazebo(robotName)
