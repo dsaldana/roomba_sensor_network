@@ -28,7 +28,7 @@ from roomba_sensor.map import *
 from roomba_comm.msg import SensedValue
 
 # Numpy
-import numpy
+import numpy as np
 
 
 
@@ -178,16 +178,21 @@ def run():
 		if (sensedValue == 0):
 			#### Planning: Bread First Search 
 			# Distance matrix
-			D = numpy.array(bread_first_search(spi, spj, grid))
-			# Force from robot location to every cell.
-			F = numpy.array(grid) * numpy.exp(-0.1 * D)	
-			#TODO take into acount the other robots.
-			for r in robot_msgs.values():
-				numpy.array(bread_first_search(spi, spj, grid))
+			D = np.array(bread_first_search(spi, spj, grid))
 
+			#TODO take into acount the other robots.
+			DRT = np.zeros((gn,gm))
+			for r in robot_msgs.values():
+				# Distances from robot
+				DRT += np.array(bread_first_search(spi, spj, grid))
+
+			# Number of robots
+			n_robots = len(robot_msgs.values())
+			# Force from robot location to every cell.
+			F = np.array(grid) * np.exp(0.1 * (-D + DRT / n_robots))
 
 			# Find maximum force in grid
-			maxi, maxj = numpy.unravel_index(F.argmax(), F.shape)
+			maxi, maxj = np.unravel_index(F.argmax(), F.shape)
 
 			
 			# Grid position to continuous coordinates. 
