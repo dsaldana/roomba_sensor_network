@@ -2,25 +2,31 @@
 import rospy
 from std_msgs.msg import String
 from std_msgs.msg import Float32
+# Image
+from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
-from roomba_comm.msg import SensedValue
 
-# Image
-from sensor_msgs.msg import Image
+
+# OpenCV
 from cv_bridge import CvBridge, CvBridgeError
 
-
+# Math
 from math import *
 import random
 
-# Gazebo
 from roomba_sensor.roomba import RoombaGazebo
 from roomba_sensor.particle_filter import ParticleFilter
+from roomba_sensor.grid_util import bread_first_search
+from roomba_sensor.grid_util import validate_index
 
 # Map configuration
 from roomba_sensor.map import *
+from roomba_comm.msg import SensedValue
+
+# Numpy
+import numpy
 
 
 
@@ -72,13 +78,6 @@ def img_callback(img):
 	sensedLeft = (pl * 2.0) / (mat.rows)
 	sensedRight = (pr * 2.0) / (mat.rows)
 	
-# Validate if one position in grid is valid.
-def validateIndex(ni, nj, grid):
-	if(ni < 0 or ni >= len(grid)):
-		return False
-	if (nj < 0 or nj >= len(grid[0])):
-		return False
-	return True
 	
 
 def run():
@@ -165,11 +164,6 @@ def run():
 		# Get a matrix with the number of particles for each cell.
 		grid = pf.particles_in_grid()
 
-		# Force matrix
-		F = [[-1 for i in xrange(gm)] for j in xrange(gn)]
-		# Distance matrix
-		D = [[-1 for i in xrange(gm)] for j in xrange(gn)]
-
 		# Convert sensor position to grid cell
 		spi = int((camY - mapY1) / gdy)
 		spj = int((camX - mapX1) / gdx)
@@ -191,38 +185,14 @@ def run():
 
 		######## Exploring #############
 		if (sensedValue == 0):
-			# Planning: Bread First Search #
-			D[spi][spj] = 0
-			
-			l = []
-			# The current position
-			l.append([spi, spj])
-		
-			while (len(l) > 0):			
-				[i,j] = l.pop(0)
-				# Possible movements[up, right, left, down]
-				mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
-
-				for [ni,nj] in mvs:
-					if validateIndex(ni,nj,grid):
-						# Not visited node
-						if (D[ni][nj] < 0):
-							D[ni][nj] = D[i][j] + 1
-							F[ni][nj] = grid[ni][nj] * exp( - 0.1 * D[ni][nj])						
-							l.append([ni, nj])
-							#TODO take into acount the other robots.
+			#### Planning: Bread First Search 
+			# Distance matrix
+			D = numpy.array(bread_first_search(spi, spj, grid))
+			# Force from robot location to every cell.
+			F = numpy.array(grid) * numpy.exp( -0.1 * D)		
 			
 			# Find maximum force in grid
-			maxi = -1
-			maxj = -1
-			maxv = -1					
-
-			mvs = [[spi - 1, spj], [spi,spj+1], [spi, spj-1], [spi+1,spj]]
-			for [i,j] in mvs:
-				if validateIndex(i, j, grid) and F[i][j] > maxv:
-					maxi = i
-					maxj = j
-					maxv = F[i][j]
+			maxi, maxj = numpy.unravel_index(F.argmax(), F.shape)
 
 
 			
