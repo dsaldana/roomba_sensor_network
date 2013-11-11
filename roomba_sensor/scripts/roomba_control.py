@@ -178,21 +178,32 @@ def run():
 		if (sensedValue == 0):
 			#### Planning: Bread First Search 
 			# Distance matrix
-			D = np.array(bread_first_search(spi, spj, grid))
+			D = np.array(bread_first_search(spi, spj, grid))			
 
 			#TODO take into acount the other robots.
 			DRT = np.zeros((gn,gm))
 			for r in robot_msgs.values():
+				if (r.robot_id == robotName):
+					continue
 				# Distances from robot
-				DRT += np.array(bread_first_search(spi, spj, grid))
+				ri,rj = coords_to_grid(r.x, r.y)
+				DRT += np.array(bread_first_search(ri, rj, grid))
 
+
+			F = np.array(grid) 
 			# Number of robots
 			n_robots = len(robot_msgs.values())
+			
+
 			# Force from robot location to every cell.
-			F = np.array(grid) * np.exp(0.1 * (-D + DRT / n_robots))
+			# if n_robots > 1:	
+			# 	npgrid = np.array(grid)
+			# 	F *=  np.exp(-(npgrid *D - 0.2*npgrid * DRT/(n_robots-1)))
+			F = np.array(grid) * np.exp(-0.1 * D)
 
 			# Find maximum force in grid
 			maxi, maxj = np.unravel_index(F.argmax(), F.shape)
+
 
 			
 			# Grid position to continuous coordinates. 
