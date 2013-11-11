@@ -1,5 +1,7 @@
-## Util for woking with Grids.
-
+#######################################
+### Utilities for woking with Grids. ##
+#######################################
+from roomba_sensor.map import *
 
 # Validate if one position in grid is valid.
 def validate_index(ni, nj, grid):
@@ -38,3 +40,25 @@ def bread_first_search(spi, spj, grid):
 					l.append([ni, nj])					
 	# Return distance from robot to each cell
 	return D
+
+
+# Convert coordinates to grid position.
+# (it uses constants from roomba_sensor.map ).
+def coords_to_grid(x, y):
+	spi = int((y - mapY1) / gdy)
+	spj = int((x - mapX1) / gdx)
+		
+	if(spi > gm - 1):
+		spi = gm - 1
+	if(spj > gn - 1):
+		spj = gn - 1
+	if(spi < 0):
+		spi = 0
+	if (spj < 0):
+		spj = 0
+	return spi,spj
+
+def grid_to_coords(i,j):
+	x =  mapX1 + gdx * j + gdx / 2
+	y =  mapY1 + gdy * i + gdy / 2
+	return x, y

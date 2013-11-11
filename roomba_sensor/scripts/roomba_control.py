@@ -20,6 +20,8 @@ from roomba_sensor.roomba import RoombaGazebo
 from roomba_sensor.particle_filter import ParticleFilter
 from roomba_sensor.grid_util import bread_first_search
 from roomba_sensor.grid_util import validate_index
+from roomba_sensor.grid_util import coords_to_grid
+from roomba_sensor.grid_util import grid_to_coords
 
 # Map configuration
 from roomba_sensor.map import *
@@ -146,10 +148,10 @@ def run():
 		# Sensed values
 		samples = []
 		for msg in robot_msgs.values():
-			samples.append([msg.x, msg.y,  msg.theta, msg.value])			
+			samples.append([msg.x, msg.y,  msg.theta, msg.value])
 		
 		# Particle filter: updade based on sensor value.
-		pf.update_particles(samples)			
+		pf.update_particles(samples)
 
 		# Particle filter: Resampling.
 		pf.resample()
@@ -165,18 +167,7 @@ def run():
 		grid = pf.particles_in_grid()
 
 		# Convert sensor position to grid cell
-		spi = int((camY - mapY1) / gdy)
-		spj = int((camX - mapX1) / gdx)
-		
-		if(spi > gm-1):
-			spi = gm-1
-		if(spj > gn-1):
-			spj = gn-1
-		if(spi < 0):
-			spi = 0
-		if (spj < 0):
-			spj = 0
-
+		spi, spj = coords_to_grid(camX, camY)
 
 
 		# Where to navigate
@@ -189,17 +180,19 @@ def run():
 			# Distance matrix
 			D = numpy.array(bread_first_search(spi, spj, grid))
 			# Force from robot location to every cell.
-			F = numpy.array(grid) * numpy.exp(-0.1 * D)		
+			F = numpy.array(grid) * numpy.exp(-0.1 * D)	
 			#TODO take into acount the other robots.
-			
+			for r in robot_msgs.values():
+				numpy.array(bread_first_search(spi, spj, grid))
+
+
 			# Find maximum force in grid
 			maxi, maxj = numpy.unravel_index(F.argmax(), F.shape)
 
 			
 			# Grid position to continuous coordinates. 
 			# goal points to the center point in the cell.
-			goalX =  mapX1 + gdx * maxj + gdx / 2
-			goalY =  mapY1 + gdy * maxi + gdy / 2
+			goalX , goalY = grid_to_coords(maxi,maxj)
 
 			# Publish goal to navigate
 			p = Point32()
