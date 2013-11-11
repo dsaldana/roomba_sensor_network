@@ -8,6 +8,8 @@ def validate_index(ni, nj, grid):
 	if (nj < 0 or nj >= len(grid[0])):
 		return False
 	return True
+
+
 # BFS from position [spi, spj]	
 def bread_first_search(spi, spj, grid):
 	gn = len(grid)
@@ -33,7 +35,6 @@ def bread_first_search(spi, spj, grid):
 				# Not visited node
 				if (D[ni][nj] < 0):
 					D[ni][nj] = D[i][j] + 1									
-					l.append([ni, nj])
-					#TODO take into acount the other robots.
+					l.append([ni, nj])					
 	# Return distance from robot to each cell
 	return D

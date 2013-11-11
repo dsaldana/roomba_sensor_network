@@ -48,8 +48,8 @@ def callback(particles):
 	# Draw the grid
 	ax = width - 2.0 * mx # area for x
 	ay = height - 2.0 * my # area for y
-	dx = (ax) / gm #Delta x
-	dy = (ay) / gn #Delta y
+	dx = ax / gm #Delta x
+	dy = ay / gn #Delta y
 
 
 	# Draw rows

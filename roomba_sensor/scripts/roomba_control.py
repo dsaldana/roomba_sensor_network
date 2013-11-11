@@ -189,14 +189,15 @@ def run():
 			# Distance matrix
 			D = numpy.array(bread_first_search(spi, spj, grid))
 			# Force from robot location to every cell.
-			F = numpy.array(grid) * numpy.exp( -0.1 * D)		
+			F = numpy.array(grid) * numpy.exp(-0.1 * D)		
+			#TODO take into acount the other robots.
 			
 			# Find maximum force in grid
 			maxi, maxj = numpy.unravel_index(F.argmax(), F.shape)
 
-
 			
-			# Grid position to continuous coordinates
+			# Grid position to continuous coordinates. 
+			# goal points to the center point in the cell.
 			goalX =  mapX1 + gdx * maxj + gdx / 2
 			goalY =  mapY1 + gdy * maxi + gdy / 2
 
