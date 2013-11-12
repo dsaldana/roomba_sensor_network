@@ -116,6 +116,15 @@ def run():
 			vel = Twist()
 			vel.linear.x = d / 5
 			vel.angular.z = (controlT) / 1
+
+			# Max velocities
+			max_linear_speed = 1
+			max_angular_speed = 100
+			#if vel.linear.x > max_linear_speed:
+			#	vel.linear.x = max_linear_speed
+			if vel.angular.z > max_angular_speed:
+				vel.angular.z = max_angular_speed
+			
 			velPub.publish(vel)
 
 		rospy.sleep(0.20)

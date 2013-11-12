@@ -129,7 +129,7 @@ def run():
 	# Time for tracking without sensing anomaly.
 	max_tracking_time = 5
 	# last time that an anomaly was detected
-	last_time_anomaly = None
+	last_time_anomaly = 0
 
 
 	######## Control Loop ###########
