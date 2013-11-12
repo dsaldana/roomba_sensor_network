@@ -43,6 +43,7 @@ robotName = "r0"
 
 robot_msgs = {}
 
+
 # Callback for robot communication.
 def robot_comm(msg):
 	# Message from the same robot
@@ -57,6 +58,8 @@ def img_callback(img):
 	global sensedValue	
 	global sensedLeft
 	global sensedRight
+
+
 	#OpenCV matrix
 	mat = CvBridge().imgmsg_to_cv(img, "mono8")
 	
@@ -120,6 +123,13 @@ def run():
 	# Object to get information from Gazebo
 	robot = RoombaGazebo(robotName)
 	
+	# Explore flag. False for tracking
+	explore = True
+
+	# Time for tracking without sensing anomaly.
+	max_tracking_time = 5
+	# last time that an anomaly was detected
+	last_time_anomaly = None
 
 
 	######## Control Loop ###########
@@ -174,8 +184,18 @@ def run():
 		goalX = None
 		goalY = None
 
+		# The flag for exploring change only if  the robot does not
+		# sense an anomaly in a n seconds (n = max_tracking_time).
+		if sensedValue > 0:
+			explore = False
+			last_time_anomaly = rospy.get_rostime().secs
+		else:
+			if rospy.get_rostime().secs - last_time_anomaly > max_tracking_time:
+				explore = True
+
+		
 		######## Exploring #############
-		if (sensedValue == 0):
+		if (explore):
 			#### Planning: Bread First Search 
 			# Distance matrix
 			D = np.array(bread_first_search(spi, spj, grid))			
