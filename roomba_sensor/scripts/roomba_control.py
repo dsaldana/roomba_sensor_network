@@ -218,9 +218,8 @@ def run():
 			n_robots = len(robot_msgs.values())
 			
 			# Force from robot location to every cell.
-			 if n_robots > 1:				 	
-			 	F -=  0.5 * npgrid * np.exp(-(npgrid *D - 0.2*npgrid * DRT/(n_robots-1)))
-			
+			if n_robots > 1:
+				F -=  npgrid * np.exp(- 0.5 * DRT / (n_robots - 1))
 
 			# Find maximum force in grid
 			maxi, maxj = np.unravel_index(F.argmax(), F.shape)
@@ -238,7 +237,7 @@ def run():
 			navPub.publish(p)
 
 		else:
-			######## Tracking ############			
+			#### Tracking
 			controlP = (sensedLeft - 1) + sensedRight
 			print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
 			trackPub.publish(controlP)
