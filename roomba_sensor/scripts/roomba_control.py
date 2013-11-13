@@ -196,6 +196,8 @@ def run():
 		
 		######## Exploring #############
 		if (explore):
+			npgrid = np.array(grid)
+
 			#### Planning: Bread First Search 
 			# Distance matrix
 			D = np.array(bread_first_search(spi, spj, grid))			
@@ -209,17 +211,16 @@ def run():
 				ri,rj = coords_to_grid(r.x, r.y)
 				DRT += np.array(bread_first_search(ri, rj, grid))
 
+			# Force for one robot.
+			F = npgrid * np.exp(-0.1 * D)
 
-			F = np.array(grid) 
 			# Number of robots
 			n_robots = len(robot_msgs.values())
 			
-
 			# Force from robot location to every cell.
-			# if n_robots > 1:	
-			# 	npgrid = np.array(grid)
-			# 	F *=  np.exp(-(npgrid *D - 0.2*npgrid * DRT/(n_robots-1)))
-			F = np.array(grid) * np.exp(-0.1 * D)
+			 if n_robots > 1:				 	
+			 	F -=  0.5 * npgrid * np.exp(-(npgrid *D - 0.2*npgrid * DRT/(n_robots-1)))
+			
 
 			# Find maximum force in grid
 			maxi, maxj = np.unravel_index(F.argmax(), F.shape)
