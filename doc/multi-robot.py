@@ -38,15 +38,20 @@ DRT= np.array([[ 10., 9., 8., 7., 6., 5., 4., 3., 2., 3.],
 F = npgrid * np.exp(-0.1 * D)
 n_robots = 2
 
-for c in DRT.tolist():
+
+for c in [npgrid.tolist()[2]]:
+	print c
+    
+for c in [DRT.tolist()[2]]:
 	print c
 
 print " ------------"
 # F =  np.exp(0.1 * (-D + DRT / (n_robots - 1)))
 # print F
-F2 = 0.5 * npgrid * np.exp(- 0.2 * npgrid * DRT / (n_robots - 1))
+F2 =  F - npgrid * np.exp(- 0.5 * DRT / (n_robots - 1))
 
 
-for c in F2.tolist():
+for c in [F.tolist()[2]]:
 	print c
-
+for c in [F2.tolist()[2]]:
+	print c
