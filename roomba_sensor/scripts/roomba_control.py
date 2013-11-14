@@ -70,8 +70,9 @@ def img_callback(img):
 
 	threshold_value = 230
 
+	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
-		for j in xrange(mat.cols/2):
+		for j in xrange(mat.cols / 2):
 			if(mat[i, j] > threshold_value):
 				pl += 1
 		for j in xrange(mat.cols/2, mat.cols):				
@@ -132,7 +133,7 @@ def run():
 	last_time_anomaly = 0
 
 
-	######## Control Loop ###########
+	######## Control Loop
 	print "Start!"
 	while not rospy.is_shutdown():
 		# Get robot position from gazebo
@@ -194,14 +195,16 @@ def run():
 				explore = True
 
 		
-		######## Exploring #############
+		######## Exploring
 		if (explore):
 			npgrid = np.array(grid)
 
 			#### Planning: Bread First Search 
 			# Distance matrix
 			D = np.array(bread_first_search(spi, spj, grid))			
-
+			#rospy.logerr("D")
+			#rospy.logerr(D)
+			
 			#TODO take into acount the other robots.
 			DRT = np.zeros((gn,gm))
 			for r in robot_msgs.values():
@@ -209,13 +212,22 @@ def run():
 					continue
 				# Distances from robot
 				ri,rj = coords_to_grid(r.x, r.y)
-				DRT += np.array(bread_first_search(ri, rj, grid))
-
-			# Force for one robot.
-			F = npgrid * np.exp(-0.1 * D)
-
+				#rospy.logerr("Robot position")
+				#rospy.logerr([ri,rj])
+				BFS = bread_first_search(ri, rj, grid)
+				#rospy.logerr(BFS)
+				DRT += np.array(BFS)
+				
+				
+			#rospy.logerr("DRT")
+			#rospy.logerr(DRT)
 			# Number of robots
 			n_robots = len(robot_msgs.values())
+			
+			# Force for one robot.
+			F = npgrid * np.exp(-0.1 * D)
+			#rospy.logerr("F")
+			#rospy.logerr(F)
 			
 			# Force from robot location to every cell.
 			if n_robots > 1:

@@ -28,7 +28,7 @@ class ParticleFilter:
 	weight_sensed_zero = 0.1
 
 	def __init__(self):
-		
+
 		# Sparce the initial particles
 		self.particles = []
 		for i in range(self.N):
