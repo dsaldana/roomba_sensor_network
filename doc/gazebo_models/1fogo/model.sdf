@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<sdf version='1.4'>
+  <model name="fogo">
+		<static>true</static>
+
+	<link name='chassis'>
+        <pose>0 0 0.001 0 0 0</pose>
+
+        <visual name='visual'>
+      <geometry>
+			<mesh>
+            <uri>file:///home/dav/.gazebo/models/1fogo/fire_marker.dae</uri>
+          </mesh>
+      </geometry>
+        </visual>
+      </link>
+
+
+  </model>
+</sdf>
