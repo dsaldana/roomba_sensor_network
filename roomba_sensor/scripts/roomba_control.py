@@ -216,7 +216,8 @@ def run():
 				#rospy.logerr([ri,rj])
 				BFS = bread_first_search(ri, rj, grid)
 				#rospy.logerr(BFS)
-				DRT += np.array(BFS)
+				u = npgrid * np.exp(-np.array(BFS))
+				DRT += u
 				
 				
 			#rospy.logerr("DRT")
@@ -231,7 +232,8 @@ def run():
 			
 			# Force from robot location to every cell.
 			if n_robots > 1:
-				F -=  npgrid * np.exp(- 0.5 * DRT / (n_robots - 1))
+				#F -=  npgrid * np.exp(- 0.5 * DRT / (n_robots - 1))
+				F -= DRT / (n_robots - 1)
 
 			# Find maximum force in grid
 			maxi, maxj = np.unravel_index(F.argmax(), F.shape)
