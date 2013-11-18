@@ -33,7 +33,7 @@
 	  	</node>
   </group>
 
-<!-- 
+
    <group ns="Robot2">
 		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
 	    	<arg name="base" value="create"/>
@@ -87,7 +87,7 @@
   	</group> 
 
 	
-
+<!-- 
 
   	 -->
 

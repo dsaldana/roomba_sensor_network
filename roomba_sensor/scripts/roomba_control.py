@@ -85,7 +85,7 @@ def img_callback(img):
 				pr = j - mat.cols/2
 	
 	total = mat.rows * mat.cols * 1.0	
-	sensedValue = (pl + pr+40) / total
+	sensedValue = (pl + pr) / total
 	sensedLeft = (pl * 2.0) / (mat.rows)
 	sensedRight = (pr * 2.0) / (mat.rows)
 	
