@@ -73,19 +73,19 @@ def img_callback(img):
 	# How many white pixels in the right
 	pr = 0
 
-	threshold_value = 230
+	threshold_value = 200
 
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
 		for j in xrange(mat.cols / 2):
 			if(red_channel[i, j] > threshold_value):
-				pl += 1
+				pl = j
 		for j in xrange(mat.cols/2, mat.cols):				
 			if(red_channel[i, j] > threshold_value):
-				pr += 1
+				pr = j - mat.cols/2
 	
 	total = mat.rows * mat.cols * 1.0	
-	sensedValue = (pl + pr) / total
+	sensedValue = (pl + pr+40) / total
 	sensedLeft = (pl * 2.0) / (mat.rows)
 	sensedRight = (pr * 2.0) / (mat.rows)
 	
