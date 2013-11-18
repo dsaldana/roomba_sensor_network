@@ -11,6 +11,7 @@ from geometry_msgs.msg import Point32
 
 # OpenCV
 from cv_bridge import CvBridge, CvBridgeError
+import cv
 
 # Math
 from math import *
@@ -61,7 +62,11 @@ def img_callback(img):
 
 
 	#OpenCV matrix
-	mat = CvBridge().imgmsg_to_cv(img, "mono8")
+	mat = CvBridge().imgmsg_to_cv(img, "rgb8")
+	# Extract red channel
+	red_channel = cv.CreateImage(cv.GetSize(mat), 8, 1)
+	cv.Split(mat, red_channel, None, None, None)
+	
 	
 	# How many white pixels in the left
 	pl = 0
@@ -73,10 +78,10 @@ def img_callback(img):
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
 		for j in xrange(mat.cols / 2):
-			if(mat[i, j] > threshold_value):
+			if(red_channel[i, j] > threshold_value):
 				pl += 1
 		for j in xrange(mat.cols/2, mat.cols):				
-			if(mat[i, j] > threshold_value):
+			if(red_channel[i, j] > threshold_value):
 				pr += 1
 	
 	total = mat.rows * mat.cols * 1.0	
@@ -216,7 +221,7 @@ def run():
 				#rospy.logerr([ri,rj])
 				BFS = bread_first_search(ri, rj, grid)
 				#rospy.logerr(BFS)
-				u = npgrid * np.exp(-np.array(BFS))
+				u = 0.5 * np.max(npgrid) * np.exp(-np.array(BFS))
 				DRT += u
 				
 				
