@@ -2,54 +2,81 @@
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Polygon
-from geometry_msgs.msg import Point32
+
+from roomba_comm.msg import Particle
+from roomba_comm.msg import PointR
 
 # For plotting
 import numpy as np
 import sys
 import pygame
+from pygame.locals import *
+
 import time
 
-# Gazebo
-from roomba_sensor.roomba import RoombaGazebo
 # Map configuration
 from roomba_sensor.map import *
 from math import *
 
 # Window size
-width = 750
-height = 600
+width, height = 750, 600
 
 # Window	
 pygame.init() 
-window = pygame.display.set_mode((width, height)) 
+window = pygame.display.set_mode((width, height),HWSURFACE|DOUBLEBUF|RESIZABLE) 
 
-
+	
+def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
+	x2 = mx + (robotX - mapX1) * ax / mapLX
+	y2 = my + (-robotY - mapY1) * ay / mapLY
+	rd = 8
+	pygame.draw.circle(window, color, (int(x2), int(y2)), rd, 0)
+	pygame.draw.line(window, (255, 248, 0), 
+		(x2, y2),
+		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
+	
 
 
 def callback(particles):
-	N = len(particles.points)
+	# Margin
+	global mx
+	global my
+	# Grid constats
+	global ax
+	global ay
+	global dx
+	global dy
+	
+	# Window size
+	try:
+		width, height =  window.get_size()
+	except :
+		return
+	
+	# Margin
+	mx = width / 12.0
+	my = height / 12.0
+	# Grid constats
+	ax = width - 2.0 * mx # area for x
+	ay = height - 2.0 * my # area for y
+	dx = ax / gm #Delta x
+	dy = ay / gn #Delta y
+	
+	
+	
+	# Number of particles to draw
+	N = len(particles.particles)
 	x = [0] * N
 	y = [0] * N
 	w = [0] * N
 
 	for i in xrange(N):
-		x[i] = particles.points[i].x
-		y[i] = particles.points[i].y
-		w[i] = particles.points[i].z
+		x[i] = particles.particles[i].x
+		y[i] = particles.particles[i].y
+		w[i] = particles.particles[i].z
 		
 	# Draw the canvas
 	window.fill((255, 255, 255))
-
-	# margin
-	mx = width / 12.0
-	my = height / 12.0
-	# Draw the grid
-	ax = width - 2.0 * mx # area for x
-	ay = height - 2.0 * my # area for y
-	dx = ax / gm #Delta x
-	dy = ay / gn #Delta y
 
 
 	# Draw rows
@@ -76,42 +103,45 @@ def callback(particles):
 		y2 = my + (-y[i] - mapY1) * ay / mapLY
 		pygame.draw.circle(window, pcolor, (int(x2), int(y2)), 2, 0)
 
-	# Get robot position from gazebo
-	[robotX, robotY, robotT] = robot.getPosition()
-	x2 = mx + (robotX - mapX1) * ax / mapLX
-	y2 = my + (-robotY - mapY1) * ay / mapLY
+	# Draw main robot
+	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
+	draw_robot(robotX, robotY, robotT)
 
-	
-	rd = 8
-	pygame.draw.circle(window, (0, 0, 170), (int(x2), int(y2)), rd, 0)
-	pygame.draw.line(window, (255, 248, 0), 
-		(x2, y2),
-		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
+
+	# Draw the other robots
+	for orobot in particles.orobots:
+		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
+		draw_robot(robotX, robotY, robotT, (150,150,150))
+
 
 	
 	pygame.display.flip() 
 
 if __name__ == '__main__':
-	global robot
+	#global robot
 	try:
 		# Node roombaControl
 		rospy.init_node('particle_drawer', anonymous=True)		
 
 		# Suscribe
 		robotName = rospy.get_param('~robot_name', 'Robot1')
-		rospy.Subscriber("/" + robotName + "/particles", Polygon, callback)
+		rospy.Subscriber("/" + robotName + "/particles", Particle, callback)
 		
 		# Object to get information from Gazebo
-		robot = RoombaGazebo(robotName)
+		#robot = RoombaGazebo(robotName)
 
 		# Window
+		pygame.RESIZABLE = True
 		while True: 
 			time.sleep(0.1)
 			for event in pygame.event.get(): 
 				if event.type == pygame.QUIT: 
 					sys.exit(0) 
-			  #else: 
-				  #print event 
+				elif event.type==VIDEORESIZE:
+					window = pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
+				#else: 
+					#print event 
 
 	except rospy.ROSInterruptException:
+		sys.exit(0)
 		pass
