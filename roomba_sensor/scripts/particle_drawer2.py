@@ -6,6 +6,10 @@ from geometry_msgs.msg import Twist
 from roomba_comm.msg import Particle
 from roomba_comm.msg import PointR
 
+
+import cv2
+
+
 # For plotting
 import numpy as np
 import sys
@@ -25,10 +29,15 @@ width, height = 750, 600
 pygame.init() 
 window = pygame.display.set_mode((width, height),HWSURFACE|DOUBLEBUF|RESIZABLE) 
 
-	
+def convertAxis(x,y):
+	x2 = mx + (x - mapX1) * ax / mapLX
+	y2 = my + (-y - mapY1) * ay / mapLY
+	return x2,y2
+
 def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
-	x2 = mx + (robotX - mapX1) * ax / mapLX
-	y2 = my + (-robotY - mapY1) * ay / mapLY
+	#x2 = mx + (robotX - mapX1) * ax / mapLX
+	#y2 = my + (-robotY - mapY1) * ay / mapLY
+	x2,y2 = convertAxis(robotX, robotY)
 	rd = 8
 	pygame.draw.circle(window, color, (int(x2), int(y2)), rd, 0)
 	pygame.draw.line(window, (255, 248, 0), 
@@ -36,11 +45,9 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
 	
 
-def draw_points(points, color=(255,0,0)):
-	
+def draw_points(points, color=(255,0,0)):	
 	for p in points:
-		x2 = mx + (p.x - mapX1) * ax / mapLX
-		y2 = my + (- p.y - mapY1) * ay / mapLY
+		x2 ,y2= convertAxis(p.x, p.y)
 		pygame.draw.circle(window, color, (int(x2), int(y2)), 2, 0)
 		
 
@@ -68,10 +75,6 @@ def callback(particles):
 	ay = height - 2.0 * my # area for y
 	dx = ax / gm #Delta x
 	dy = ay / gn #Delta y
-	
-	
-	
-
 		
 	# Draw the canvas
 	window.fill((255, 255, 255))	
@@ -96,11 +99,29 @@ def callback(particles):
 	# Draw particles
 	draw_points(particles.particles,(0,200,0))
 	
-	# Draw particles
+	# Draw anomaly
 	draw_points(particles.anomaly)
 	
+	######## Draw ellipse aproximation
+	# Convert PointR to numpy
+	points = [] 
+	for p in particles.anomaly:
+		points.append([p.x, p.y])	
+	cnt = np.array(points, dtype=np.float32)	
 
+	# ellipse = ((center),(width,height of bounding rect), angle)
+	ellipse = cv2.fitEllipse(cnt)    
+	#pygame.draw.ellipse
+	# Ellipse center
+	ecx, ecy = convertAxis(-1*ellipse[0][0], -1*ellipse[0][1])	
+	#we, he = 
+	#pygame.draw.line(window, (0, 0, 180), int(mx / 2, my + dy * gn / 2),
+	#	(width - mx / 2, my + dy * gn / 2))
+	#pygame.draw.ellipse(window, (128,0,0), ((0,0) ,(10,20)), 1)
+	pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(10), 0)
+#	pygame.draw.circle(window, color, (int(x2), int(y2)), rd, 0)
 	
+	print (ellipse)
 
 	# Draw the other robots
 	for orobot in particles.orobots:
