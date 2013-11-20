@@ -36,6 +36,13 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
 	
 
+def draw_points(points, color=(255,0,0)):
+	
+	for p in points:
+		x2 = mx + (p.x - mapX1) * ax / mapLX
+		y2 = my + (- p.y - mapY1) * ay / mapLY
+		pygame.draw.circle(window, color, (int(x2), int(y2)), 2, 0)
+		
 
 def callback(particles):
 	# Margin
@@ -64,20 +71,10 @@ def callback(particles):
 	
 	
 	
-	# Number of particles to draw
-	N = len(particles.particles)
-	x = [0] * N
-	y = [0] * N
-	w = [0] * N
 
-	for i in xrange(N):
-		x[i] = particles.particles[i].x
-		y[i] = particles.particles[i].y
-		w[i] = particles.particles[i].z
 		
 	# Draw the canvas
-	window.fill((255, 255, 255))
-
+	window.fill((255, 255, 255))	
 
 	# Draw rows
 	color = (170, 170, 170)
@@ -96,12 +93,12 @@ def callback(particles):
 		(mx + dx * gm / 2, my / 2),
 		(mx + dx * gm / 2, height - my / 2))
 		
-	# Draw the particles
-	pcolor = (255,0,0)
-	for i in range(N):
-		x2 = mx + (x[i] - mapX1) * ax / mapLX
-		y2 = my + (-y[i] - mapY1) * ay / mapLY
-		pygame.draw.circle(window, pcolor, (int(x2), int(y2)), 2, 0)
+	# Draw particles
+	draw_points(particles.particles,(0,200,0))
+	
+	# Draw particles
+	draw_points(particles.anomaly)
+	
 
 	# Draw main robot
 	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z

@@ -29,6 +29,13 @@ def run():
 	pmsg.orobots = [r1, r2, r3]
 
 	# Anomaly
+	anomaly = []
+	for i in range(20):
+		a = PointR()
+		a.x, a.y = -2+0.1*i, 2 * sin(i * 0.1)
+		anomaly.append(a)
+	
+	pmsg.anomaly = anomaly
 	
 	
 	while not rospy.is_shutdown():
