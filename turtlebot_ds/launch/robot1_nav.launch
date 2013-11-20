@@ -1,7 +1,24 @@
 <launch>
+ <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> <!-- create, roomba -->
+
+
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="use_sim_time" value="true"/>
+    <arg name="debug" value="false"/>
+
+	<!-- $(find turtlebot_ds)/worlds/simple.world -->
+    <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
+  </include>
   
+
   <!--Robots -->
   <group ns="Robot1">
+		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
+	    	<arg name="base" value="create"/>
+	    	<arg name="init_pose" value="-x -1 -y -1 -z 0" />
+	    	<arg name="robot_name"  value="Robot1" />
+		</include>
 
 	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
 			<param name="robot_name" value="Robot1"/>

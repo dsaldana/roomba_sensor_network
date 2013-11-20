@@ -5,8 +5,9 @@ from std_msgs.msg import Float32
 # Image
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
+from roomba_comm.msg import Particle
+from roomba_comm.msg import PointR
 
 
 # OpenCV
@@ -163,8 +164,13 @@ def run():
 		
 		# Sensed values
 		samples = []
+		orobots = []
 		for msg in robot_msgs.values():
 			samples.append([msg.x, msg.y,  msg.theta, msg.value])
+			# Other robot positions
+			orobot = PointR()
+			orobot.x, orobot.y, orobot.z = msg.x, msg.y,  msg.theta
+			orobots.append(orobot)
 		
 		# Particle filter: updade based on sensor value.
 		pf.update_particles(samples)
@@ -173,8 +179,13 @@ def run():
 		pf.resample()
 		
 		# Publish particles
-		msg_parts = Polygon()
-		msg_parts.points = pf.particles
+		msg_parts = Particle()
+		msg_parts.anomaly = pf.particles
+		mrobot = PointR()
+		mrobot.x, mrobot.y, mrobot.z = camX, camY, camT
+		msg_parts.mrobot = mrobot
+		msg_parts.orobots = orobots
+						
 		partPub.publish(msg_parts)
 
 

@@ -1,5 +1,5 @@
 
-from geometry_msgs.msg import Point32
+from roomba_comm.msg import PointR
 
 
 from roomba_sensor.map import *
@@ -32,7 +32,7 @@ class ParticleFilter:
 		# Sparce the initial particles
 		self.particles = []
 		for i in range(self.N):
-			p = Point32()
+			p = PointR()
 			# Position
 			p.x = random.random() * mapLX + mapX1
 			p.y = random.random() * mapLY + mapY1

@@ -100,10 +100,7 @@ def callback(particles):
 	draw_points(particles.anomaly)
 	
 
-	# Draw main robot
-	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
-	draw_robot(robotX, robotY, robotT)
-
+	
 
 	# Draw the other robots
 	for orobot in particles.orobots:
@@ -111,7 +108,11 @@ def callback(particles):
 		draw_robot(robotX, robotY, robotT, (150,150,150))
 
 
-	
+	# Draw main robot
+	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
+	draw_robot(robotX, robotY, robotT)
+
+
 	pygame.display.flip() 
 
 if __name__ == '__main__':
