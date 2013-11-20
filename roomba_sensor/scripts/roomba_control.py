@@ -138,7 +138,7 @@ def run():
 	# last time that an anomaly was detected
 	last_time_anomaly = 0
 
-
+	anomaly_points = []
 	######## Control Loop
 	print "Start!"
 	while not rospy.is_shutdown():
@@ -151,9 +151,9 @@ def run():
 
 		# Send the info to other robots.
 		smsg = SensedValue()
-		smsg.x = camX
-		smsg.y = camY
-		smsg.theta = camT
+		smsg.x,smsg.y, smsg.theta  = camX, camY, camT
+		smsg.rx,smsg.ry, smsg.rtheta  = robotX, robotY, robotT
+		
 		smsg.robot_id = robotName
 		smsg.value = sensedValue
 		sensorPub.publish(smsg)
@@ -169,7 +169,7 @@ def run():
 			samples.append([msg.x, msg.y,  msg.theta, msg.value])
 			# Other robot positions
 			orobot = PointR()
-			orobot.x, orobot.y, orobot.z = msg.x, msg.y,  msg.theta
+			orobot.x, orobot.y, orobot.z = msg.rx, msg.ry,  msg.rtheta
 			orobots.append(orobot)
 		
 		# Particle filter: updade based on sensor value.
@@ -180,12 +180,12 @@ def run():
 		
 		# Publish particles
 		msg_parts = Particle()
-		msg_parts.anomaly = pf.particles
+		msg_parts.particles = pf.particles
 		mrobot = PointR()
-		mrobot.x, mrobot.y, mrobot.z = camX, camY, camT
+		mrobot.x, mrobot.y, mrobot.z = robotX, robotY, robotT
 		msg_parts.mrobot = mrobot
 		msg_parts.orobots = orobots
-						
+		msg_parts.anomaly = anomaly_points
 		partPub.publish(msg_parts)
 
 
@@ -201,11 +201,17 @@ def run():
 		goalX = None
 		goalY = None
 
+		#### Evaluate Sensed value
 		# The flag for exploring change only if  the robot does not
 		# sense an anomaly in a n seconds (n = max_tracking_time).
 		if sensedValue > 0:
 			explore = False
 			last_time_anomaly = rospy.get_rostime().secs
+			
+			# new point with anomaly
+			an = PointR()
+			an.x, an.y = robotX, robotY
+			anomaly_points.append(an)
 		else:
 			if rospy.get_rostime().secs - last_time_anomaly > max_tracking_time:
 				explore = True
