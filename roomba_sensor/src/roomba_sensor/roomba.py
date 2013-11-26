@@ -4,6 +4,7 @@ import rospy
 # Gazebo
 import gazebo_msgs.srv
 from tf.transformations import euler_from_quaternion
+from tf2_msgs.msg import TFMessage
 
 from math import *
 from roomba_sensor.util import cut_angle
@@ -38,6 +39,7 @@ class RoombaGazebo:
 				resp.pose.orientation.z]
 
 			euler = euler_from_quaternion(quat)
+			#TODO hay que revisar ese menos
 			robotT =  cut_angle(-euler[0] + pi)
 
 			return [robotX, robotY, robotT]
@@ -58,20 +60,19 @@ class RoombaGazebo:
 
 from ar_track_alvar.msg import AlvarMarkers
 
-class ArLocator:
-	robots = ["Robot0", "Robot1", "Robot2","Robot3", "Robot4", "Robot5", "Robot6"]
+class ArLocator:	
 	poses = {}
 	def __init__(self):
-		print "fd"
 		self.load()
 	
-	def load(self):
-		rospy.Subscriber("/ar_pose_marker1", AlvarMarkers, self.callback_maker)	
+	def load(self):		
+		rospy.Subscriber("/tf", TFMessage, self.callback_maker)
 	
 	def callback_maker(self, msg_positions):
 		
-		for m in msg_positions.markers:				
-			self.poses[self.robots[m.id]] = m.pose.pose
+		for tf in msg_positions.transforms:				
+			frame_id = tf.child_frame_id.replace("ar_marker_","Robot")
+			self.poses[frame_id] = tf.transform
 	
 	def get_robot_position(self, robotname):
 		
@@ -103,16 +104,16 @@ class RealRoomba:
 		if pose == None:
 			return None
 
-		robotX, robotY = pose.position.x, pose.position.y
+		robotX, robotY = pose.translation.x, pose.translation.y
 			
 		# the reference for the angle is the y axes.			
-		quat = [pose.orientation.w, 
-				pose.orientation.x,
-				pose.orientation.y, 
-				pose.orientation.z]
+		quat = [pose.rotation.w, 				
+				pose.rotation.x, 
+				pose.rotation.y,
+				pose.rotation.z]
 
 		euler = euler_from_quaternion(quat)
-		robotT =  cut_angle(-euler[0] + pi)
+		robotT =  cut_angle(euler[0])
 
 		return [robotX, robotY, robotT]
 
