@@ -66,15 +66,19 @@ class ArLocator:
 		self.load()
 	
 	def load(self):
-		rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self.makerPositions)	
+		rospy.Subscriber("/ar_pose_marker1", AlvarMarkers, self.callback_maker)	
+	
+	def callback_maker(self, msg_positions):
 		
-	def makerPositions(self, msg_positions):
-		
-		for m in msg_positions.markers:						
-			poses[robots[m.id]] = m.pose.pose
+		for m in msg_positions.markers:				
+			self.poses[self.robots[m.id]] = m.pose.pose
 	
 	def get_robot_position(self, robotname):
-		return poses[robotname]
+		
+		if robotname in self.poses:
+			return self.poses[robotname]
+		else:
+			return None
 		
 
 	
@@ -89,23 +93,16 @@ class RealRoomba:
 		self.robotName = robotName
 		self.positionServer = None
 		
-		if(locator == None):
-			locator = ArLocator()
+		if(self.locator == None):
+			self.locator = ArLocator()
 		#locator.add_robot(robotName)
-		self.load()
 
-
-	def load(self):
-		rospy.Subscriber("/ar_pose_marker", AlvarMarkers, goal_callback)
+	def get_position(self):
+		pose = self.locator.get_robot_position(self.robotName)
 		
-		
-		rospy.wait_for_service('/gazebo/get_model_state')
-		self.positionServer = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+		if pose == None:
+			return None
 
-
-	def getPosition(self):
-		pose = locator.get_robot_position(robotName)
-		
 		robotX, robotY = pose.position.x, pose.position.y
 			
 		# the reference for the angle is the y axes.			
