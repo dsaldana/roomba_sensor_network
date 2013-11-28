@@ -30,11 +30,16 @@ def run():
 
 	# Anomaly
 	anomaly = []
-	for i in range(20):
-		a = PointR()
-		a.x, a.y = -2+0.1*i, 2 * sin(i * 0.1)
-		anomaly.append(a)
+	#points = [[-2,0], [2,0], [0, 1], [0, -1], [-1.9,0.4]]
+	points = [[-2,0], [2,0], [-0.3, -0.9], [0, -1], [-1.9,0.4]]
 	
+	for i in range(5):
+		a = PointR()
+		#a.x, a.y = -2+0.1*i, 2 * sin(i * 0.1)
+		a.x, a.y = -2+0.2*i, 2 * sin(i * 0.1)
+		a.x, a.y = points[i]
+		anomaly.append(a)
+
 	pmsg.anomaly = anomaly
 	
 	
