@@ -1,6 +1,5 @@
-/roomba_comm/msg/SensedValue.msg~
-/roomba_sensor/scripts/particle_drawer2 (copy).py
-/roomba_sensor/scripts/test/test_ellipse_aproximation.py~
+/roomba_sensor/scripts/test/test_locator.py~
+/roomba_sensor/src/roomba_sensor/roomba.py~
 /roomba_sensor/src/roomba_sensor/particle_filter.py~
 /roomba_sensor/scripts/test/test_particle_drawer.py~
 /roomba_sensor/scripts/test/particle_drawer_test.py~

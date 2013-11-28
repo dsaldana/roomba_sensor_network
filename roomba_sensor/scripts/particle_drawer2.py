@@ -89,14 +89,28 @@ def convertAxis(x,y):
 	return x2,y2
 
 def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
+<<<<<<< HEAD
 	#x2 = mx + (robotX - mapX1) * ax / mapLX
 	#y2 = my + (-robotY - mapY1) * ay / mapLY
 	x2,y2 = convertAxis(robotX, robotY)
 	rd = 8
+=======
+	x2 = mx + (robotX - mapX1) * ax / mapLX
+	y2 = my + (-robotY - mapY1) * ay / mapLY
+	# Robot radio
+	rd = int(mx / 3)
+	if rd <1:
+		rd = 1
+	# Line for direction
+	linew = int(mx / 15)
+	if linew < 1:
+		linew = 1
+		
+>>>>>>> da1a6094fac4d79ccd7bba7b6229a39558e1f1de
 	pygame.draw.circle(window, color, (int(x2), int(y2)), rd, 0)
 	pygame.draw.line(window, (255, 248, 0), 
 		(x2, y2),
-		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), 2)
+		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
 
 def draw_points(points, color=(255,0,0)):	
