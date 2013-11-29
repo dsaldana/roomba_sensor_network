@@ -1,13 +1,14 @@
 <launch>
   <arg name="robot_id"       default="Robot1"/> 
 
-  <arg name="simulation" default="$(optenv TURTLEBOT_SIMULATION false)"/>
+  
 
-  <param name="/use_sim_time" value="$(arg simulation)"/>
+   <param name="/use_sim_time" value="false"/>
 
 
 
 	<!-- Roomba Driver -->
+  <group ns="Robot1">
   	<node pkg="create_node" type="turtlebot_node.py" name="turtlebot_node" respawn="true" args="--respawnable">
 		<param name="bonus" value="false" />
 		<param name="update_rate" value="30.0" />
@@ -17,14 +18,6 @@
 		<remap from="imu/data" to="sensors/imu_data" />
 		<remap from="imu/raw" to="sensors/imu_data_raw" />
   	</node>
-
-
-  <!-- bateria -->
-  <!--
-
-  <include file="$(find turtlebot_bringup)/launch/includes/netbook.launch.xml">
-    <arg name="battery" value="$(arg battery)" />
-  </include>
-   -->
+  </group>
 
 </launch>

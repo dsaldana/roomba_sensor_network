@@ -74,15 +74,16 @@ def img_callback(img):
 	# How many white pixels in the right
 	pr = 0
 
-	threshold_value = 200
-
+	threshold_value = 120
+	threshold_other = 100
+	
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
 		for j in xrange(mat.cols / 2):
 			if(red_channel[i, j] > threshold_value):
 				pl = j
 		for j in xrange(mat.cols/2, mat.cols):				
-			if(red_channel[i, j] > threshold_value):
+			if red_channel[i, j] > threshold_other:
 				pr = j - mat.cols/2
 	
 	total = mat.rows * mat.cols * 1.0	
@@ -218,7 +219,8 @@ def run():
 
 		
 		######## Exploring
-		if (explore):
+		#if explore:
+		if False:
 			npgrid = np.array(grid)
 
 			#### Planning: Bread First Search 
