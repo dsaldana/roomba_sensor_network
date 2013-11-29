@@ -23,7 +23,7 @@ goal.x = -1
 goal.y = -1
 
 # state
-traking = False
+traking = None
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
@@ -42,6 +42,7 @@ def goal_callback(point):
 	print "new goal ", [goal.x, goal.y]
 
 def run():
+	global traking
 	# Node roomba navigation
 	rospy.init_node('roomba_navigation')
 
@@ -66,14 +67,18 @@ def run():
 	rospy.Subscriber(topicName, Float32, tracking_callback)
 
 	# Object to get information from Gazebo
-	robot = RoombaGazebo(robotName)
-
+	#robot = RoombaGazebo(robotName)
+	traking = None
 
 	######## Control Loop ###########
 	print "Start!"
 	old_val = -1
 	while not rospy.is_shutdown():
-		
+		rospy.sleep(0.20)
+
+		if (traking is None):
+			continue
+
 		if(traking):
 			###### Tracking ######
 			lin_vel = 0.2
@@ -81,8 +86,9 @@ def run():
 			D = pi / 2
 
 			vel = Twist()
-			vel.linear.x = lin_vel
-			vel.angular.z = -(sensedValue.data * P + (sensedValue.data - old_val) * D)
+			vel.linear.x = 0.3 * lin_vel
+			vel.angular.z = 0.6 * -(sensedValue.data * P + (sensedValue.data - old_val) * D)
+			
 			velPub.publish(vel)
 
 			old_val = sensedValue.data
@@ -127,7 +133,7 @@ def run():
 			
 			velPub.publish(vel)
 
-		rospy.sleep(0.20)
+		
 
 
 if __name__ == '__main__':

@@ -66,7 +66,9 @@ def img_callback(img):
 	mat = CvBridge().imgmsg_to_cv(img, "rgb8")
 	# Extract red channel
 	red_channel = cv.CreateImage(cv.GetSize(mat), 8, 1)
-	cv.Split(mat, red_channel, None, None, None)
+	green_channel = cv.CreateImage(cv.GetSize(mat), 8, 1)
+	blue_channel = cv.CreateImage(cv.GetSize(mat), 8, 1)
+	cv.Split(mat, red_channel, green_channel, blue_channel, None)
 	
 	
 	# How many white pixels in the left
@@ -75,22 +77,24 @@ def img_callback(img):
 	pr = 0
 
 	threshold_value = 120
-	threshold_other = 100
+	threshold_other = 120
 	
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
 		for j in xrange(mat.cols / 2):
-			if(red_channel[i, j] > threshold_value):
+			if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[i, j] < threshold_other:
 				pl = j
-		for j in xrange(mat.cols/2, mat.cols):				
-			if red_channel[i, j] > threshold_other:
-				pr = j - mat.cols/2
+				
+		for j in xrange(int(mat.cols / 2) + 1, mat.cols):				
+			if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[i, j] < threshold_other:
+				pr = j - int(mat.cols / 2)
 	
 	total = mat.rows * mat.cols * 1.0	
 	sensedValue = (pl + pr) / total
 	sensedLeft = (pl * 2.0) / (mat.rows)
 	sensedRight = (pr * 2.0) / (mat.rows)
 	
+	#print [total, sensedValue, sensedLeft, sensedRight]
 	
 
 def run():
@@ -129,7 +133,7 @@ def run():
 	pf = ParticleFilter()		
 
 	# Object to get information from Gazebo
-	robot = RoombaGazebo(robotName)
+	#robot = RoombaGazebo(robotName)
 	
 	# Explore flag. False for tracking
 	explore = True
@@ -144,11 +148,11 @@ def run():
 	print "Start!"
 	while not rospy.is_shutdown():
 		# Get robot position from gazebo
-		[robotX, robotY, robotT] = robot.getPosition()
-
+		#[robotX, robotY, robotT] = robot.getPosition()
+		robotX, robotY, robotT = 0,0,0
 		# Camera position
-		[camX, camY, camT] = robot.getSensorPosition()
-				
+		#[camX, camY, camT] = robot.getSensorPosition()
+		camX, camY, camT = 0,0,0		
 
 		# Send the info to other robots.
 		smsg = SensedValue()
