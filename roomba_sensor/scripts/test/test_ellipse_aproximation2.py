@@ -26,9 +26,6 @@ x = cnt[:, 0]
 y = cnt[:, 1]
 print x
 
-# TODO ???
-eps = 1.0e-8
-
 
 d1 = np.transpose([x*x, x*y, y*y])
 
