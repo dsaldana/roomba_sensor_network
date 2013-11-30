@@ -6,6 +6,8 @@ from geometry_msgs.msg import Twist
 from roomba_comm.msg import Particle
 from roomba_comm.msg import PointR
 from roomba_sensor.ellipse import fit_ellipse
+from roomba_sensor.ellipse import ellipse_box
+from roomba_sensor.ellipse import ellipse_points
 
 # For plotting
 import numpy as np
@@ -27,6 +29,9 @@ pygame.init()
 window = pygame.display.set_mode((width, height),HWSURFACE|DOUBLEBUF|RESIZABLE) 
 
 
+def convert_axis_p(p):
+	x2,y2 = convertAxis[p[0], p[1]]
+	return [x2, y2]
 
 def convertAxis(x,y):
 	x2 = mx + (x - mapX1) * ax / mapLX
@@ -110,44 +115,26 @@ def callback(particles):
 	
 	######## Draw ellipse aproximation
 	# Convert PointR to numpy
-	points = [] 
-	for p in particles.anomaly:
-		points.append([p.x, p.y])	
-	cnt = np.array(points)	
-		
-	x = cnt[:, 0]
-	y = cnt[:, 1]
-
+	NE = len(particles.anomaly)
+	x = [0] * NE
+	y = [0] * NE
+	for i in range(NE):
+		x[i],y[i] = particles.anomaly[i].x, particles.anomaly[i].y	
+	
 	
 	center, axes, phi  = fit_ellipse(x, y)
-	print "web", (center, axes, phi)
-
-	# major axe
-	x1 = center[0] - axes[0] * cos(phi)
-	y1 = center[1] - axes[0] * sin(phi)
-	x2 = center[0] + axes[0] * cos(phi)
-	y2 = center[1] + axes[0] * sin(phi)
 	
-	x1, y1 = convertAxis(x1,y1)
-	x2, y2 = convertAxis(x2,y2)
+	pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
 	
-	pygame.draw.line(window, (0, 180, 180), (int(x1), int(y1)), (int(x2),int(y2)))
-
-	# minor axe
-	x1 = center[0] - axes[1] * cos(phi + pi /2 )
-	y1 = center[1] - axes[1] * sin(phi + pi / 2)
-	x2 = center[0] + axes[1] * cos(phi + pi / 2)
-	y2 = center[1] + axes[1] * sin(phi + pi / 2)
-	
-	x1, y1 = convertAxis(x1,y1)
-	x2, y2 = convertAxis(x2,y2)
-	
-	pygame.draw.line(window, (0, 180, 180), (int(x1), int(y1)), (int(x2),int(y2)))
-	#
+	for i in range(len(pe_x)):
+		ex, ey = pe_x[i], pe_y[i]
+		ex, ey = convertAxis(ex, ey)
+		pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
 
 	ecx, ecy = convertAxis(center[0], center[1])	
 	pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(10), 0)
 	
+
 	# Draw the other robots
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z

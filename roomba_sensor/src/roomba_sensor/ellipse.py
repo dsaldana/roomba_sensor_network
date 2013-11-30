@@ -1,3 +1,8 @@
+
+import numpy as np
+from math import *
+
+
 # Least squares fitting of an ellipse to point data
 # using the algorithm described in:
 #   Radim Halir & Jan Flusser. 1998.
@@ -9,12 +14,6 @@
 # 
 # Migrated code by David Saldana <dajulian at gmail.com>
 #
-
-import numpy as np
-from math import *
-
-
-
 # Arguments:
 # x, y - the x and y coordinates of the data points
 #
@@ -28,7 +27,8 @@ from math import *
 #
 # phi - rotated angle
 def fit_ellipse(x, y):
-		
+	x, y = np.array(x), np.array(y)
+	
 	d1 = np.transpose([x*x, x*y, y*y])
 
 	ones = [1] * len(x)
@@ -77,3 +77,51 @@ def fit_ellipse(x, y):
 	phi = atan(1 / term) / 2
 
 	return center, semi_axes, phi
+
+#
+# Fit the ellipse in a box
+#
+# Return 2 points that defines a box
+#
+def ellipse_box(center, axes, phi):
+	p1x = center[0] + axes[0] * cos(phi) + center[0] + axes[1] * cos(phi + pi / 2)
+	p1y = center[1] + axes[0] * sin(phi) + center[1] + axes[1] * sin(phi + pi / 2)
+	
+	p2x = center[0] - axes[0] * cos(phi) - center[0] - axes[1] * cos(phi + pi /2 )
+	p2y = center[1] - axes[0] * sin(phi) - center[1] - axes[1] * sin(phi + pi / 2)
+
+	return p1x, p1y, p2x, p2y
+
+#
+# Calculate points on an ellipse
+#
+def ellipse_points(center, axes, phi, n=500):	
+	# Calculate points on an ellipse described by
+	# the fit argument as returned by fit.ellipse
+	#
+	# n is the number of points to render
+
+	tt = np.linspace(0, 2*pi, n, endpoint=True, retstep=False)
+##	sa <- sin(fit$angle)
+	sa = sin(phi)
+##	ca <- cos(fit$angle)
+	ca = cos(phi)
+##	ct <- cos(tt)
+	ct = np.cos(tt)
+##	st <- sin(tt)
+	st = np.sin(tt)
+
+	max = np.max(axes)
+	min =np.min(axes)
+##	x <- fit$center[1] + fit$maj * ct * ca - fit$min * st * sa
+
+	x = center[0] + max * ct * ca - min * st * sa
+##	y <- fit$center[2] + fit$maj * ct * sa + fit$min * st * ca
+	y = center[1] + max * ct * sa + min * st * ca
+##	cbind(x=x, y=y)
+	return x,y
+
+
+
+
+
