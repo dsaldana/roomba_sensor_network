@@ -43,7 +43,7 @@ def fit_ellipse(x, y):
 
 	t = np.dot(-np.linalg.inv(s3), s2.T)
 
-	m =  s1 + np.dot(s2,T)
+	m =  s1 + np.dot(s2,t)
 	m = np.array([m[2] / 2, -m[1], m[0]/2])
 
 	d, evec = np.linalg.eig(m)
@@ -53,7 +53,7 @@ def fit_ellipse(x, y):
 	a = evec[:, np.nonzero(cond>0)]
 	a1 = a[:,0][:,0]
 
-	f = np.r_[a1, np.dot(T,a1)]
+	f = np.r_[a1, np.dot(t,a1)]
 
 
 
