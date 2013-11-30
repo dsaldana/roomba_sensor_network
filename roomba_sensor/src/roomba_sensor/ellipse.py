@@ -93,32 +93,29 @@ def ellipse_box(center, axes, phi):
 	return p1x, p1y, p2x, p2y
 
 #
-# Calculate points on an ellipse
+# Calculate points on an ellipse.
+#
+# Return a set of points gerated from the ellipse.
 #
 def ellipse_points(center, axes, phi, n=500):	
 	# Calculate points on an ellipse described by
 	# the fit argument as returned by fit.ellipse
 	#
 	# n is the number of points to render
-
 	tt = np.linspace(0, 2*pi, n, endpoint=True, retstep=False)
-##	sa <- sin(fit$angle)
+
 	sa = sin(phi)
-##	ca <- cos(fit$angle)
 	ca = cos(phi)
-##	ct <- cos(tt)
 	ct = np.cos(tt)
-##	st <- sin(tt)
 	st = np.sin(tt)
 
 	max = np.max(axes)
 	min =np.min(axes)
-##	x <- fit$center[1] + fit$maj * ct * ca - fit$min * st * sa
-
+	
+	# X,Y points
 	x = center[0] + max * ct * ca - min * st * sa
-##	y <- fit$center[2] + fit$maj * ct * sa + fit$min * st * ca
 	y = center[1] + max * ct * sa + min * st * ca
-##	cbind(x=x, y=y)
+
 	return x,y
 
 
