@@ -111,7 +111,7 @@ def run():
 	velPub = rospy.Publisher(topicName, Twist)
 
 	# Create a publisher for the particles
-	partPub = rospy.Publisher("particles", Particle)
+	partPub = rospy.Publisher("/" + robotName + "/particles", Particle)
 	
 	# Camera
 	topicName = "/" + robotName + "/front_cam/camera/image"

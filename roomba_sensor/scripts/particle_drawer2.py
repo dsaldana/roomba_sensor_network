@@ -27,7 +27,7 @@ width, height = 750, 600
 # Window	
 pygame.init() 
 window = pygame.display.set_mode((width, height),HWSURFACE|DOUBLEBUF|RESIZABLE) 
-
+particles = None
 
 def convert_axis_p(p):
 	x2,y2 = convertAxis[p[0], p[1]]
@@ -42,11 +42,11 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 	x2,y2 = convertAxis(robotX, robotY)
 
 	# Robot radio
-	rd = int(mx / 5)
+	rd = int((mx + my)/ 12)
 	if rd <1:
 		rd = 1
 	# Line for direction
-	linew = int(mx / 15)
+	linew = int((mx + my)/ 40)
 	if linew < 1:
 		linew = 1
 		
@@ -62,7 +62,11 @@ def draw_points(points, color=(255,0,0)):
 		pygame.draw.circle(window, color, (int(x2), int(y2)), 2, 0)
 		
 
-def callback(particles):
+def callback(particles_msg):
+	global particles
+	particles = particles_msg
+
+def draw_particles():
 	# Margin
 	global mx
 	global my
@@ -71,7 +75,8 @@ def callback(particles):
 	global ay
 	global dx
 	global dy
-	
+	global particles
+
 	# Window size
 	try:
 		width, height =  window.get_size()
@@ -112,27 +117,29 @@ def callback(particles):
 	
 	# Draw anomaly
 	draw_points(particles.anomaly)
-	
-	######## Draw ellipse aproximation
-	# Convert PointR to numpy
-	NE = len(particles.anomaly)
-	x = [0] * NE
-	y = [0] * NE
-	for i in range(NE):
-		x[i],y[i] = particles.anomaly[i].x, particles.anomaly[i].y	
-	
-	
-	center, axes, phi  = fit_ellipse(x, y)
-	
-	pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
-	
-	for i in range(len(pe_x)):
-		ex, ey = pe_x[i], pe_y[i]
-		ex, ey = convertAxis(ex, ey)
-		pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
 
-	ecx, ecy = convertAxis(center[0], center[1])	
-	pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(10), 0)
+	# Fit the anomaly to an ellipse
+	if len(particles.anomaly) > 5:				
+		######## Draw ellipse aproximation
+		# Convert PointR to numpy
+		NE = len(particles.anomaly)
+		x = [0] * NE
+		y = [0] * NE
+		for i in range(NE):
+			x[i],y[i] = particles.anomaly[i].x, particles.anomaly[i].y	
+		
+		
+		center, axes, phi  = fit_ellipse(x, y)
+		
+		pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
+		
+		for i in range(len(pe_x)):
+			ex, ey = pe_x[i], pe_y[i]
+			ex, ey = convertAxis(ex, ey)
+			pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
+
+		ecx, ecy = convertAxis(center[0], center[1])	
+		pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(10), 0)
 	
 
 	# Draw the other robots
@@ -148,29 +155,42 @@ def callback(particles):
 
 	pygame.display.flip() 
 
+
+
+
+def run():
+
+	# Node roombaControl
+	rospy.init_node('particle_drawer')		
+
+	# Suscribe
+	robotName = rospy.get_param('~robot_name', 'Robot1')
+	rospy.Subscriber("/" + robotName + "/particles", Particle, callback)
+					
+
+	# Window
+	pygame.RESIZABLE = True
+	while not rospy.is_shutdown():
+		rospy.sleep(0.1)
+		# PyGame events
+		for event in pygame.event.get(): 
+			if event.type == pygame.QUIT: 
+				sys.exit(0) 
+			elif event.type==VIDEORESIZE:
+				window = pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
+			#else: 
+				#print event 
+		# Draw the particles
+		if particles is not None:
+			draw_particles()
+		
+		
+
+
 if __name__ == '__main__':
 	#global robot
 	try:
-		# Node roombaControl
-		rospy.init_node('particle_drawer')		
-
-		# Suscribe
-		robotName = rospy.get_param('~robot_name', 'Robot1')
-		rospy.Subscriber("/" + robotName + "/particles", Particle, callback)
-						
-
-		# Window
-		pygame.RESIZABLE = True
-		while True: 
-			time.sleep(0.1)
-			for event in pygame.event.get(): 
-				if event.type == pygame.QUIT: 
-					sys.exit(0) 
-				elif event.type==VIDEORESIZE:
-					window = pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
-				#else: 
-					#print event 
-
+		run()		
 	except rospy.ROSInterruptException:
 		sys.exit(0)
 		pass
