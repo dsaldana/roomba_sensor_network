@@ -152,14 +152,12 @@ if __name__ == '__main__':
 	#global robot
 	try:
 		# Node roombaControl
-		rospy.init_node('particle_drawer', anonymous=True)		
+		rospy.init_node('particle_drawer')		
 
 		# Suscribe
 		robotName = rospy.get_param('~robot_name', 'Robot1')
 		rospy.Subscriber("/" + robotName + "/particles", Particle, callback)
-		
-		# Object to get information from Gazebo
-		#robot = RoombaGazebo(robotName)
+						
 
 		# Window
 		pygame.RESIZABLE = True

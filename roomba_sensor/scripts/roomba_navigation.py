@@ -103,6 +103,7 @@ def run():
 				continue
 
 			# The reference for the angle is the x axes.
+			# TODO cambiar por atan2
 			t = atan(y / x) 
 			if  x < 0:
 				t += pi
