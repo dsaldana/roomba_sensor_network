@@ -15,7 +15,7 @@ import random
 import copy
 
 from roomba_sensor.sensor import Sensor
-from roomba_sensor.roomba import RoombaGazebo
+from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.util import cut_angle
 
 goal = Point32()
@@ -45,30 +45,27 @@ def run():
 	global traking
 	# Node roomba navigation
 	rospy.init_node('roomba_navigation')
-
-	#a = Sensor()
-	#print a.p
-	#roomba_sensor.hello.say('my friend!')
-		
+	
 	######### Initialization ##################
 	# Robot's name is an argument
-	global robotName
-	robotName = rospy.get_param('~robot_name', 'Robot1')
+	global robot_name
+	robot_name = rospy.get_param('~robot_name', 'Robot1')
+	simulated_robots = rospy.get_param('simulated_robots', True)
+
 
 	# Create the Publisher to control the robot.
-	topicName = "/" + robotName + "/commands/velocity"
+	topicName = "/" + robot_name + "/commands/velocity"
 	velPub = rospy.Publisher(topicName, Twist)
 		
-	topicName = "/" + robotName + "/goal"
+	topicName = "/" + robot_name + "/goal"
 	rospy.Subscriber(topicName, Point32, goal_callback)
 
 	# Tracking callback
-	topicName = "/" + robotName + "/tracking"
+	topicName = "/" + robot_name + "/tracking"
 	rospy.Subscriber(topicName, Float32, tracking_callback)
 
-	# Object to get information from Gazebo
-	#robot = RoombaGazebo(robotName)
-	traking = None
+	## Object to get information from Gazebo
+	robot = RoombaLocalization(robot_name)	
 
 	######## Control Loop ###########
 	print "Start!"
@@ -78,7 +75,7 @@ def run():
 
 		if (traking is None):
 			continue
-
+		#TODO implement tracking in another module.
 		if(traking):
 			###### Tracking ######
 			lin_vel = 0.2
@@ -95,7 +92,7 @@ def run():
 
 		else:
 			###### Navigation ######
-			[sX, sY, sT] = robot.getPosition()
+			[sX, sY, sT] = robot.get_position()
 
 			# Orientation
 			x = goal.x - sX 
@@ -105,7 +102,7 @@ def run():
 				rospy.sleep(0.20)
 				continue
 
-			# the reference for the angle is the x axes.
+			# The reference for the angle is the x axes.
 			t = atan(y / x) 
 			if  x < 0:
 				t += pi
@@ -117,14 +114,14 @@ def run():
 			# Euclidean distance
 			d = sqrt(x*x + y*y)
 
-			print  "distance=",d," teta: ", degrees(controlT)
+			print  "distance=", d, " teta: ", degrees(controlT)
 
 			vel = Twist()
 			vel.linear.x = d / 5
 			vel.angular.z = (controlT) / 1
 
 			# Max velocities
-			max_linear_speed = 1
+			max_linear_speed = 3
 			max_angular_speed = 100
 			#if vel.linear.x > max_linear_speed:
 			#	vel.linear.x = max_linear_speed

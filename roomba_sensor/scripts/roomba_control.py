@@ -18,7 +18,7 @@ import cv
 from math import *
 import random
 
-from roomba_sensor.roomba import RoombaGazebo
+from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.particle_filter import ParticleFilter
 from roomba_sensor.grid_util import bread_first_search
 from roomba_sensor.grid_util import validate_index
@@ -105,7 +105,6 @@ def run():
 	# Robot's name is an argument
 	global robotName
 	robotName = rospy.get_param('~robot_name', 'Robot1')
-	#print robotName
 
 	# Create the Publisher to control the robot.
 	topicName = "/" + robotName + "/commands/velocity"
@@ -132,8 +131,8 @@ def run():
 	# Initialize Particles 
 	pf = ParticleFilter()		
 
-	# Object to get information from Gazebo
-	#robot = RoombaGazebo(robotName)
+	## Robot Localization
+	robot = RoombaLocalization(robotName)
 	
 	# Explore flag. False for tracking
 	explore = True
@@ -148,11 +147,9 @@ def run():
 	print "Start!"
 	while not rospy.is_shutdown():
 		# Get robot position from gazebo
-		#[robotX, robotY, robotT] = robot.getPosition()
-		robotX, robotY, robotT = 0,0,0
+		[robotX, robotY, robotT] = robot.get_position()		
 		# Camera position
-		#[camX, camY, camT] = robot.getSensorPosition()
-		camX, camY, camT = 0,0,0		
+		[camX, camY, camT] = robot.get_sensor_position()
 
 		# Send the info to other robots.
 		smsg = SensedValue()
@@ -223,8 +220,8 @@ def run():
 
 		
 		######## Exploring
-		#if explore:
-		if False:
+		if explore:
+		#if False:
 			npgrid = np.array(grid)
 
 			#### Planning: Bread First Search 
@@ -233,7 +230,8 @@ def run():
 			#rospy.logerr("D")
 			#rospy.logerr(D)
 			
-			#TODO take into acount the other robots.
+			# Take into acount the other robots.
+			# It needs to be tested
 			DRT = np.zeros((gn,gm))
 			for r in robot_msgs.values():
 				if (r.robot_id == robotName):

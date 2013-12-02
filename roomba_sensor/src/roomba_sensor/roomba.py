@@ -10,6 +10,37 @@ from math import *
 from roomba_sensor.util import cut_angle
 from roomba_sensor.particle_filter import ParticleFilter
 
+#######################################################
+##### Localization for virtual or physical robot.
+#######################################################
+class RoombaLocalization:
+
+	def __init__(self, robotName):
+		simulated_robots = rospy.get_param('simulated_robots', True)
+		# Object to get information from Gazebo		
+		self.robot = None
+
+		if simulated_robots:
+			rospy.loginfo("Working with simulated robots.")
+			# Localization by Gazebo
+			self.robot = RoombaGazebo(robotName)
+		else:
+			rospy.loginfo("Working with physical robots.")
+			# Localization by ar_alvar
+			self.robot = RealRoomba(robotName)
+
+	def get_position(self):
+		return self.robot.get_position()
+
+	def get_sensor_position(self):
+		return self.robot.get_sensor_position()
+
+
+
+
+######################################
+### Localization from Gazebo.
+######################################
 class RoombaGazebo:
 	# Distance from robot to camera.
 	d = 0.5
@@ -24,12 +55,13 @@ class RoombaGazebo:
 
 
 	def load(self):
-		print "wait for service"
-		rospy.wait_for_service('/gazebo/get_model_state')
-		self.positionServer = rospy.ServiceProxy('/gazebo/get_model_state', gazebo_msgs.srv.GetModelState)
+		print "waiting model state service from Gazebo"
+		rospy.wait_for_service('/gazebo/get_model_state')		
+		self.positionServer = rospy.ServiceProxy('/gazebo/get_model_state', 
+			gazebo_msgs.srv.GetModelState)
 
 
-	def getPosition(self):
+	def get_position(self):
 		try:			
 			resp = self.positionServer(self.robotName, "world")
 			robotX = resp.pose.position.x
@@ -41,7 +73,7 @@ class RoombaGazebo:
 				resp.pose.orientation.z]
 
 			euler = euler_from_quaternion(quat)
-			#TODO hay que revisar ese menos
+			# That minus is a little bit strage but it works well.
 			robotT =  cut_angle(-euler[0] + pi)
 
 			return [robotX, robotY, robotT]
@@ -50,8 +82,8 @@ class RoombaGazebo:
 			print "Service call to gazebo failed: %s" %e
 
 
-	def getSensorPosition(self):
-		[robotX, robotY, robotT] = self.getPosition()
+	def get_sensor_position(self):
+		[robotX, robotY, robotT] = self.get_position()
 
 		camX = robotX + self.d * cos(robotT)
 		camY = robotY + self.d * sin(robotT)
@@ -84,8 +116,9 @@ class ArLocator:
 			return None
 		
 
-	
-
+######################################################################
+# This class gets the robot position based on ar_track_alvar package.	
+######################################################################
 class RealRoomba:
 	# Distance from robot to camera.
 	d = 0.5
@@ -119,11 +152,10 @@ class RealRoomba:
 
 		return [robotX, robotY, robotT]
 
-	def getSensorPosition(self):
-		[robotX, robotY, robotT] = self.getPosition()
+	def get_sensor_position(self):
+		[robotX, robotY, robotT] = self.get_position()
 
 		camX = robotX + self.d * cos(robotT)
 		camY = robotY + self.d * sin(robotT)
 
 		return [camX, camY, robotT]
-
