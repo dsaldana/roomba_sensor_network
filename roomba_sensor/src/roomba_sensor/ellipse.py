@@ -10,8 +10,11 @@ from math import *
 #   Proceedings of the 6th International Conference in Central Europe
 #   on Computer Graphics and Visualization. WSCG '98, p. 125-132
 #
-# Adapted from the original Matlab, and  R code from Michael Bedward
-# 
+# Adapted from the original Matlab
+#
+# R Code and documentation by Michael Bedward:
+# http://lastresortsoftware.blogspot.com.au/2012/09/fitting-ellipse-to-point-data.html
+#
 # Migrated code by David Saldana <dajulian at gmail.com>
 #
 # Arguments:

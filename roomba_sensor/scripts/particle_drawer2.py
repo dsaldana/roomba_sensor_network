@@ -118,29 +118,38 @@ def draw_particles():
 	# Draw anomaly
 	draw_points(particles.anomaly)
 
+	particles
 	# Fit the anomaly to an ellipse
-	if len(particles.anomaly) > 5:				
+	if len(particles.anomaly) > 0:				
 		######## Draw ellipse aproximation
 		# Convert PointR to numpy
 		NE = len(particles.anomaly)
+		#NE = 40
 		x = [0] * NE
 		y = [0] * NE
-		for i in range(NE):
-			x[i],y[i] = particles.anomaly[i].x, particles.anomaly[i].y	
+		#for i in range(NE):
+		for i in range(0, NE):
+			j = len(particles.anomaly)-NE -1 + i
+			x[i],y[i] = particles.anomaly[j].x, particles.anomaly[j].y	
 		
 		
 		center, axes, phi  = fit_ellipse(x, y)
-		
-		pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
-		
-		for i in range(len(pe_x)):
-			ex, ey = pe_x[i], pe_y[i]
-			ex, ey = convertAxis(ex, ey)
-			pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
 
-		ecx, ecy = convertAxis(center[0], center[1])	
-		pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(10), 0)
-	
+		if max(axes) > 100:
+			rospy.logerr("Elipse fuera de rango")
+		else:
+			print "drawing ellipse", [center, axes, degrees(phi)]
+			pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
+			
+			for i in range(len(pe_x)):
+				ex, ey = pe_x[i], pe_y[i]
+				ex, ey = convertAxis(ex, ey)
+				pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
+
+			ecx, ecy = convertAxis(center[0], center[1])	
+			pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(5), 0)
+		
+			
 
 	# Draw the other robots
 	for orobot in particles.orobots:
