@@ -16,7 +16,7 @@ from roomba_sensor.particle_filter import ParticleFilter
 class RoombaLocalization:
 
 	def __init__(self, robotName):
-		simulated_robots = rospy.get_param('simulated_robots', True)
+		simulated_robots = rospy.get_param('/simulated_robots', False)
 		# Object to get information from Gazebo		
 		self.robot = None
 
@@ -54,8 +54,8 @@ class RoombaGazebo:
 		self.load()
 
 
-	def load(self):
-		print "waiting model state service from Gazebo"
+	def load(self):		
+		rospy.logerr("waiting model state service from Gazebo")
 		rospy.wait_for_service('/gazebo/get_model_state')		
 		self.positionServer = rospy.ServiceProxy('/gazebo/get_model_state', 
 			gazebo_msgs.srv.GetModelState)
@@ -137,7 +137,8 @@ class RealRoomba:
 		pose = self.locator.get_robot_position(self.robotName)
 		
 		if pose == None:
-			return None
+			rospy.logerr("No robot position")
+			return [0, 0, 0]
 
 		robotX, robotY = pose.translation.x, pose.translation.y
 			

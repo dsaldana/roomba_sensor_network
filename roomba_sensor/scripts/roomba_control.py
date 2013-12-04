@@ -97,7 +97,7 @@ def img_callback(img):
 	#print [total, sensedValue, sensedLeft, sensedRight]
 	
 
-def run():
+def run():	
 	######### Initialization ##################
 	# Node roombaControl
 	rospy.init_node('roomba_control')
@@ -106,9 +106,12 @@ def run():
 	global robotName
 	robotName = rospy.get_param('~robot_name', 'Robot1')
 
+	rospy.loginfo("Loading robot control.")
+
 	# Create the Publisher to control the robot.
 	topicName = "/" + robotName + "/commands/velocity"
 	velPub = rospy.Publisher(topicName, Twist)
+	
 
 	# Create a publisher for the particles
 	partPub = rospy.Publisher("/" + robotName + "/particles", Particle)
