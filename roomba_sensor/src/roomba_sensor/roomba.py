@@ -122,7 +122,7 @@ class ArLocator:
 class RealRoomba:
 	# Distance from robot to camera.
 	d = rospy.get_param('/sensor_distance', 0.5)
-	
+
 	locator = None
 	
 	def __init__(self, robotName):
@@ -150,7 +150,7 @@ class RealRoomba:
 				pose.rotation.z]
 
 		euler = euler_from_quaternion(quat)
-		robotT =  cut_angle(euler[0])
+		robotT = cut_angle(euler[0])
 
 		return [robotX, robotY, robotT]
 

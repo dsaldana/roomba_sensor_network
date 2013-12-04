@@ -19,11 +19,11 @@ from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.util import cut_angle
 
 goal = Point32()
-goal.x = -1
-goal.y = -1
+goal.x = 0
+goal.y = 0
 
 # state
-traking = None
+traking = False
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
@@ -73,8 +73,8 @@ def run():
 	while not rospy.is_shutdown():
 		rospy.sleep(0.20)
 
-		if (traking is None):
-			continue
+		#if (traking is None):
+		#	continue
 		#TODO implement tracking in another module.
 		if(traking):
 			###### Tracking ######
@@ -91,8 +91,9 @@ def run():
 			old_val = sensedValue.data
 
 		else:
-			###### Navigation ######
+			###### Navigation #####
 			[sX, sY, sT] = robot.get_position()
+			print "Navigating", [sX, sY, sT]
 
 			# Orientation
 			x = goal.x - sX 
@@ -118,16 +119,19 @@ def run():
 			print  "distance=", d, " teta: ", degrees(controlT)
 
 			vel = Twist()
-			vel.linear.x = d / 5
-			vel.angular.z = (controlT) / 1
+			vel.linear.x = d / 10
+			vel.angular.z = (controlT)  * 1
 
-			# Max velocities
-			max_linear_speed = 3
-			max_angular_speed = 100
-			#if vel.linear.x > max_linear_speed:
-			#	vel.linear.x = max_linear_speed
-			if vel.angular.z > max_angular_speed:
-				vel.angular.z = max_angular_speed
+			# velocity range
+			#linear_r = [0.02, 3]
+			#angular_r = [1, 100]
+			#if vel.linear.x < linear_r[0]:
+			#	vel.linear.x = 0
+
+			#if vel.angular.z > angular_r[1]:
+			#	vel.angular.z = angular_r[1]
+			#if vel.angular.z < angular_r[0]:
+			#	vel.angular.z = 0
 			
 			velPub.publish(vel)
 

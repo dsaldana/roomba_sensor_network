@@ -15,18 +15,18 @@
 
 	<param name="sensor_radio" value="0.15" />
 	<param name="sensor_distance" value="0.15" />
-	
+
 	<group ns="$(arg robot_id)">
 
 	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
 			<param name="robot_name" value="$(arg robot_id)"/>
 	  	</node>
 		
-		<!--
+		
 		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
 			<param name="robot_name" value="$(arg robot_id)"/>
 	  	</node>
-  -->
+
 	  	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
 			<param name="robot_name" value="$(arg robot_id)"/>
 	  	</node>
