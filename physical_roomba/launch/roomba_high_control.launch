@@ -6,13 +6,16 @@
 	<!-- Map parameters -->
 	<param name="map_x1" value="-2.0" /> 
 	<param name="map_x2" value="2.0" /> 
-	<param name="map_y1" value="-2.0" /> 
-	<param name="map_y2" value="2.0" /> 
+	<param name="map_y1" value="-1.0" /> 
+	<param name="map_y2" value="1.0" /> 
 	<!-- Grid -->
-	<param name="grid_n" value="8" /> 
+	<param name="grid_n" value="4" /> 
 	<param name="grid_m" value="8" />
 
 
+	<param name="sensor_radio" value="0.15" />
+	<param name="sensor_distance" value="0.15" />
+	
 	<group ns="$(arg robot_id)">
 
 	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">

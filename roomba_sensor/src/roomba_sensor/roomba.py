@@ -121,7 +121,8 @@ class ArLocator:
 ######################################################################
 class RealRoomba:
 	# Distance from robot to camera.
-	d = 0.5
+	d = rospy.get_param('/sensor_distance', 0.5)
+	
 	locator = None
 	
 	def __init__(self, robotName):

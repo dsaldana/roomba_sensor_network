@@ -19,7 +19,7 @@ class ParticleFilter:
 	sd_mov = 0.1
 
 	# radio to cover
-	r = 0.5
+	r = rospy.get_param('/sensor_radio', 0.5)
 
 	# PF weights
 	weight_tracking_left = 1.2
@@ -107,7 +107,7 @@ class ParticleFilter:
 
 	def particles_in_grid(self):
 		# Particle position in grid n rows and m columns
-		grid = [[0 for j in xrange(gm)] for i in xrange(gn)]
+		grid = [[0 for j in xrange(gn)] for i in xrange(gm)]
 		for p in self.particles:
 			# Particle in grid
 			if(p.x > mapX1 and p.x < mapX2 and p.y > mapY1 and p.y < mapY2):
