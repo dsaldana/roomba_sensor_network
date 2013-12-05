@@ -235,18 +235,22 @@ def run():
 			
 			# Take into acount the other robots.
 			# It needs to be tested
-			DRT = np.zeros((gn,gm))
-			for r in robot_msgs.values():
-				if (r.robot_id == robotName):
-					continue
-				# Distances from robot
-				ri,rj = coords_to_grid(r.x, r.y)
-				#rospy.logerr("Robot position")
-				#rospy.logerr([ri,rj])
-				BFS = bread_first_search(ri, rj, grid)
-				#rospy.logerr(BFS)
-				u = 0.5 * np.max(npgrid) * np.exp(-np.array(BFS))
-				DRT += u
+			try:
+				DRT = np.zeros((gn,gm))
+				for r in robot_msgs.values():
+					if (r.robot_id == robotName):
+						continue
+					# Distances from robot
+					ri,rj = coords_to_grid(r.x, r.y)
+					#rospy.logerr("Robot position")
+					#rospy.logerr([ri,rj])
+					BFS = bread_first_search(ri, rj, grid)
+					#rospy.logerr(BFS)
+					u = 0.5 * np.max(npgrid) * np.exp(-np.array(BFS))
+					DRT += u
+			except Exception, e:
+				rospy.logerr("Error integrating the data from other robots", e)
+			
 				
 				
 			#rospy.logerr("DRT")
