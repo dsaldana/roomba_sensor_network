@@ -235,8 +235,9 @@ def run():
 			
 			# Take into acount the other robots.
 			# It needs to be tested
+			DRT = np.zeros((gn,gm))
+
 			try:
-				DRT = np.zeros((gn,gm))
 				for r in robot_msgs.values():
 					if (r.robot_id == robotName):
 						continue
@@ -249,7 +250,7 @@ def run():
 					u = 0.5 * np.max(npgrid) * np.exp(-np.array(BFS))
 					DRT += u
 			except Exception, e:
-				rospy.logerr("Error integrating the data from other robots", e)
+				rospy.logerr("Error integrating the data from other robots. " + str(e))
 			
 				
 				
