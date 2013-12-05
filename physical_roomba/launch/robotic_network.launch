@@ -1,0 +1,6 @@
+<launch> 
+<include file="$(find physical_roomba)/launch/roomba_high_control.launch">
+    <arg name="robot_id" value="Robot2"/>
+  </include>
+
+</launch>

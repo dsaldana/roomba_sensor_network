@@ -135,19 +135,23 @@ def draw_particles():
 		
 		center, axes, phi  = fit_ellipse(x, y)
 
-		if max(axes) > 100:
-			rospy.logerr("Elipse fuera de rango")
-		else:
-			print "drawing ellipse", [center, axes, degrees(phi)]
-			pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
-			
-			for i in range(len(pe_x)):
-				ex, ey = pe_x[i], pe_y[i]
-				ex, ey = convertAxis(ex, ey)
-				pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
+		try:
+				
+			if max(axes) > 100:
+				rospy.logerr("Elipse fuera de rango")
+			else:
+				print "drawing ellipse", [center, axes, degrees(phi)]
+				pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
+				
+				for i in range(len(pe_x)):
+					ex, ey = pe_x[i], pe_y[i]
+					ex, ey = convertAxis(ex, ey)
+					pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
 
-			ecx, ecy = convertAxis(center[0], center[1])	
-			pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(5), 0)
+				ecx, ecy = convertAxis(center[0], center[1])	
+				pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(5), 0)
+		except Exception, e:
+			print e
 		
 			
 
