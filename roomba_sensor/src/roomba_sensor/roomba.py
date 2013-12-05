@@ -4,7 +4,8 @@ import rospy
 # Gazebo
 import gazebo_msgs.srv
 from tf.transformations import euler_from_quaternion
-from tf2_msgs.msg import TFMessage
+#from tf2_msgs.msg import TFMessage
+from ar_track_alvar.msg import AlvarMarkers
 
 from math import *
 from roomba_sensor.util import cut_angle
@@ -100,16 +101,17 @@ class ArLocator:
 		self.load()
 	
 	def load(self):		
-		rospy.Subscriber("/tf", TFMessage, self.callback_maker)
-	
+		#rospy.Subscriber("/tf", TFMessage, self.callback_maker)
+		rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self.callback_maker)
+
 	def callback_maker(self, msg_positions):
-		
-		for tf in msg_positions.transforms:				
-			frame_id = tf.child_frame_id.replace("ar_marker_","Robot")
-			self.poses[frame_id] = tf.transform
+
+		for marker in msg_positions.markers:
+			detected_robot = "Robot%i" % marker.id
+			self.poses[detected_robot] = marker.pose.pose
+
 	
-	def get_robot_position(self, robotname):
-		
+	def get_robot_position(self, robotname):		
 		if robotname in self.poses:
 			return self.poses[robotname]
 		else:
@@ -141,16 +143,18 @@ class RealRoomba:
 			rospy.logerr("No robot position")
 			return [0, 0, 0]
 
-		robotX, robotY = pose.translation.x, pose.translation.y
+		robotX, robotY = pose.position.x, pose.position.y
 			
 		# the reference for the angle is the y axes.			
-		quat = [pose.rotation.w, 				
-				pose.rotation.x, 
-				pose.rotation.y,
-				pose.rotation.z]
+		quat = [pose.orientation.w, 				
+				pose.orientation.x, 
+				pose.orientation.y,
+				pose.orientation.z]
 
 		euler = euler_from_quaternion(quat)
-		robotT = cut_angle(euler[0])
+
+		## FIXME It works, I dont know why.
+		robotT = cut_angle(-euler[0] + pi)
 
 		return [robotX, robotY, robotT]
 

@@ -19,8 +19,8 @@ from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.util import cut_angle
 
 goal = Point32()
-goal.x = 0
-goal.y = 0
+goal.x = 0.0000001
+goal.y = 0.0000001
 
 # state
 traking = False
@@ -119,8 +119,8 @@ def run():
 			print  "distance=", d, " teta: ", degrees(controlT)
 
 			vel = Twist()
-			vel.linear.x = d / 10
-			vel.angular.z = (controlT)  * 1
+			vel.linear.x = 0* d / 5
+			vel.angular.z =- (controlT)  * 1
 
 			# velocity range
 			#linear_r = [0.02, 3]
