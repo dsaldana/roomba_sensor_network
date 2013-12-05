@@ -119,7 +119,7 @@ def run():
 			print  "distance=", d, " teta: ", degrees(controlT)
 
 			vel = Twist()
-			vel.linear.x = 0* d / 5
+			vel.linear.x = d * 0.5
 			vel.angular.z =- (controlT)  * 1
 
 			# velocity range
