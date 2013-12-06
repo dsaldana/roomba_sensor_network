@@ -75,7 +75,7 @@ class RoombaGazebo:
 
 			euler = euler_from_quaternion(quat)
 			# That minus is a little bit strage but it works well.
-			robotT =  cut_angle(-euler[0] + pi)
+			robotT =  cut_angle(- euler[0] + pi)
 
 			return [robotX, robotY, robotT]
 
