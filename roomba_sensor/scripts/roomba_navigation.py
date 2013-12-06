@@ -25,6 +25,11 @@ goal.y = 0.0000001
 # state
 traking = False
 
+# P Control factors
+p_angular = rospy.get_param('/p_control_angular', 1.0)
+p_linear = rospy.get_param('/p_control_linear', 0.5)
+
+
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
 	global traking
@@ -119,17 +124,27 @@ def run():
 			print  "distance=", d, " teta: ", degrees(controlT)
 
 			vel = Twist()
-			vel.linear.x = d * 0.5
-			vel.angular.z =- (controlT)  * 1
+			# for rial robot: vel.linear.x = 0.5 * d 
+			### P Control ###
+
+			vel.linear.x = p_linear * d 
+			vel.angular.z = p_angular * controlT
+
+			# TODO For real robots
+			#vel.angular.z *= -1
 
 			# velocity range
-			#linear_r = [0.02, 3]
-			#angular_r = [1, 100]
-			#if vel.linear.x < linear_r[0]:
-			#	vel.linear.x = 0
+			linear_r = [0.02, 0.2 * 10]
+			angular_r = [1, pi/2 ]
+			
+			if vel.linear.x > linear_r[1]:
+				vel.linear.x = linear_r[1]
+			
 
-			#if vel.angular.z > angular_r[1]:
-			#	vel.angular.z = angular_r[1]
+			if vel.angular.z > angular_r[1]: 
+				vel.angular.z = angular_r[1]
+			elif vel.angular.z < - angular_r[1]:
+				vel.angular.z = - angular_r[1]
 			#if vel.angular.z < angular_r[0]:
 			#	vel.angular.z = 0
 			

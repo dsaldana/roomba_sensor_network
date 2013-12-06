@@ -1,7 +1,7 @@
 <launch>
   <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> <!-- create, roomba -->
 
-
+  <param name="simulated_robots" value="true"/> 
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="use_sim_time" value="true"/>
@@ -28,9 +28,9 @@
 			<param name="robot_name" value="Robot1"/>
 	  	</node>
 
-	  	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
+<!-- 	  	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
 			<param name="robot_name" value="Robot1"/>
-	  	</node>
+	  	</node> -->
   </group>
 
 
@@ -44,14 +44,15 @@
 	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
 			<param name="robot_name" value="Robot2"/>
 	  	</node>
-		
+
 		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
 			<param name="robot_name" value="Robot2"/>
 	  	</node>
-
-	   	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
+<!-- 		
+		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
 			<param name="robot_name" value="Robot2"/>
-	  	</node> 
+	  	</node> -->
+
   </group>
 
 	<group ns="Robot3">

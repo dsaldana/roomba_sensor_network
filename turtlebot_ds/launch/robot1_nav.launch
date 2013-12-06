@@ -1,6 +1,19 @@
 <launch>
- <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> <!-- create, roomba -->
+	<arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> 
+	<param name="simulated_robots" value="true"/> 
 
+	<param name="p_control_linear" value="0.2" /> 
+	<param name="p_control_angular" value="0.5" /> 
+
+
+	<!-- Map parameters -->
+	<param name="map_x1" value="-2.0" /> 
+	<param name="map_x2" value="2.0" /> 
+	<param name="map_y1" value="-1.0" /> 
+	<param name="map_y2" value="1.0" /> 
+	<!-- Grid -->
+	<param name="grid_n" value="4" /> 
+	<param name="grid_m" value="8" />
 
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -20,7 +33,7 @@
 	    	<arg name="robot_name"  value="Robot1" />
 		</include>
 
-	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
+	 	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
 			<param name="robot_name" value="Robot1"/>
 	  	</node>
 		

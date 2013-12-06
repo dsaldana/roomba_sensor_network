@@ -26,7 +26,7 @@ width, height = 750, 600
 
 # Window	
 pygame.init() 
-window = pygame.display.set_mode((width, height),HWSURFACE|DOUBLEBUF|RESIZABLE) 
+window = pygame.display.set_mode((width, height), HWSURFACE | DOUBLEBUF | RESIZABLE) 
 particles = None
 
 def convert_axis_p(p):
@@ -118,7 +118,15 @@ def draw_particles():
 	# Draw anomaly
 	draw_points(particles.anomaly)
 
-	particles
+	# # Write particles in a CSV file
+	# u = []
+	# for p in particles.particles:
+	# 	u.append([p.x, p.y])
+
+	# np.savetxt("foo.csv", u, delimiter=",")
+	# print len(particles.particles)
+	# ## End Write
+
 	# Fit the anomaly to an ellipse
 	if len(particles.anomaly) > 0:				
 		######## Draw ellipse aproximation
