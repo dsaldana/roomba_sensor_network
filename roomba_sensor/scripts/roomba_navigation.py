@@ -29,6 +29,7 @@ traking = False
 p_angular = rospy.get_param('/p_control_angular', 1.0)
 p_linear = rospy.get_param('/p_control_linear', 0.5)
 
+simulated_robots = rospy.get_param('/simulated_robots', False)
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
@@ -130,8 +131,10 @@ def run():
 			vel.linear.x = p_linear * d 
 			vel.angular.z = p_angular * controlT
 
-			# TODO For real robots
-			#vel.angular.z *= -1
+			# For real robots: the relative position affect the axes.
+			if not simulated_robots:
+				vel.angular.z *= -1
+
 
 			# velocity range
 			linear_r = [0.02, 0.2 * 10]
