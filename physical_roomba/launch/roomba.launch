@@ -7,8 +7,9 @@
 
 
 
-	<!-- Roomba Driver -->
+	
   <group ns="$(arg robot_id)">
+  	<!-- Roomba Driver -->
   	<node pkg="create_node" type="turtlebot_node.py" name="turtlebot_node" respawn="true" args="--respawnable">
 		<param name="bonus" value="false" />
 		<param name="update_rate" value="30.0" />
@@ -18,10 +19,8 @@
 		<remap from="imu/data" to="sensors/imu_data" />
 		<remap from="imu/raw" to="sensors/imu_data_raw" />
   	</node>
-  </group>
 
-
- <!-- USB Cam driver-->
+  	 <!-- USB Cam driver-->
 	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam_node0">
 		<param name="video_device" type="string" value="/dev/video1"/>
 
@@ -35,4 +34,6 @@
 	
 		<remap from="/usb_cam_node0/image_raw" to="/$(arg robot_id)/front_cam/camera/image"/>
 	</node>
+  </group>
+
 </launch>

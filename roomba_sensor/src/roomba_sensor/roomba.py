@@ -11,6 +11,12 @@ from math import *
 from roomba_sensor.util import cut_angle
 from roomba_sensor.particle_filter import ParticleFilter
 
+
+
+
+# Distance from robot to camera.
+d = rospy.get_param('/sensor_distance', 0.5)
+
 #######################################################
 ##### Localization for virtual or physical robot.
 #######################################################
@@ -43,9 +49,6 @@ class RoombaLocalization:
 ### Localization from Gazebo.
 ######################################
 class RoombaGazebo:
-	# Distance from robot to camera.
-	d = 0.5
-	
 
 
 	def __init__(self, robotName):
@@ -86,8 +89,8 @@ class RoombaGazebo:
 	def get_sensor_position(self):
 		[robotX, robotY, robotT] = self.get_position()
 
-		camX = robotX + self.d * cos(robotT)
-		camY = robotY + self.d * sin(robotT)
+		camX = robotX + d * cos(robotT)
+		camY = robotY + d * sin(robotT)
 
 		return [camX, camY, robotT]
 		
@@ -122,8 +125,6 @@ class ArLocator:
 # This class gets the robot position based on ar_track_alvar package.	
 ######################################################################
 class RealRoomba:
-	# Distance from robot to camera.
-	d = rospy.get_param('/sensor_distance', 0.5)
 
 	locator = None
 	
@@ -161,7 +162,7 @@ class RealRoomba:
 	def get_sensor_position(self):
 		[robotX, robotY, robotT] = self.get_position()
 
-		camX = robotX + self.d * cos(robotT)
-		camY = robotY + self.d * sin(robotT)
+		camX = robotX + d * cos(robotT)
+		camY = robotY + d * sin(robotT)
 
 		return [camX, camY, robotT]
