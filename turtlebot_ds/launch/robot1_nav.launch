@@ -12,8 +12,8 @@
 	<param name="map_y1" value="-1.0" /> 
 	<param name="map_y2" value="1.0" /> 
 	<!-- Grid -->
-	<param name="grid_n" value="4" /> 
-	<param name="grid_m" value="8" />
+	<param name="grid_n" value="8" /> 
+	<param name="grid_m" value="16" />
 
 	<!-- Sensor config -->
 	<param name="sensor_radio" value="0.2" />

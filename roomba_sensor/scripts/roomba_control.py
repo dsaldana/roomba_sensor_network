@@ -224,14 +224,12 @@ def run():
 		
 		######## Exploring
 		if explore:
-		#if False:
 			npgrid = np.array(grid)
 
 			#### Planning: Bread First Search 
-			# Distance matrix
+			# Distance matrix to particles
 			D = np.array(bread_first_search(spi, spj, grid))			
-			#rospy.logerr("D")
-			#rospy.logerr(D)
+
 			
 			# Take into acount the other robots.
 			# It needs to be tested
@@ -241,32 +239,31 @@ def run():
 				for r in robot_msgs.values():
 					if (r.robot_id == robotName):
 						continue
-					# Distances from robot
-					ri,rj = coords_to_grid(r.x, r.y)
-					#rospy.logerr("Robot position")
-					#rospy.logerr([ri,rj])
+					# Distances from the other robot
+					o[ri,rj] = coords_to_grid(r.x, r.y)
+
+					comb = [[-1,-1], [-1, 0], [0, -1], [0, 0], [0, 1],
+						[1, 0], [1, 1], [-1, 1], [1, -1]]
+
+
 					BFS = bread_first_search(ri, rj, grid)
-					#rospy.logerr(BFS)
-					u = 0.5 * np.max(npgrid) * np.exp(-np.array(BFS))
+
+					u = 0.5 * np.max(npgrid) * np.exp(-2 * np.array(BFS))
 					DRT += u
 			except Exception, e:
 				rospy.logerr("Error integrating the data from other robots. " + str(e))
 			
 				
 				
-			#rospy.logerr("DRT")
-			#rospy.logerr(DRT)
 			# Number of robots
 			n_robots = len(robot_msgs.values())
 			
 			# Force for one robot.
 			F = npgrid * np.exp(-0.1 * D)
-			#rospy.logerr("F")
-			#rospy.logerr(F)
+
 			
 			# Force from robot location to every cell.
 			if n_robots > 1:
-				#F -=  npgrid * np.exp(- 0.5 * DRT / (n_robots - 1))
 				F -= DRT / (n_robots - 1)
 
 			# Find maximum force in grid

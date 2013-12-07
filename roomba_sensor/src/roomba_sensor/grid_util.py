@@ -2,6 +2,7 @@
 ### Utilities for woking with Grids. ##
 #######################################
 from roomba_sensor.map import *
+from math import *
 
 # Validate if one position in grid is valid.
 def validate_index(ni, nj, grid):
@@ -30,14 +31,24 @@ def bread_first_search(spi, spj, grid):
 		# Extract in FIFO.	
 		[i,j] = l.pop(0)
 		# Possible movements[up, right, left, down]
-		mvs = [[i - 1, j], [i,j+1], [i, j-1], [i+1,j]]
+		mvs = [[i - 1, j], [i, j+1], [i, j-1], [i+1, j]]
 
 		for [ni,nj] in mvs:
 			if validate_index(ni,nj,grid):
 				# Not visited node
 				if (D[ni][nj] < 0):
 					D[ni][nj] = D[i][j] + 1									
-					l.append([ni, nj])					
+					l.append([ni, nj])		
+
+		# Diagonal movements
+		mvs = [[i + 1, j + 1], [i + 1, j-1], [i-1, j+1], [i - 1, j - 1]]		
+		for [ni,nj] in mvs:
+			if validate_index(ni,nj,grid):
+				# Not visited node
+				if (D[ni][nj] < 0):
+					D[ni][nj] = D[i][j] + sqrt(2)									
+					l.append([ni, nj])
+
 	# Return distance from robot to each cell
 	return D
 
