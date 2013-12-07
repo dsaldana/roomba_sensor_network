@@ -13,6 +13,23 @@ def validate_index(ni, nj, grid):
 	return True
 
 
+def maximum_neightbor(i, j, grid):
+	mi, mj = -float("inf"), -float("inf")
+	max = -float("inf")
+
+	mvs = [[i - 1, j], [i, j+1], [i, j-1], 
+		[i+1, j], [i + 1, j + 1], [i + 1, j-1], [i-1, j+1], [i - 1, j - 1]]
+
+	for [ni,nj] in mvs:
+		if not validate_index(ni,nj,grid):
+			continue
+
+		if grid[ni][nj] > max:
+			mi, mj = ni, nj
+			max = grid[ni][nj]
+	return mi, mj
+
+
 # BFS from position [spi, spj]	
 def bread_first_search(spi, spj, grid):
 	gn = len(grid)

@@ -24,6 +24,7 @@ from roomba_sensor.grid_util import bread_first_search
 from roomba_sensor.grid_util import validate_index
 from roomba_sensor.grid_util import coords_to_grid
 from roomba_sensor.grid_util import grid_to_coords
+from roomba_sensor.grid_util import maximum_neightbor
 
 # Map configuration
 from roomba_sensor.map import *
@@ -240,15 +241,11 @@ def run():
 					if (r.robot_id == robotName):
 						continue
 					# Distances from the other robot
-					o[ri,rj] = coords_to_grid(r.x, r.y)
-
-					comb = [[-1,-1], [-1, 0], [0, -1], [0, 0], [0, 1],
-						[1, 0], [1, 1], [-1, 1], [1, -1]]
-
+					ri,rj = coords_to_grid(r.x, r.y)
 
 					BFS = bread_first_search(ri, rj, grid)
 
-					u = 0.5 * np.max(npgrid) * np.exp(-2 * np.array(BFS))
+					u = np.max(npgrid) * np.exp(-1 * np.array(BFS))
 					DRT += u
 			except Exception, e:
 				rospy.logerr("Error integrating the data from other robots. " + str(e))
@@ -264,16 +261,16 @@ def run():
 			
 			# Force from robot location to every cell.
 			if n_robots > 1:
-				F -= DRT / (n_robots - 1)
+				F -= DRT #/ (n_robots - 1)
 
 			# Find maximum force in grid
-			maxi, maxj = np.unravel_index(F.argmax(), F.shape)
-
-
+			# TODO select the best in front of the robot or modify the BFS
+			#maxi, maxj = np.unravel_index(F.argmax(), F.shape)			
+			maxi, maxj = maximum_neightbor(spi, spj, F)			
 			
 			# Grid position to continuous coordinates. 
 			# goal points to the center point in the cell.
-			goalX , goalY = grid_to_coords(maxi,maxj)
+			goalX , goalY = grid_to_coords(maxi, maxj)
 
 			# Publish goal to navigate
 			p = Point32()

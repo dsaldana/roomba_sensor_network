@@ -1,5 +1,6 @@
 <launch>
   <arg name="robot_id"       default="Robot1"/> 
+  <arg name="robot_pose"/> 
 
   <arg name="base"  value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> 
 
@@ -7,7 +8,7 @@
     <group ns="$(arg robot_id)">
 		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
 	    	<arg name="base" value="create"/>
-	    	<arg name="init_pose" value="-x -1 -y -1 -z 0" />
+	    	<arg name="init_pose" value="$(arg robot_pose)" />
 	    	<arg name="robot_name"  value="$(arg robot_id)" />
 		</include>
 
@@ -19,9 +20,6 @@
 			<param name="robot_name" value="$(arg robot_id)"/>
 	  	</node>
 
-	  	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
-			<param name="robot_name" value="$(arg robot_id)"/>
-	  	</node>
   </group>
 
 </launch>
