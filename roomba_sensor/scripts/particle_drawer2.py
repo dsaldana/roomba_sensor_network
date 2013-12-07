@@ -36,13 +36,13 @@ def convert_axis_p(p):
 def convertAxis(x,y):
 	x2 = mx + (x - mapX1) * ax / mapLX
 	y2 = my + (-y - mapY1) * ay / mapLY
-	return x2,y2
+	return x2, y2
 
 def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 	x2,y2 = convertAxis(robotX, robotY)
 
 	# Robot radio
-	rd = int((mx + my)/ 12)
+	rd = int((mx + my) / 8)
 	if rd <1:
 		rd = 1
 	# Line for direction
