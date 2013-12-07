@@ -1,80 +1,27 @@
 <launch>
-  <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> <!-- create, roomba -->
-  <arg name="battery"   value="$(optenv TURTLEBOT_BATTERY /proc/acpi/battery/BAT0)"/>  <!-- /proc/acpi/battery/BAT0 --> 
+  <arg name="robot_id"       default="Robot1"/> 
 
-	<!-- it could help -->
-	 <param name="/use_sim_time" value="true" />
-
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="use_sim_time" value="true"/>
-    <arg name="debug" value="false"/>
-
-	<!-- $(find turtlebot_ds)/worlds/simple.world -->
-    <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
-  </include>
-  
+  <arg name="base"  value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> 
 
   <!--Robots -->
-  <group ns="Robot1">
-	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    <arg name="base" value="create"/>
-	    <arg name="init_pose" value="-x -1 -y -1 -z 0" />
-	    <arg name="robot_name"  value="Robot1" />
-	  </include>
+    <group ns="$(arg robot_id)">
+		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
+	    	<arg name="base" value="create"/>
+	    	<arg name="init_pose" value="-x -1 -y -1 -z 0" />
+	    	<arg name="robot_name"  value="$(arg robot_id)" />
+		</include>
 
-	
+	 	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
+			<param name="robot_name" value="$(arg robot_id)"/>
+	  	</node>
+		
+		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
+			<param name="robot_name" value="$(arg robot_id)"/>
+	  	</node>
+
+	  	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
+			<param name="robot_name" value="$(arg robot_id)"/>
+	  	</node>
   </group>
-
- <!--
-
-
-	  <include file="$(find turtlebot_navigation)/launch/includes/gmapping.launch.xml"/>
-	  <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml"/>
-
-	<include file="$(find turtlebot_rviz_launchers)/launch/view_navigation.launch"/>
-
-
-  <group ns="Robot2">
-	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    <arg name="base" value="create"/>
-	    <arg name="init_pose" value="-x -1 -y 1 -z 0" />
-	    <arg name="robot_name"  value="Robot2" />
-	  </include>
-
-	  <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
-		<param name="robot_name" value="Robot2"/>
-	  </node>
-  </group>
-
-  <group ns="Robot3">
-	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    <arg name="base" value="create"/>
-	    <arg name="init_pose" value="-x 1 -y -1 -z 0" />
-	    <arg name="robot_name"  value="Robot3" />
-	  </include>
-
-      <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
-		<param name="robot_name" value="Robot3"/>
-	  </node>
-  </group>
-
-  <group ns="Robot4">
-	  <include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    <arg name="base" value="create"/>
-	    <arg name="init_pose" value="-x 1 -y 1 -z 0" />
-	    <arg name="robot_name"  value="Robot4" />
-	  </include>
-
-      <node pkg="roomba_sensor" type="roomba_control.py" name="roomba_control">
-		<param name="robot_name" value="Robot4"/>
-	  </node>
-  </group>	
-
--->  
- 
-  
-	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
-	    	<param name="publish_frequency" type="double" value="30.0" />
-	</node>
 
 </launch>

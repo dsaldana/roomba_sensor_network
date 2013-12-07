@@ -1,95 +1,42 @@
 <launch>
-  <arg name="base"      value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> <!-- create, roomba -->
+	<param name="simulated_robots" value="true"/> 
 
-  <param name="simulated_robots" value="true"/> 
+	<param name="p_control_linear" value="0.2" /> 
+	<param name="p_control_angular" value="0.5" /> 
 
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="use_sim_time" value="true"/>
-    <arg name="debug" value="false"/>
 
-	<!-- $(find turtlebot_ds)/worlds/simple.world -->
-    <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
-  </include>
+	<!-- Map parameters -->
+	<param name="map_x1" value="-2.0" /> 
+	<param name="map_x2" value="2.0" /> 
+	<param name="map_y1" value="-1.0" /> 
+	<param name="map_y2" value="1.0" /> 
+	<!-- Grid -->
+	<param name="grid_n" value="8" /> 
+	<param name="grid_m" value="16" />
+
+	<!-- Sensor config -->
+	<param name="sensor_radio" value="0.2" />
+	<param name="sensor_distance" value="0.2" />
+
+	<!-- Particle filter parameters -->
+	<param name="particles_number" value="5000" />
+	<param name="particle_movement" value="0.03" />
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+	    <arg name="use_sim_time" value="true"/>
+	    <arg name="debug" value="false"/>
+
+		<!-- $(find turtlebot_ds)/worlds/simple.world -->
+	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
+  	</include>
   
 
-  <!--Robots -->
-  <group ns="Robot1">
-		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    	<arg name="base" value="create"/>
-	    	<arg name="init_pose" value="-x -1 -y -1 -z 0" />
-	    	<arg name="robot_name"  value="Robot1" />
-		</include>
+  	<!--Robots -->
+   	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
+   		<arg name="robot_id" value="Robot1"/>
+  	</include>
 
-	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
-			<param name="robot_name" value="Robot1"/>
-	  	</node>
-		
-		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
-			<param name="robot_name" value="Robot1"/>
-	  	</node>
+ 
+ 
 
-<!-- 	  	<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
-			<param name="robot_name" value="Robot1"/>
-	  	</node> -->
-  </group>
-
-
-   <group ns="Robot2">
-		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    	<arg name="base" value="create"/>
-	    	<arg name="init_pose" value="-x 2 -y 1 -z 0" />
-	    	<arg name="robot_name"  value="Robot2" />
-		</include>
-
-	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
-			<param name="robot_name" value="Robot2"/>
-	  	</node>
-
-		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
-			<param name="robot_name" value="Robot2"/>
-	  	</node>
-<!-- 		
-		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
-			<param name="robot_name" value="Robot2"/>
-	  	</node> -->
-
-  </group>
-
-	<group ns="Robot3">
-		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    	<arg name="base" value="create"/>
-	    	<arg name="init_pose" value="-x 3 -y 3 -z 0" />
-	    	<arg name="robot_name"  value="Robot3" />
-		</include>
-
-	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
-			<param name="robot_name" value="Robot3"/>
-	  	</node>
-		
-		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
-			<param name="robot_name" value="Robot3"/>
-	  	</node>
-  </group>
-
- 	<group ns="Robot4">
-		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
-	    	<arg name="base" value="create"/>
-	    	<arg name="init_pose" value="-x -2 -y -4 -z 0" />
-	    	<arg name="robot_name"  value="Robot4" />
-		</include>
-
-	  	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
-			<param name="robot_name" value="Robot4"/>
-	  	</node>
-		
-		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
-			<param name="robot_name" value="Robot4"/>
-	  	</node>
-  	</group> 
-
-	
-<!-- 
-
-  	 -->
-
- </launch>
+</launch>
