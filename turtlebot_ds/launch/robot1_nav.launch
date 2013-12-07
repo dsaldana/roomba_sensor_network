@@ -17,8 +17,11 @@
 
 	<!-- Sensor config -->
 	<param name="sensor_radio" value="0.2" />
-	<param name="sensor_distance" value="0.5" />
+	<param name="sensor_distance" value="0.2" />
 
+	<!-- Particle filter parameters -->
+	<param name="particles_number" value="5000" />
+	<param name="particle_movement" value="0.03" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="use_sim_time" value="true"/>

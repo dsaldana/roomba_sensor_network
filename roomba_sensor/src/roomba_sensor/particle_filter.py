@@ -13,10 +13,10 @@ import copy
 
 class ParticleFilter:
 	# Number of particles
-	N = 5000
+	N = rospy.get_param('/particles_number', 5000)
 
 	# Particle movement (standard deviation)
-	sd_mov = 0.1
+	sd_mov = rospy.get_param('/particle_movement', 0.1)
 
 	# radio to cover
 	r = rospy.get_param('/sensor_radio', 0.5)
