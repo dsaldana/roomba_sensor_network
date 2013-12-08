@@ -32,18 +32,22 @@ from math import *
 def fit_ellipse(x, y):
 	x, y = np.array(x), np.array(y)
 	
+	# quadratic part of the design matrix
 	d1 = np.transpose([x*x, x*y, y*y])
 
 	ones = [1] * len(x)
+	# linear part of the design matrix
 	d2 = np.transpose([x, y, ones])
 
-
+	# quadratic part of the scatter matrix
 	s1 = np.dot(d1.T,d1)
+	# combined part of the scatter matrix
 	s2 = np.dot(d1.T, d2)
+	# linear part of the scatter matrix
 	s3 = np.dot(d2.T, d2)
 
 
-
+	# for getting a2 from a1
 	t = np.dot(-np.linalg.inv(s3), s2.T)
 
 	m =  s1 + np.dot(s2,t)
@@ -53,9 +57,10 @@ def fit_ellipse(x, y):
 
 	cond = 4 * evec[0] * evec[2] - evec[1]**2
 
-	a = evec[:, np.nonzero(cond>0)]
-	a1 = a[:,0][:,0]
+	aux = evec[:, np.nonzero(cond>0)]
 
+	# ellipse coefficients
+	a1 = aux[:,0][:,0]
 	f = np.r_[a1, np.dot(t,a1)]
 
 
@@ -111,7 +116,6 @@ def ellipse_points(center, axes, phi, n=500):
 	#
 	# n is the number of points to render
 	tt = np.linspace(0, 2 * pi, n, endpoint=True, retstep=False)
-	print degrees(phi)
 	sa = sin(phi)
 	ca = cos(phi)
 	ct = np.cos(tt)
