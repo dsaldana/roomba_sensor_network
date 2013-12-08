@@ -113,7 +113,7 @@ def draw_particles():
 		(mx + dx * gm / 2, height - my / 2))
 		
 	# Draw particles
-	draw_points(particles.particles,(0,200,0))
+	draw_points(particles.particles,(0, 200, 0))
 	
 	# Draw anomaly
 	draw_points(particles.anomaly)
@@ -124,7 +124,6 @@ def draw_particles():
 	# 	u.append([p.x, p.y])
 
 	# np.savetxt("foo.csv", u, delimiter=",")
-	# print len(particles.particles)
 	# ## End Write
 
 	# Fit the anomaly to an ellipse
@@ -148,8 +147,8 @@ def draw_particles():
 			if max(axes) > 100:
 				rospy.logerr("Elipse fuera de rango")
 			else:
-				print "drawing ellipse", [center, axes, degrees(phi)]
-				pe_x, pe_y  = ellipse_points(center, axes, phi, n=width)
+				#print "drawing ellipse", [center, axes, degrees(phi)]
+				pe_x, pe_y  = ellipse_points(center, axes, phi, n = width)
 				
 				for i in range(len(pe_x)):
 					ex, ey = pe_x[i], pe_y[i]
@@ -166,7 +165,7 @@ def draw_particles():
 	# Draw the other robots
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
-		draw_robot(robotX, robotY, robotT, (150,150,150))
+		draw_robot(robotX, robotY, robotT, (150, 150, 150))
 
 
 	# Draw main robot
@@ -197,8 +196,9 @@ def run():
 		for event in pygame.event.get(): 
 			if event.type == pygame.QUIT: 
 				sys.exit(0) 
-			elif event.type==VIDEORESIZE:
-				window = pygame.display.set_mode(event.dict['size'],HWSURFACE|DOUBLEBUF|RESIZABLE)
+			elif event.type == VIDEORESIZE:
+				window = pygame.display.set_mode(event.dict['size'],
+					HWSURFACE | DOUBLEBUF | RESIZABLE)
 			#else: 
 				#print event 
 		# Draw the particles

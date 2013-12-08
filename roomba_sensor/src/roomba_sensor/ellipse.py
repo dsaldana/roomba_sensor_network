@@ -90,7 +90,7 @@ def ellipse_box(center, axes, phi):
 	p1x = center[0] + axes[0] * cos(phi) + center[0] + axes[1] * cos(phi + pi / 2)
 	p1y = center[1] + axes[0] * sin(phi) + center[1] + axes[1] * sin(phi + pi / 2)
 	
-	p2x = center[0] - axes[0] * cos(phi) - center[0] - axes[1] * cos(phi + pi /2 )
+	p2x = center[0] - axes[0] * cos(phi) - center[0] - axes[1] * cos(phi + pi / 2)
 	p2y = center[1] - axes[0] * sin(phi) - center[1] - axes[1] * sin(phi + pi / 2)
 
 	return p1x, p1y, p2x, p2y
@@ -105,21 +105,21 @@ def ellipse_points(center, axes, phi, n=500):
 	# the fit argument as returned by fit.ellipse
 	#
 	# n is the number of points to render
-	tt = np.linspace(0, 2*pi, n, endpoint=True, retstep=False)
-
+	tt = np.linspace(0, 2 * pi, n, endpoint=True, retstep=False)
+	print degrees(phi)
 	sa = sin(phi)
 	ca = cos(phi)
 	ct = np.cos(tt)
 	st = np.sin(tt)
 
-	max = np.max(axes)
-	min =np.min(axes)
+	max = np.min(axes)
+	min = np.max(axes)
 	
 	# X,Y points
 	x = center[0] + max * ct * ca - min * st * sa
 	y = center[1] + max * ct * sa + min * st * ca
 
-	return x,y
+	return x, y
 
 
 
