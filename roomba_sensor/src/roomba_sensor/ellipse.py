@@ -75,6 +75,11 @@ def fit_ellipse(x, y):
 	# axes
 	semi_axes = [ sqrt(num / (den1 * (den2 - den3))), sqrt(num / (den1 * (-den2 - den3)))]
 
+	if abs(a1[0]) < abs(a1[2]):
+		semi_axes = [max(semi_axes), min(semi_axes)]
+	else:
+		semi_axes = [min(semi_axes), max(semi_axes)]
+
 	# calculate the angle of rotation
 	term = (f[0] - f[2]) / f[1]
 	phi = atan(1 / term) / 2
@@ -112,8 +117,8 @@ def ellipse_points(center, axes, phi, n=500):
 	ct = np.cos(tt)
 	st = np.sin(tt)
 
-	max = np.min(axes)
-	min = np.max(axes)
+	max = axes[0]
+	min = axes[1]
 	
 	# X,Y points
 	x = center[0] + max * ct * ca - min * st * sa
