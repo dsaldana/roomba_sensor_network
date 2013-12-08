@@ -77,8 +77,8 @@ def img_callback(img):
 	# How many white pixels in the right
 	pr = 0
 
-	threshold_value = 160
-	threshold_other = 160
+	threshold_value = 120
+	threshold_other = 120
 	
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
@@ -177,6 +177,12 @@ def run():
 			orobot = PointR()
 			orobot.x, orobot.y, orobot.z = msg.rx, msg.ry,  msg.rtheta
 			orobots.append(orobot)
+
+			if msg.value > 0:
+				# new point with anomaly
+				an = PointR()
+				an.x, an.y = msg.rx, msg.ry
+				anomaly_points.append(an)
 		
 		# Particle filter: updade based on sensor value.
 		pf.update_particles(samples)
@@ -212,12 +218,7 @@ def run():
 		# sense an anomaly in a n seconds (n = max_tracking_time).
 		if sensedValue > 0:
 			explore = False
-			last_time_anomaly = rospy.get_rostime().secs
-			
-			# new point with anomaly
-			an = PointR()
-			an.x, an.y = robotX, robotY
-			anomaly_points.append(an)
+			last_time_anomaly = rospy.get_rostime().secs						
 		else:
 			if rospy.get_rostime().secs - last_time_anomaly > max_tracking_time:
 				explore = True
@@ -256,7 +257,7 @@ def run():
 			n_robots = len(robot_msgs.values())
 			
 			# Force for one robot.
-			F = npgrid * np.exp(-0.1 * D)
+			F = npgrid * np.exp(-0.01 * D)
 
 			
 			# Force from robot location to every cell.

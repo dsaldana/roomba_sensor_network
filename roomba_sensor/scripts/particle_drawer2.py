@@ -154,10 +154,10 @@ def draw_particles():
 				for i in range(len(pe_x)):
 					ex, ey = pe_x[i], pe_y[i]
 					ex, ey = convertAxis(ex, ey)
-					pygame.draw.circle(window, (200,0,0), (int(ex), int(ey)) , int(1), 0)
+					pygame.draw.circle(window, (0, 0, 200), (int(ex), int(ey)) , int(1), 0)
 
 				ecx, ecy = convertAxis(center[0], center[1])	
-				pygame.draw.circle(window, (128,0,0), (int(ecx), int(ecy)) , int(5), 0)
+				pygame.draw.circle(window, (0, 0, 200), (int(ecx), int(ecy)) , int(5), 0)
 		except Exception, e:
 			print e
 		

@@ -20,7 +20,7 @@
 
 	<!-- Particle filter parameters -->
 	<param name="particles_number" value="5000" />
-	<param name="particle_movement" value="0.06" />
+	<param name="particle_movement" value="0.08" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 	    <arg name="use_sim_time" value="true"/>
