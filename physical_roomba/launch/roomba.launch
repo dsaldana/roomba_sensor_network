@@ -32,7 +32,7 @@
 
 		<param name="camera_frame_id" type="string" value="usb_cam_frame0" />
 	
-		<remap from="/usb_cam_node0/image_raw" to="/$(arg robot_id)/front_cam/camera/image"/>
+		<remap from="/$(arg robot_id)/usb_cam_node0/image_raw" to="/$(arg robot_id)/front_cam/camera/image"/>
 	</node>
   </group>
 
