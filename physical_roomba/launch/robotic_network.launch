@@ -1,12 +1,32 @@
 <launch> 
-<include file="$(find physical_roomba)/launch/roomba_high_control.launch">
-    <arg name="robot_id" value="Robot1"/>
-  </include>
+	<param name="simulated_robots" value="false"/> 
+ 	
+	<arg name="robot_id"       default="Robot1"/> 
 
-<include file="$(find physical_roomba)/launch/roomba_high_control.launch">
-    <arg name="robot_id" value="Robot2"/>
-  </include>
-<include file="$(find physical_roomba)/launch/roomba_high_control.launch">
-    <arg name="robot_id" value="Robot3"/>
-  </include>
+	<!-- P Control -->
+	<param name="p_control_linear" value="0.2" /> 
+	<param name="p_control_angular" value="1" /> 
+
+	<!-- Map parameters -->
+	<param name="map_x1" value="-2.0" /> 
+	<param name="map_x2" value="2.0" /> 
+	<param name="map_y1" value="-1.0" /> 
+	<param name="map_y2" value="1.0" /> 
+	<!-- Grid -->
+	<param name="grid_n" value="8" /> 
+	<param name="grid_m" value="16" />
+
+	<!-- Sensor config -->
+	<param name="sensor_radio" value="0.2" />
+	<param name="sensor_distance" value="0.2" />
+
+	<!-- Particle filter parameters -->
+	<param name="particles_number" value="2000" />
+	<param name="particle_movement" value="0.04" />
+
+	<!-- Launch the robot control -->
+	<include file="$(find physical_roomba)/launch/roomba_high_control.launch">
+	    <arg name="robot_id" value="Robot1"/>
+	</include>	
+
 </launch>

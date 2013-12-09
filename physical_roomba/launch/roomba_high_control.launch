@@ -1,20 +1,4 @@
 <launch>
-	<param name="simulated_robots" value="false"/> 
- 	
-	<arg name="robot_id"       default="Robot1"/> 
-
-	<!-- Map parameters -->
-	<param name="map_x1" value="-2.0" /> 
-	<param name="map_x2" value="2.0" /> 
-	<param name="map_y1" value="-1.0" /> 
-	<param name="map_y2" value="1.0" /> 
-	<!-- Grid -->
-	<param name="grid_n" value="4" /> 
-	<param name="grid_m" value="8" />
-
-	<!-- Sensor config -->
-	<param name="sensor_radio" value="0.3" />
-	<param name="sensor_distance" value="0.25" />
 
 	<group ns="$(arg robot_id)">
 
