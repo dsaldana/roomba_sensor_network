@@ -1,5 +1,5 @@
 <launch>
-  <arg name="robot_id"       default="Robot1"/> 
+  	<arg name="robot_id"       default="Robot1"/> 
 
   
 
@@ -8,20 +8,21 @@
 
 
 	
-  <group ns="$(arg robot_id)">
+  	<group ns="$(arg robot_id)">
   	<!-- Roomba Driver -->
-  	<node pkg="create_node" type="turtlebot_node.py" name="turtlebot_node" respawn="true" args="--respawnable">
-		<param name="bonus" value="false" />
-		<param name="update_rate" value="30.0" />
-		<param name="port" value="/dev/ttyUSB0" />
-		<remap from="cmd_vel" to="commands/velocity" />
-		<remap from="turtlebot_node/sensor_state" to="sensors/core" />
-		<remap from="imu/data" to="sensors/imu_data" />
-		<remap from="imu/raw" to="sensors/imu_data_raw" />
-  	</node>
+  		<node pkg="create_node" type="turtlebot_node.py" name="turtlebot_node" respawn="true" args="--respawnable">
+			<param name="bonus" value="false" />
+			<param name="update_rate" value="30.0" />
+			<param name="port" value="/dev/ttyUSB0" />
+			<remap from="cmd_vel" to="commands/velocity" />
+			<remap from="turtlebot_node/sensor_state" to="sensors/core" />
+			<remap from="imu/data" to="sensors/imu_data" />
+			<remap from="imu/raw" to="sensors/imu_data_raw" />
+  		</node>
+  	</group>
 
   	 <!-- USB Cam driver-->
-	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam_node0">
+	<node pkg="usb_cam" type="usb_cam_node" name="$(arg robot_id)_cam">
 		<param name="video_device" type="string" value="/dev/video1"/>
 
 		<param name="pixel_format" type="string" value="mjpeg" />
@@ -30,10 +31,10 @@
 		<param name="image_width" type="int" value="160" />
 		<param name="image_height" type="int" value="120" />
 
-		<param name="camera_frame_id" type="string" value="usb_cam_frame0" />
+		<param name="camera_frame_id" type="string" value="$(arg robot_id)_cam_frame" />
 	
-		<remap from="/$(arg robot_id)/usb_cam_node0/image_raw" to="/$(arg robot_id)/front_cam/camera/image"/>
+		<remap from="/$(arg robot_id)_cam/image_raw" to="/$(arg robot_id)/front_cam/camera/image"/>
 	</node>
-  </group>
+
 
 </launch>
