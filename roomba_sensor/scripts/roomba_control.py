@@ -33,6 +33,8 @@ from roomba_comm.msg import SensedValue
 # Numpy
 import numpy as np
 
+# Clustering
+from scipy.cluster.vq import kmeans2
 
 
 # Sensed value by the camera
@@ -203,7 +205,7 @@ def run():
 
 		##### Plan in grid ####
 		# Get a matrix with the number of particles for each cell.
-		grid = pf.particles_in_grid()
+		#grid = pf.particles_in_grid()
 
 		# Convert sensor position to grid cell
 		spi, spj = coords_to_grid(camX, camY)
@@ -224,54 +226,96 @@ def run():
 				explore = True
 
 		
-		######## Exploring
+		######## Exploring #################
 		if explore:
-			npgrid = np.array(grid)
+			k_groups = 9
+			# 
+			x, y = [], []			
+			for p in pf.particles:
+				x.append(p.x)
+				y.append(p.y)
 
-			#### Planning: Bread First Search 
-			# Distance matrix to particles
-			D = np.array(bread_first_search(spi, spj, grid))			
+			# Categorize in k groups
+			#cents, idx = kmeans2(np.array(zip(x, y)),
+			#	np.array([[1,1],[-1,-1],[2,2]]))
+			cents, idx = kmeans2(np.array(zip(x, y)),
+				k_groups)
+
+			max_f = -1
+			max_c = None
+			
+			for i in range(len(cents)):
+				c  = cents[i]
+
+				# points in centroid
+				n_pts = sum(idx == i)
+				print n_pts
+
+				# Dinstance
+				d = hypot(robotX - c[0], robotY - c[1])
+				# Angular distance
+				t = (robotT - atan((robotY - c[1])/(robotX - c[0])))**2
+				
+				# force to each centroid
+				f = n_pts / d
+
+				if f > max_f:
+					max_f = f
+					max_c = c
+
+				print f, c
+
+			#print "max=", max_f, max_c
+
+			goalX, goalY = max_c
+
+
+			# npgrid = np.array(grid)
+
+			# #### Planning: Bread First Search 
+			# # Distance matrix to particles
+			# D = np.array(bread_first_search(spi, spj, grid))			
 
 			
-			# Take into acount the other robots.
-			# It needs to be tested
-			DRT = np.zeros((gm,gn))
+			# # Take into acount the other robots.
+			# # It needs to be tested
+			# DRT = np.zeros((gm,gn))
 
-			try:
-				for r in robot_msgs.values():
-					if (r.robot_id == robotName):
-						continue
-					# Distances from the other robot
-					ri,rj = coords_to_grid(r.x, r.y)
+			# try:
+			# 	for r in robot_msgs.values():
+			# 		if (r.robot_id == robotName):
+			# 			continue
+			# 		# Distances from the other robot
+			# 		ri,rj = coords_to_grid(r.x, r.y)
 
-					BFS = bread_first_search(ri, rj, grid)
+			# 		BFS = bread_first_search(ri, rj, grid)
 
-					u = np.max(npgrid) * np.exp(-1 * np.array(BFS))
-					DRT += u
-			except Exception, e:
-				rospy.logerr("Error integrating the data from other robots. " + str(e))
+			# 		u = np.max(npgrid) * np.exp(-1 * np.array(BFS))
+			# 		DRT += u
+			# except Exception, e:
+			# 	rospy.logerr("Error integrating the data from other robots. " + str(e))
 			
 				
 				
-			# Number of robots
-			n_robots = len(robot_msgs.values())
+			# # Number of robots
+			# n_robots = len(robot_msgs.values())
 			
-			# Force for one robot.
-			F = npgrid * np.exp(-0.01 * D)
+			# # Force for one robot.
+			# F = npgrid * np.exp(-0.01 * D)
 
 			
-			# Force from robot location to every cell.
-			if n_robots > 1:
-				F -= DRT #/ (n_robots - 1)
+			# # Force from robot location to every cell.
+			# if n_robots > 1:
+			# 	F -= DRT #/ (n_robots - 1)
 
-			# Find maximum force in grid
-			# TODO select the best in front of the robot or modify the BFS
-			#maxi, maxj = np.unravel_index(F.argmax(), F.shape)			
-			maxi, maxj = maximum_neightbor(spi, spj, F)			
+			# # Find maximum force in grid
+			# # TODO select the best in front of the robot or modify the BFS
+			# #maxi, maxj = np.unravel_index(F.argmax(), F.shape)			
+			# maxi, maxj = maximum_neightbor(spi, spj, F)			
 			
-			# Grid position to continuous coordinates. 
-			# goal points to the center point in the cell.
-			goalX , goalY = grid_to_coords(maxi, maxj)
+			# # Grid position to continuous coordinates. 
+			# # goal points to the center point in the cell.
+			# goalX , goalY = grid_to_coords(maxi, maxj)
 
 			# Publish goal to navigate
 			p = Point32()

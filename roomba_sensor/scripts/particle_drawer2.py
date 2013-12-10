@@ -61,8 +61,11 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2, y2),
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
-
+old_cents = [[1,1],[-1,-1],[2,2]]
 def draw_points(points, color=(255,0,0)):
+	if len(points) == 0:
+		return
+
 	x, y = [], []
 	for p in points:
 		x2 ,y2= convertAxis(p.x, p.y)
@@ -70,10 +73,14 @@ def draw_points(points, color=(255,0,0)):
 		y.append(y2)
 	
 	# let scipy do its magic (k==3 groups)
-	res, idx = kmeans2(np.array(zip(x, y)), 3)
+	#res, idx = kmeans2(np.array(zip(x, y)), 
+	#	np.array([[1,1],[-1,-1],[2,2]]))
+	cents, idx = kmeans2(np.array(zip(x, y)), 9)
 
 	# convert groups to rbg 3-tuples.
-	colors = ([([0,255,0],[255,0,0],[0,0,255])[i] for i in idx])
+	colors = ([([0,255,0],[255,0,0],[0,0,255],
+		[0,55,0],[55,0,0],[0,0,55],
+		[0,25,0],[25,0,0],[0,0,25])[i] for i in idx])
 
 	for i in range(len(x)):
 		pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
