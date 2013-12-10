@@ -247,33 +247,50 @@ def run():
 				cents, idx = kmeans2(np.array(zip(x, y)),
 					cents)
 
-			max_f = -1
-			max_c = None
+			# Total force
+			F = [0,0]
+			# Foces by the clusters
+			fc = []			
+			for c in cents:
+				u,v = (c[0] - robotX , c[1] - robotY)
+				F = [F[0] + u, F[1] + v]
+				fc.append([u,v])
 			
-			for i in range(len(cents)):
-				c  = cents[i]
+			##TODO foces by other robots
 
-				# points in centroid
-				n_pts = sum(idx == i)
-				print n_pts
+			
+			#F = sum(fc[:,0]) , sum(fc[:,1])
+			
+			F = 0.3* F[0], 0.3 * F[1]
+			goal = robotX + F[0], robotY + F[1]
 
-				# Dinstance
-				d = hypot(robotX - c[0], robotY - c[1])
-				# Angular distance
-				t = (robotT - atan((robotY - c[1])/(robotX - c[0])))**2
+			#print F , robotX 
+			# max_f = -1
+			# max_c = None
+			# for i in range(len(cents)):
+			# 	c  = cents[i]
+
+			# 	# points in centroid
+			# 	n_pts = sum(idx == i)
+			# 	print n_pts
+
+			# 	# Dinstance
+			# 	d = hypot(robotX - c[0], robotY - c[1])
+			# 	# Angular distance
+			# 	t = (robotT - atan((robotY - c[1])/(robotX - c[0])))**2
 				
-				# force to each centroid
-				f = n_pts / d
+			# 	# force to each centroid
+			# 	f = n_pts / d
 
-				if f > max_f:
-					max_f = f
-					max_c = c
+			# 	if f > max_f:
+			# 		max_f = f
+			# 		max_c = c
 
-				print f, c
+			# 	print f, c
 
-			#print "max=", max_f, max_c
+			# #print "max=", max_f, max_c
 
-			goalX, goalY = max_c
+			# goalX, goalY = max_c
 
 
 			# npgrid = np.array(grid)
@@ -325,8 +342,7 @@ def run():
 
 			# Publish goal to navigate
 			p = Point32()
-			p.x = goalX
-			p.y = goalY
+			p.x, p.y = goal
 			navPub.publish(p)
 
 		else:
