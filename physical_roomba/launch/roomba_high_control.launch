@@ -1,4 +1,5 @@
 <launch>
+	<arg name="robot_id"/> 
 
 	<group ns="$(arg robot_id)">
 

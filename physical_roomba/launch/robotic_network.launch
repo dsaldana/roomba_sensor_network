@@ -26,7 +26,7 @@
 
 	<!-- Launch the robot control -->
 	<include file="$(find physical_roomba)/launch/roomba_high_control.launch">
-	    <arg name="robot_id" value="Robot1"/>
+	    <arg name="robot_id" value="$(arg robot_id)"/>
 	</include>	
 
 </launch>
