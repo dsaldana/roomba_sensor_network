@@ -20,7 +20,7 @@
 	<param name="sensor_distance" value="0.2" />
 
 	<!-- Particle filter parameters -->
-	<param name="particles_number" value="5000" />
+	<param name="particles_number" value="1000" />
 	<param name="particle_movement" value="0.03" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -42,7 +42,7 @@
 
 	 	<node pkg="roomba_sensor" type="roomba_control.py" name="rcontrol">
 			<param name="robot_name" value="Robot1"/>
-	  	</node>
+	  	</node> 
 		
 		<node pkg="roomba_sensor" type="roomba_navigation.py" name="rnavigation">
 			<param name="robot_name" value="Robot1"/>

@@ -152,6 +152,8 @@ def run():
 
 	cents = None
 
+	k_skip = -1
+
 	######## Control Loop
 	print "Start!"
 	while not rospy.is_shutdown():
@@ -241,14 +243,13 @@ def run():
 			# Categorize in k groups and compute
 			# new centroids
 			np.random.seed(1)
-			#if cents == None:				
-			cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
-			#else:
-			#	cents, idx = kmeans2(np.array(zip(x, y)),
-			#		cents)
 
-			
-			print cents 
+			if (k_skip < 0):	
+				cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
+				k_skip = 2
+			else:				
+				k_skip -= 1
+						
 				
 
 			# Total force
@@ -261,12 +262,18 @@ def run():
 				# points in centroid
 				n_pts = sum(idx == i)
 
-				# Magnitud
-				
+				dx, dy = c[0] - robotX, c[1] - robotY
+
+				# Magnitude. Coulomb law. Charge c=n_pts
+				fm = n_pts / (dx**2 + dy**2)
+				# Angle
+				f_theta = atan(dy / dx)
+
+				if  dx < 0:
+					f_theta += pi
 
 				# components
-				u,v = (n_pts * (c[0] - robotX) , n_pts * (c[1] - robotY))				
-
+				u,v = fm * cos(f_theta), fm * sin(f_theta)			
 
 				F[0] += u
 				F[1] += v
@@ -275,43 +282,45 @@ def run():
 				fc.append([u,v])
 
 			
-			##TODO foces by other robots
+			## Foces by other robots
+			fr = []
+			try:
+				for r in robot_msgs.values():
+					if (r.robot_id == robotName):
+						continue
+
+					# TODO create a funcion, this code is above.
+					# Distances to the other robot
+					dx, dy = r.x - robotX, r.y - robotY
+					# Magnitude. Coulomb law. Charge c=n_pts
+					c = 2.0 *  (len(pf.particles) / len(cents))
+					fm = c / (dx**2 + dy**2)
+					# Angle
+					f_theta = atan(dy / dx)
+					if  dx < 0:
+						f_theta += pi
+					
+					# Components
+					u,v = fm * cos(f_theta), fm * sin(f_theta)			
+
+					# Force is in opposite direction.
+					F[0] -= u
+					F[1] -= v
+
+
+				
+			except Exception, e:
+				rospy.logerr("Error integrating the data from other robots. " + str(e))
 
 			
 			#F = sum(fc[:,0]) , sum(fc[:,1])
-			#cte = 2 / float(len(pf.particles))
-			#F = cte * F[0], cte * F[1]
+			cte = 0.5 * 1 / hypot(F[0] , F[1])
+			F = cte * F[0], cte * F[1]
+
 			print "----------Total force: ", F
 
 			goal = robotX + F[0], robotY + F[1]
-
-			#print F , robotX 
-			# max_f = -1
-			# max_c = None
-			# for i in range(len(cents)):
-			# 	c  = cents[i]
-
-			# 	# points in centroid
-			# 	n_pts = sum(idx == i)
-			# 	print n_pts
-
-			# 	# Dinstance
-			# 	d = hypot(robotX - c[0], robotY - c[1])
-			# 	# Angular distance
-			# 	t = (robotT - atan((robotY - c[1])/(robotX - c[0])))**2
-				
-			# 	# force to each centroid
-			# 	f = n_pts / d
-
-			# 	if f > max_f:
-			# 		max_f = f
-			# 		max_c = c
-
-			# 	print f, c
-
-			# #print "max=", max_f, max_c
-
-			# goalX, goalY = max_c
+			
 
 
 			# npgrid = np.array(grid)

@@ -72,8 +72,10 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2, y2),
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
-cents = None
+
+
 def draw_points(points, color=(255,0,0)):
+
 	if len(points) == 0:
 		return
 
@@ -92,13 +94,9 @@ def draw_points(points, color=(255,0,0)):
 	# Categorize in k groups and compute
 	# new centroids
 	np.random.seed(1)
-	# if cents == None:				
-	# 	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
-	# else:
-	# 	cents, idx = kmeans2(np.array(zip(x, y)),
-	# 		cents)
-	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
 
+	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
+	
 	np.savetxt("cents.csv", cents, delimiter=",")
 
 
