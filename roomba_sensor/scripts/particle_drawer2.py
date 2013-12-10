@@ -140,10 +140,9 @@ def draw_particles():
 			x[i],y[i] = particles.anomaly[j].x, particles.anomaly[j].y	
 		
 		
-		center, axes, phi  = fit_ellipse(x, y)
-
 		try:
-				
+			center, axes, phi  = fit_ellipse(x, y)
+
 			if max(axes) > 100:
 				rospy.logerr("Elipse fuera de rango")
 			else:
