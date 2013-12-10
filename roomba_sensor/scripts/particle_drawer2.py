@@ -21,6 +21,12 @@ import time
 from roomba_sensor.map import *
 from math import *
 
+# Clustering
+from scipy.cluster.vq import kmeans2
+
+
+
+
 # Window size
 width, height = 750, 600
 
@@ -56,10 +62,21 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
 
-def draw_points(points, color=(255,0,0)):	
+def draw_points(points, color=(255,0,0)):
+	x, y = [], []
 	for p in points:
 		x2 ,y2= convertAxis(p.x, p.y)
-		pygame.draw.circle(window, color, (int(x2), int(y2)), 2, 0)
+		x.append(x2)
+		y.append(y2)
+	
+	# let scipy do its magic (k==3 groups)
+	res, idx = kmeans2(np.array(zip(x, y)), 3)
+
+	# convert groups to rbg 3-tuples.
+	colors = ([([0,255,0],[255,0,0],[0,0,255])[i] for i in idx])
+
+	for i in range(len(x)):
+		pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
 		
 
 def callback(particles_msg):
