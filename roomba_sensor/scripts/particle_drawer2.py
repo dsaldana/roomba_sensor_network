@@ -2,6 +2,7 @@
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Point32
 
 from roomba_comm.msg import Particle
 from roomba_comm.msg import PointR
@@ -35,6 +36,15 @@ pygame.init()
 window = pygame.display.set_mode((width, height), HWSURFACE | DOUBLEBUF | RESIZABLE) 
 particles = None
 
+goal = Point32()
+goal.x, goal.y = 0.0 ,0.0
+
+
+
+def goal_callback(point):
+	global goal
+	goal = point
+	print "new goal ", [goal.x, goal.y]
 
 def convert_axis_p(p):
 	x2,y2 = convertAxis[p[0], p[1]]
@@ -62,7 +72,7 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2, y2),
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
-old_cents = [[1,1],[-1,-1],[2,2]]
+cents = None
 def draw_points(points, color=(255,0,0)):
 	if len(points) == 0:
 		return
@@ -74,7 +84,7 @@ def draw_points(points, color=(255,0,0)):
 		y.append(y2)
 	
 	k_groups = 9
-	cents = None
+
 	# let scipy do its magic (k==3 groups)
 	#res, idx = kmeans2(np.array(zip(x, y)), 
 	#	np.array([[1,1],[-1,-1],[2,2]]))
@@ -82,11 +92,15 @@ def draw_points(points, color=(255,0,0)):
 	# Categorize in k groups and compute
 	# new centroids
 	np.random.seed(1)
-	if cents == None:				
-		cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
-	else:
-		cents, idx = kmeans2(np.array(zip(x, y)),
-			cents)
+	# if cents == None:				
+	# 	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
+	# else:
+	# 	cents, idx = kmeans2(np.array(zip(x, y)),
+	# 		cents)
+	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
+
+	np.savetxt("cents.csv", cents, delimiter=",")
+
 
 	# convert groups to rbg 3-tuples.
 	colors = ([([0,255,0],[255,0,0],[0,0,255],
@@ -204,11 +218,16 @@ def draw_particles():
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
 
+	# Draw the target
+	gx, gy = convertAxis(goal.x, goal.y)
+	pygame.draw.circle(window, [0,250,250], (int(gx),
+		int(gy)), 20, 0)
 
 	# Draw main robot
 	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
 	draw_robot(robotX, robotY, robotT)
 
+	np.savetxt("robot.csv", [[robotX, robotY]], delimiter=",")
 
 	pygame.display.flip() 
 
@@ -221,9 +240,9 @@ def run():
 	rospy.init_node('particle_drawer')		
 
 	# Suscribe
-	robotName = rospy.get_param('~robot_name', 'Robot1')
-	rospy.Subscriber("/" + robotName + "/particles", Particle, callback)
-					
+	robot_name = rospy.get_param('~robot_name', 'Robot1')
+	rospy.Subscriber("/" + robot_name + "/particles", Particle, callback)
+	rospy.Subscriber("/" + robot_name + "/goal", Point32, goal_callback)			
 
 	# Window
 	pygame.RESIZABLE = True

@@ -241,27 +241,48 @@ def run():
 			# Categorize in k groups and compute
 			# new centroids
 			np.random.seed(1)
-			if cents == None:				
-				cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
-			else:
-				cents, idx = kmeans2(np.array(zip(x, y)),
-					cents)
+			#if cents == None:				
+			cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
+			#else:
+			#	cents, idx = kmeans2(np.array(zip(x, y)),
+			#		cents)
+
+			
+			print cents 
+				
 
 			# Total force
-			F = [0,0]
+			F = [0, 0]
 			# Foces by the clusters
 			fc = []			
-			for c in cents:
-				u,v = (c[0] - robotX , c[1] - robotY)
-				F = [F[0] + u, F[1] + v]
+			for i in range(len(cents)):
+				c  = cents[i]
+
+				# points in centroid
+				n_pts = sum(idx == i)
+
+				# Magnitud
+				
+
+				# components
+				u,v = (n_pts * (c[0] - robotX) , n_pts * (c[1] - robotY))				
+
+
+				F[0] += u
+				F[1] += v
+
+				print u, v
 				fc.append([u,v])
+
 			
 			##TODO foces by other robots
 
 			
 			#F = sum(fc[:,0]) , sum(fc[:,1])
-			
-			F = 0.3* F[0], 0.3 * F[1]
+			#cte = 2 / float(len(pf.particles))
+			#F = cte * F[0], cte * F[1]
+			print "----------Total force: ", F
+
 			goal = robotX + F[0], robotY + F[1]
 
 			#print F , robotX 
