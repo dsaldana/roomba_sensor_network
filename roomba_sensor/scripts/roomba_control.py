@@ -149,6 +149,9 @@ def run():
 	last_time_anomaly = 0
 
 	anomaly_points = []
+
+	cents = None
+
 	######## Control Loop
 	print "Start!"
 	while not rospy.is_shutdown():
@@ -235,11 +238,14 @@ def run():
 				x.append(p.x)
 				y.append(p.y)
 
-			# Categorize in k groups
-			#cents, idx = kmeans2(np.array(zip(x, y)),
-			#	np.array([[1,1],[-1,-1],[2,2]]))
-			cents, idx = kmeans2(np.array(zip(x, y)),
-				k_groups)
+			# Categorize in k groups and compute
+			# new centroids
+			np.random.seed(1)
+			if cents == None:				
+				cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
+			else:
+				cents, idx = kmeans2(np.array(zip(x, y)),
+					cents)
 
 			max_f = -1
 			max_c = None

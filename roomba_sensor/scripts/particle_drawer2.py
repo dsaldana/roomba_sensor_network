@@ -25,7 +25,7 @@ from math import *
 from scipy.cluster.vq import kmeans2
 
 
-
+import random
 
 # Window size
 width, height = 750, 600
@@ -34,6 +34,7 @@ width, height = 750, 600
 pygame.init() 
 window = pygame.display.set_mode((width, height), HWSURFACE | DOUBLEBUF | RESIZABLE) 
 particles = None
+
 
 def convert_axis_p(p):
 	x2,y2 = convertAxis[p[0], p[1]]
@@ -72,18 +73,31 @@ def draw_points(points, color=(255,0,0)):
 		x.append(x2)
 		y.append(y2)
 	
+	k_groups = 9
+	cents = None
 	# let scipy do its magic (k==3 groups)
 	#res, idx = kmeans2(np.array(zip(x, y)), 
 	#	np.array([[1,1],[-1,-1],[2,2]]))
-	cents, idx = kmeans2(np.array(zip(x, y)), 9)
+	
+	# Categorize in k groups and compute
+	# new centroids
+	np.random.seed(1)
+	if cents == None:				
+		cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
+	else:
+		cents, idx = kmeans2(np.array(zip(x, y)),
+			cents)
 
 	# convert groups to rbg 3-tuples.
 	colors = ([([0,255,0],[255,0,0],[0,0,255],
-		[0,55,0],[55,0,0],[0,0,55],
-		[0,25,0],[25,0,0],[0,0,25])[i] for i in idx])
+		[0,100,100],[100,100,0],[100,0,100],
+		[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
 
 	for i in range(len(x)):
 		pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
+
+	for c in cents:
+		pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
 		
 
 def callback(particles_msg):
@@ -214,7 +228,7 @@ def run():
 	# Window
 	pygame.RESIZABLE = True
 	while not rospy.is_shutdown():
-		rospy.sleep(0.1)
+		rospy.sleep(0.02)
 		# PyGame events
 		for event in pygame.event.get(): 
 			if event.type == pygame.QUIT: 
