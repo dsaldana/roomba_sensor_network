@@ -79,8 +79,8 @@ def img_callback(img):
 	# How many white pixels in the right
 	pr = 0
 
-	threshold_value = 130
-	threshold_other = 130
+	threshold_value = 160
+	threshold_other = 160
 	
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
