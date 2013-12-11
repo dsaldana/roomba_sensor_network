@@ -1,13 +1,8 @@
 <launch>
   	<arg name="robot_id"       default="Robot1"/> 
 
-  
-
    <param name="/use_sim_time" value="false"/>
 
-
-
-	
   	<group ns="$(arg robot_id)">
   	<!-- Roomba Driver -->
   		<node pkg="create_node" type="turtlebot_node.py" name="turtlebot_node" respawn="true" args="--respawnable">
