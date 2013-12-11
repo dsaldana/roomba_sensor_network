@@ -21,9 +21,18 @@ class ParticleFilter:
 	# radio to cover
 	r = rospy.get_param('/sensor_radio', 0.5)
 
+	simulated_robots = rospy.get_param('simulated_robots', True)
+	
 	# PF weights
 	weight_tracking_left = 1.2
 	weight_tracking_right = 0.01
+	
+	# FIXME this if should not exist.
+	if not simulated_robots:
+		weight_tracking_left = 0.01
+		weight_tracking_right = 1.2
+	
+
 	weight_out_of_map = 0.01
 	weight_sensed_zero = 0.1
 
