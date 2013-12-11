@@ -293,7 +293,7 @@ def run():
 					# Distances to the other robot
 					dx, dy = r.x - robotX, r.y - robotY
 					# Magnitude. Coulomb law. Charge c=n_pts
-					c = 2.0 *  (len(pf.particles) / len(cents))
+					c = 4.0 *  (len(pf.particles) / len(cents))
 					fm = c / (dx**2 + dy**2)
 					# Angle
 					f_theta = atan(dy / dx)
