@@ -29,8 +29,6 @@ traking = False
 p_angular = rospy.get_param('/p_control_angular', 1.0)
 p_linear = rospy.get_param('/p_control_linear', 0.5)
 
-simulated_robots = rospy.get_param('/simulated_robots', False)
-
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
 	global traking
@@ -56,7 +54,7 @@ def run():
 	# Robot's name is an argument
 	global robot_name
 	robot_name = rospy.get_param('~robot_name', 'Robot1')
-	simulated_robots = rospy.get_param('simulated_robots', True)
+	simulated_robots = rospy.get_param('/simulated_robots', False)
 
 
 	# Create the Publisher to control the robot.
