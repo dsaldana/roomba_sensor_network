@@ -3,9 +3,9 @@
  	
 	<arg name="robot_id"       default="Robot1"/> 
 
-	<!-- P Control -->
-	<param name="p_control_linear" value="0.2" /> 
-	<param name="p_control_angular" value="1" /> 
+	<!-- P Control for Navigation -->
+	<param name="p_control_linear" value="0.5" /> 
+	<param name="p_control_angular" value="0.6" /> 
 
 	<!-- Map parameters -->
 	<param name="map_x1" value="-2.0" /> 

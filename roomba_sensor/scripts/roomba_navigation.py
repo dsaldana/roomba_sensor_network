@@ -90,7 +90,7 @@ def run():
 
 			vel = Twist()
 			vel.linear.x = 0.3 * lin_vel
-			vel.angular.z = 0.6 * -(sensedValue.data * P + (sensedValue.data - old_val) * D)
+			vel.angular.z = 0.5 * -(sensedValue.data * P + (sensedValue.data - old_val) * D)
 			
 			velPub.publish(vel)
 
