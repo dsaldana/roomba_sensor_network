@@ -94,23 +94,26 @@ def draw_points(points, color=(255,0,0)):
 	# Categorize in k groups and compute
 	# new centroids
 	np.random.seed(1)
-
-	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
-	
-	np.savetxt("cents.csv", cents, delimiter=",")
-
-
-	# convert groups to rbg 3-tuples.
-	colors = ([([0,255,0],[255,0,0],[0,0,255],
-		[0,100,100],[100,100,0],[100,0,100],
-		[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
-
-	for i in range(len(x)):
-		pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
-
-	for c in cents:
-		pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
+	try:
 		
+		cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
+		
+		np.savetxt("cents.csv", cents, delimiter=",")
+
+
+		# convert groups to rbg 3-tuples.
+		colors = ([([0,255,0],[255,0,0],[0,0,255],
+			[0,100,100],[100,100,0],[100,0,100],
+			[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
+
+		for i in range(len(x)):
+			pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
+
+		for c in cents:
+			pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
+	except Exception, e:
+		print e
+		return
 
 def callback(particles_msg):
 	global particles
