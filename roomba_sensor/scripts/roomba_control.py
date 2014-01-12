@@ -109,6 +109,10 @@ def run():
 	global robotName
 	robotName = rospy.get_param('~robot_name', 'Robot1')
 
+	# Constant in columbs law. Force by centroid.
+	f_centroid = rospy.get_param('/f_centroid', 1.0)
+	f_robots = rospy.get_param('/f_robots', 2.0)
+	
 	rospy.loginfo("Loading robot control.")
 
 	# Create the Publisher to control the robot.
@@ -265,7 +269,7 @@ def run():
 				dx, dy = c[0] - robotX, c[1] - robotY
 
 				# Magnitude. Coulomb law. Charge c=n_pts
-				fm = n_pts / (dx**2 + dy**2)
+				fm = f_centroid* n_pts / (dx**2 + dy**2)
 				# Angle
 				f_theta = atan(dy / dx)
 
@@ -293,7 +297,7 @@ def run():
 					# Distances to the other robot
 					dx, dy = r.x - robotX, r.y - robotY
 					# Magnitude. Coulomb law. Charge c=n_pts
-					c = 2.0 *  (len(pf.particles) / len(cents))
+					c = f_robots *  (len(pf.particles) / len(cents))
 					fm = c / (dx**2 + dy**2)
 					# Angle
 					f_theta = atan(dy / dx)

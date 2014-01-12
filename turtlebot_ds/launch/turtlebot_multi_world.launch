@@ -1,10 +1,6 @@
 <launch>
 	<param name="simulated_robots" value="true"/> 
 
-	<param name="p_control_linear" value="0.2" /> 
-	<param name="p_control_angular" value="0.5" /> 
-
-
 	<!-- Map parameters -->
 	<param name="map_x1" value="-5.0" /> 
 	<param name="map_x2" value="5.0" /> 
@@ -20,7 +16,16 @@
 
 	<!-- Particle filter parameters -->
 	<param name="particles_number" value="3000" />
-	<param name="particle_movement" value="0.06" />
+	<param name="particle_movement" value="0.07" />
+
+	<!-- Robot navigation -->
+	<!-- forces for gradient descent -->
+	<param name="f_centroid" value="5" />
+	<param name="f_robots" value="3" />
+	<!-- PID for velocities -->
+	<param name="p_control_linear" value="0.4" /> 
+	<param name="p_control_angular" value="0.5" /> 
+
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 	    <arg name="use_sim_time" value="true"/>
