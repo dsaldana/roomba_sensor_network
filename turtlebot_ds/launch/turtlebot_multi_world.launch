@@ -23,7 +23,7 @@
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
 	<param name="f_centroid" value="5" />
-	<param name="f_robots" value="3" />
+	<param name="f_robots" value="8" />
 	<!-- PID for velocities -->
 	<param name="p_control_linear" value="0.4" /> 
 	<param name="p_control_angular" value="0.5" /> 
