@@ -305,9 +305,9 @@ def run():
 						f_theta += pi
 					
 					# Components
-					u,v = fm * cos(f_theta), fm * sin(f_theta)			
+					u, v = fm * cos(f_theta), fm * sin(f_theta)			
 
-					# Force is in opposite direction.
+					# Positive or robot Force is in opposite direction.
 					F[0] -= u
 					F[1] -= v
 
@@ -325,55 +325,6 @@ def run():
 
 			goal = robotX + F[0], robotY + F[1]
 			
-
-
-			# npgrid = np.array(grid)
-
-			# #### Planning: Bread First Search 
-			# # Distance matrix to particles
-			# D = np.array(bread_first_search(spi, spj, grid))			
-
-			
-			# # Take into acount the other robots.
-			# # It needs to be tested
-			# DRT = np.zeros((gm,gn))
-
-			# try:
-			# 	for r in robot_msgs.values():
-			# 		if (r.robot_id == robotName):
-			# 			continue
-			# 		# Distances from the other robot
-			# 		ri,rj = coords_to_grid(r.x, r.y)
-
-			# 		BFS = bread_first_search(ri, rj, grid)
-
-			# 		u = np.max(npgrid) * np.exp(-1 * np.array(BFS))
-			# 		DRT += u
-			# except Exception, e:
-			# 	rospy.logerr("Error integrating the data from other robots. " + str(e))
-			
-				
-				
-			# # Number of robots
-			# n_robots = len(robot_msgs.values())
-			
-			# # Force for one robot.
-			# F = npgrid * np.exp(-0.01 * D)
-
-			
-			# # Force from robot location to every cell.
-			# if n_robots > 1:
-			# 	F -= DRT #/ (n_robots - 1)
-
-			# # Find maximum force in grid
-			# # TODO select the best in front of the robot or modify the BFS
-			# #maxi, maxj = np.unravel_index(F.argmax(), F.shape)			
-			# maxi, maxj = maximum_neightbor(spi, spj, F)			
-			
-			# # Grid position to continuous coordinates. 
-			# # goal points to the center point in the cell.
-			# goalX , goalY = grid_to_coords(maxi, maxj)
-
 			# Publish goal to navigate
 			p = Point32()
 			p.x, p.y = goal

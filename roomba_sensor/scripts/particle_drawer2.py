@@ -236,6 +236,7 @@ def draw_particles():
 	# Draw main robot	
 	draw_robot(robotX, robotY, robotT)
 
+	#print "magnitud", hypot(robotX-goal.x, robotY-goal.y)
 
 	#np.savetxt("robot.csv", [[robotX, robotY]], delimiter=",")
 
