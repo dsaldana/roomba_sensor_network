@@ -17,6 +17,8 @@
 	<!-- Particle filter parameters -->
 	<param name="particles_number" value="3000" />
 	<param name="particle_movement" value="0.07" />
+	<!-- Particle drawer -->
+	<param name="draw_clusters" value="true" />
 
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
@@ -25,6 +27,7 @@
 	<!-- PID for velocities -->
 	<param name="p_control_linear" value="0.4" /> 
 	<param name="p_control_angular" value="0.5" /> 
+
 
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">

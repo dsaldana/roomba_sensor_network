@@ -39,7 +39,7 @@ particles = None
 goal = Point32()
 goal.x, goal.y = 0.0 ,0.0
 
-
+draw_clusters = rospy.get_param('/draw_clusters', False)
 
 def goal_callback(point):
 	global goal
@@ -85,36 +85,39 @@ def draw_points(points, color=(255,0,0)):
 		x.append(x2)
 		y.append(y2)
 	
-	for i in range(len(x)):
-		pygame.draw.circle(window, [0,255,0], (int(x[i]), int(y[i])), 2, 0)
-	# k_groups = 9
-
-	# let scipy do its magic (k==3 groups)
-	#res, idx = kmeans2(np.array(zip(x, y)), 
-	#	np.array([[1,1],[-1,-1],[2,2]]))
 	
-	# Categorize in k groups and compute
-	# new centroids
-	# np.random.seed(1)
-	# try:
+	if not draw_clusters:
+		for i in range(len(x)):
+			pygame.draw.circle(window, [0,255,0], (int(x[i]), int(y[i])), 2, 0)
+	else: 
+		k_groups = 9
+
+		# let scipy do its magic (k_groups)
+		res, idx = kmeans2(np.array(zip(x, y)), 
+			np.array([[1,1],[-1,-1],[2,2]]))
 		
-	# 	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
-		
-	# 	np.savetxt("cents.csv", cents, delimiter=",")
+		# Categorize in k groups and compute
+		# new centroids
+		np.random.seed(1)
+		try:
+			
+			cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
+			
+			np.savetxt("cents.csv", cents, delimiter=",")
 
 
-	# 	# convert groups to rbg 3-tuples.
-	# 	colors = ([([0,255,0],[255,0,0],[0,0,255],
-	# 		[0,100,100],[100,100,0],[100,0,100],
-	# 		[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
+			# convert groups to rbg 3-tuples.
+			colors = ([([0,255,0],[255,0,0],[0,0,255],
+				[0,100,100],[100,100,0],[100,0,100],
+				[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
 
-	# 	for i in range(len(x)):
-	# 		pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
+			for i in range(len(x)):
+				pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
 
-	# 	for c in cents:
-	# 		pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
-	# except Exception, e:
-	# 	print e
+			for c in cents:
+				pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
+		except Exception, e:
+			print e
 	return
 
 def callback(particles_msg):
