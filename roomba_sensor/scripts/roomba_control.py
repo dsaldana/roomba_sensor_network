@@ -250,7 +250,7 @@ def run():
 
 			if (k_skip < 0):	
 				cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
-				k_skip = 2
+				k_skip = 5
 			else:				
 				k_skip -= 1
 						
@@ -317,8 +317,9 @@ def run():
 				rospy.logerr("Error integrating the data from other robots. " + str(e))
 
 			
-			#F = sum(fc[:,0]) , sum(fc[:,1])
-			cte = 0.5 * 1 / hypot(F[0] , F[1])
+			
+			cte =  10.0 / (len(pf.particles))
+			#cte = 0.5 * 1 / hypot(F[0] , F[1])
 			F = cte * F[0], cte * F[1]
 
 			print "----------Total force: ", F

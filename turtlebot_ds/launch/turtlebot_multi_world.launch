@@ -7,16 +7,16 @@
 	<param name="map_y1" value="-4.0" /> 
 	<param name="map_y2" value="4.0" /> 
 	<!-- Grid n=y-->
-	<param name="grid_n" value="8" /> 
+	<param name="grid_n" value="20" /> 
 	<param name="grid_m" value="10" />
 
 	<!-- Sensor config -->
-	<param name="sensor_radio" value="0.3" />
-	<param name="sensor_distance" value="0.45" />
+	<param name="sensor_radio" value="0.45" />
+	<param name="sensor_distance" value="0.55" />
 
 	<!-- Particle filter parameters -->
 	<param name="particles_number" value="3000" />
-	<param name="particle_movement" value="0.07" />
+	<param name="particle_movement" value="0.08" />
 	<!-- Particle drawer -->
 	<param name="draw_clusters" value="true" />
 
@@ -26,7 +26,7 @@
 	<param name="f_robots" value="8" />
 	<!-- PID for velocities -->
 	<param name="p_control_linear" value="0.4" /> 
-	<param name="p_control_angular" value="0.5" /> 
+	<param name="p_control_angular" value="0.6" /> 
 
 
 

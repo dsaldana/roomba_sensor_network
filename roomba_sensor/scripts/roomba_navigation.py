@@ -138,7 +138,7 @@ def run():
 
 			# velocity range
 			linear_r = [0.02, 0.5]
-			angular_r = [1, pi/2 ]
+			angular_r = [1, pi]
 			
 			if vel.linear.x > linear_r[1]:
 				vel.linear.x = linear_r[1]
