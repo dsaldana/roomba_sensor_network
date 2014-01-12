@@ -85,7 +85,9 @@ def draw_points(points, color=(255,0,0)):
 		x.append(x2)
 		y.append(y2)
 	
-	k_groups = 9
+	for i in range(len(x)):
+		pygame.draw.circle(window, [0,255,0], (int(x[i]), int(y[i])), 2, 0)
+	# k_groups = 9
 
 	# let scipy do its magic (k==3 groups)
 	#res, idx = kmeans2(np.array(zip(x, y)), 
@@ -93,27 +95,27 @@ def draw_points(points, color=(255,0,0)):
 	
 	# Categorize in k groups and compute
 	# new centroids
-	np.random.seed(1)
-	try:
+	# np.random.seed(1)
+	# try:
 		
-		cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
+	# 	cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
 		
-		np.savetxt("cents.csv", cents, delimiter=",")
+	# 	np.savetxt("cents.csv", cents, delimiter=",")
 
 
-		# convert groups to rbg 3-tuples.
-		colors = ([([0,255,0],[255,0,0],[0,0,255],
-			[0,100,100],[100,100,0],[100,0,100],
-			[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
+	# 	# convert groups to rbg 3-tuples.
+	# 	colors = ([([0,255,0],[255,0,0],[0,0,255],
+	# 		[0,100,100],[100,100,0],[100,0,100],
+	# 		[0,180,0],[185,0,0],[0,0,185])[i] for i in idx])
 
-		for i in range(len(x)):
-			pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
+	# 	for i in range(len(x)):
+	# 		pygame.draw.circle(window, colors[i], (int(x[i]), int(y[i])), 2, 0)
 
-		for c in cents:
-			pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
-	except Exception, e:
-		print e
-		return
+	# 	for c in cents:
+	# 		pygame.draw.circle(window, [0,0,0], (int(c[0]), int(c[1])), 5, 0)		
+	# except Exception, e:
+	# 	print e
+	return
 
 def callback(particles_msg):
 	global particles
@@ -219,16 +221,20 @@ def draw_particles():
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
 
+	# robot position (just for name reduction)
+	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
+	
 	# Draw the target
 	gx, gy = convertAxis(goal.x, goal.y)
-	pygame.draw.circle(window, [0,250,250], (int(gx),
-		int(gy)), 20, 0)
+	#pygame.draw.circle(window, [0,250,250], (int(gx),
+	#	int(gy)), 20, 0)
+	pygame.draw.line(window, color , convertAxis(robotX, robotY), (gx, gy),5)
 
-	# Draw main robot
-	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
+	# Draw main robot	
 	draw_robot(robotX, robotY, robotT)
 
-	np.savetxt("robot.csv", [[robotX, robotY]], delimiter=",")
+
+	#np.savetxt("robot.csv", [[robotX, robotY]], delimiter=",")
 
 	pygame.display.flip() 
 

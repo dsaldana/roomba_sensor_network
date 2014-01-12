@@ -10,17 +10,17 @@
 	<param name="map_x2" value="5.0" /> 
 	<param name="map_y1" value="-4.0" /> 
 	<param name="map_y2" value="4.0" /> 
-	<!-- Grid -->
+	<!-- Grid n=y-->
 	<param name="grid_n" value="8" /> 
-	<param name="grid_m" value="16" />
+	<param name="grid_m" value="10" />
 
 	<!-- Sensor config -->
-	<param name="sensor_radio" value="0.2" />
-	<param name="sensor_distance" value="0.2" />
+	<param name="sensor_radio" value="0.3" />
+	<param name="sensor_distance" value="0.45" />
 
 	<!-- Particle filter parameters -->
-	<param name="particles_number" value="2000" />
-	<param name="particle_movement" value="0.04" />
+	<param name="particles_number" value="3000" />
+	<param name="particle_movement" value="0.06" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 	    <arg name="use_sim_time" value="true"/>
