@@ -111,6 +111,8 @@ class ParticleFilter:
 
 					
 					#print "lugar errado da particula",p.z
+				# if the particles is outside the map.
+				# FIXME elif
 				if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
 					p.z = p.z * self.weight_out_of_map
 

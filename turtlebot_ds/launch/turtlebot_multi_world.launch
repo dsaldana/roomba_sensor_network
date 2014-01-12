@@ -6,10 +6,10 @@
 
 
 	<!-- Map parameters -->
-	<param name="map_x1" value="-2.0" /> 
-	<param name="map_x2" value="2.0" /> 
-	<param name="map_y1" value="-1.0" /> 
-	<param name="map_y2" value="1.0" /> 
+	<param name="map_x1" value="-5.0" /> 
+	<param name="map_x2" value="5.0" /> 
+	<param name="map_y1" value="-4.0" /> 
+	<param name="map_y2" value="4.0" /> 
 	<!-- Grid -->
 	<param name="grid_n" value="8" /> 
 	<param name="grid_m" value="16" />
