@@ -24,8 +24,9 @@ class ParticleFilter:
 	simulated_robots = rospy.get_param('simulated_robots', True)
 	
 	# PF weights
+	weight_no_sensed = 1.0
 	weight_tracking_left = 1.2
-	weight_tracking_right = 0.01
+	weight_tracking_right = 0.01	
 	
 	# FIXME this if should not exist.
 	if not simulated_robots:
@@ -108,9 +109,11 @@ class ParticleFilter:
 							p.z *= self.weight_tracking_left 
 						else:
 							p.z *= self.weight_tracking_right 
-
+				else:
+					# particle was not sensed
+					p.z *= self.weight_no_sensed
 					
-					#print "lugar errado da particula",p.z
+
 				# if the particles is outside the map.
 				# FIXME elif
 				if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
