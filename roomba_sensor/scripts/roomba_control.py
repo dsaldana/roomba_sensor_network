@@ -79,8 +79,8 @@ def img_callback(img):
 	# How many white pixels in the right
 	pr = 0
 
-	threshold_value = 130
-	threshold_other = 130
+	threshold_value = 160
+	threshold_other = 160
 	
 	# Conunt the pixels in the middel row of the image.
 	for i in [int(mat.rows / 2)]:
@@ -296,6 +296,7 @@ def run():
 					# TODO create a funcion, this code is above.
 					# Distances to the other robot
 					dx, dy = r.x - robotX, r.y - robotY
+					
 					# Magnitude. Coulomb law. Charge c=n_pts
 					c = f_robots *  (len(pf.particles) / len(cents))
 					fm = c / (dx**2 + dy**2)
