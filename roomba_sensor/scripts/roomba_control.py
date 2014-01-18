@@ -313,7 +313,7 @@ def run():
 						continue
 
 					# Vector to the other robot
-					d, theta = points_to_vector([robotX, robotY], [r.x, r.y])
+					d, theta = points_to_vector([robotX, robotY], [r.rx, r.ry])
 
 					# Foce, Coulombs law. Charge c=n_pts
 					k = f_robots *  (len(pf.particles) / len(cents))					
@@ -347,7 +347,7 @@ def run():
 		else:
 			####### Tracking ##########
 			controlP = (sensedLeft - 1) + sensedRight
-			print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
+			#print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
 
 			# counter robot force.
 			crf = 0
@@ -358,19 +358,20 @@ def run():
 						continue
 
 					# Vector to the other robot
-					d, theta = points_to_vector([robotX, robotY], [r.x, r.y])
+					d, theta = points_to_vector([robotX, robotY], [r.rx, r.ry])
 					# Robot force.
 					rf = 1 / (d**2)
-
+					print [r.rx, r.ry]#, "d=",d," theta=", theta 
 					# is this robot considerable?
 					# if the other robot is in front of it (angle view is 120 degress)
-					if abs(theta - robotT) < (pi / 3) and  rf > 0.1:
+					if abs(theta - robotT) < (pi / 3):
 						if rf > crf:
 							crf = rf
 
 			p = Point32()
 			p.x = controlP
 			p.y = crf
+			#print "f=", crf
 			trackPub.publish(p)
 
 

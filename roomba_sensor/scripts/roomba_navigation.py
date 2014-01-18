@@ -33,12 +33,13 @@ p_linear = rospy.get_param('/p_control_linear', 0.5)
 def tracking_callback(sensedData):
 	global traking
 	global sensedValue
+	global crf
 
 	# sensed data
 	sensedValue = sensedData.x
-	crr = sensedData.y
+	crf = sensedData.y
 	traking = True
-	print "Tracking ", sensedValue
+	print "Tracking=", sensedValue, " force=",crf
 
 def goal_callback(point):
 	global goal
@@ -64,11 +65,11 @@ def run():
 	velPub = rospy.Publisher(topicName, Twist)
 		
 	topicName = "/" + robot_name + "/goal"
-	rospy.Subscriber(topicName, Point32, goal_callback)
+	rospy.Subscriber(topicName, Point32, goal_callback, queue_size = 1)
 
 	# Tracking callback
 	topicName = "/" + robot_name + "/tracking"
-	rospy.Subscriber(topicName, Point32, tracking_callback)
+	rospy.Subscriber(topicName, Point32, tracking_callback, queue_size = 1)
 
 	## Object to get information from Gazebo
 	robot = RoombaLocalization(robot_name)	
@@ -83,8 +84,20 @@ def run():
 		#	continue
 		#TODO implement tracking in another module.
 		if(traking):
-			###### Tracking ######
-			lin_vel = 0.2
+			###### Tracking ######		
+			# Max speed for tracking.	
+			lin_vel = 0.4
+			# if there is a robot to crash.
+			if crf > 0:
+				# input force crf: i = [0 , 1.2]
+				# output o = [0.4, 0]
+				# mappint i to o: x = (2 - i) * 0.4
+				cm = 4.5
+				lin_vel *= (cm - crf) / cm
+
+				if lin_vel < 0:
+					lin_vel = 0
+
 			P = pi / 4
 			D = pi / 2
 
