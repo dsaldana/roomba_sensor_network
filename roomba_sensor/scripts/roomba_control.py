@@ -99,6 +99,30 @@ def img_callback(img):
 	
 	#print [total, sensedValue, sensedLeft, sensedRight]
 	
+# Convert two points to a verctor. 
+# Return magnitude and angle.
+def points_to_vector(p1, p2):
+	dx, dy = p2[0] - p1[0], p2[1] - p1[1]
+
+	# Magnitude. Coulomb law.
+	mag = sqrt(dx**2 + dy**2)
+
+	# Angle
+	theta = atan(dy / dx)
+
+	if  dx < 0:
+		theta += pi
+
+	return mag, theta 
+
+
+# Return x,y components.
+def vector_components(mag, theta):
+	# components
+	x,y = mag * cos(theta), mag * sin(theta)			
+	return x,y
+
+
 
 def run():	
 	######### Initialization ##################
@@ -266,23 +290,18 @@ def run():
 				# points in centroid
 				n_pts = sum(idx == i)
 
-				dx, dy = c[0] - robotX, c[1] - robotY
+				# Vector to the centroid
+				d, theta = points_to_vector([robotX, robotY], c)
 
-				# Magnitude. Coulomb law. Charge c=n_pts
-				fm = f_centroid* n_pts / (dx**2 + dy**2)
-				# Angle
-				f_theta = atan(dy / dx)
-
-				if  dx < 0:
-					f_theta += pi
+				# Force. Coulomb law. Charge c=n_pts
+				fm = f_centroid * n_pts / (d**2)
 
 				# components
-				u,v = fm * cos(f_theta), fm * sin(f_theta)			
+				u,v = vector_components(fm, theta)		
 
 				F[0] += u
 				F[1] += v
 
-				print u, v
 				fc.append([u,v])
 
 			
@@ -293,20 +312,15 @@ def run():
 					if (r.robot_id == robotName):
 						continue
 
-					# TODO create a funcion, this code is above.
-					# Distances to the other robot
-					dx, dy = r.x - robotX, r.y - robotY
+					# Vector to the other robot
+					d, theta = points_to_vector([robotX, robotY], [r.x, r.y])
 
-					# Magnitude. Coulomb law. Charge c=n_pts
-					c = f_robots *  (len(pf.particles) / len(cents))
-					fm = c / (dx**2 + dy**2)
-					# Angle
-					f_theta = atan(dy / dx)
-					if  dx < 0:
-						f_theta += pi
+					# Foce, Coulombs law. Charge c=n_pts
+					k = f_robots *  (len(pf.particles) / len(cents))					
+					fm = k / (d**2)
 					
 					# Components
-					u, v = fm * cos(f_theta), fm * sin(f_theta)			
+					u, v = vector_components(fm, theta)		
 
 					# Positive or robot Force is in opposite direction.
 					F[0] -= u
@@ -331,9 +345,17 @@ def run():
 			navPub.publish(p)
 
 		else:
-			#### Tracking
+			####### Tracking ##########
 			controlP = (sensedLeft - 1) + sensedRight
 			print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
+			### TODO Observe the other robots
+			for r in robot_msgs.values():
+					if (r.robot_id == robotName):
+						continue
+
+					# Vector to the other robot
+					d, theta = points_to_vector([robotX, robotY], [r.x, r.y])
+
 			trackPub.publish(controlP)
 
 

@@ -47,23 +47,23 @@
   	<!--Robots -->
    	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
    		<arg name="robot_id" value="Robot1"/>
-   		<arg name="robot_pose" value="-x 0 -y 0.5 -z 0"/>
+   		<arg name="robot_pose" value="-x 0 -y 1.5 -z 0"/>
   	</include>
 
  
  	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
    		<arg name="robot_id" value="Robot2"/>
-   		<arg name="robot_pose" value="-x 0 -y -0.5 -z 0"/>
+   		<arg name="robot_pose" value="-x 0 -y -1.5 -z 0"/>
   	</include>
 
 
 	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
    		<arg name="robot_id" value="Robot3"/>
-   		<arg name="robot_pose" value="-x -0.5 -y 0 -z 0"/>
+   		<arg name="robot_pose" value="-x -1.5 -y 0 -z 0"/>
   	</include>
 
 	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
    		<arg name="robot_id" value="Robot4"/>
-   		<arg name="robot_pose" value="-x 0.5 -y 0.0 -z 0"/>
+   		<arg name="robot_pose" value="-x 1.5 -y 0.0 -z 0"/>
   	</include>
 </launch>
