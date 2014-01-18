@@ -149,7 +149,7 @@ def run():
 	
 	# Camera
 	topicName = "/" + robotName + "/front_cam/camera/image"
-	image_sub = rospy.Subscriber(topicName, Image, img_callback)
+	image_sub = rospy.Subscriber(topicName, Image, img_callback,  queue_size = 1)
 
 	# Robot communication
 	# Subscriber for robot communication
@@ -160,7 +160,7 @@ def run():
 	# Goal Navigator
 	navPub = rospy.Publisher("/" + robotName + "/goal", Point32)
 	# Tracker navigator
-	trackPub = rospy.Publisher("/" + robotName + "/tracking", Float32)
+	trackPub = rospy.Publisher("/" + robotName + "/tracking", Point32)
 
 	# Initialize Particles 
 	pf = ParticleFilter()		
@@ -348,6 +348,10 @@ def run():
 			####### Tracking ##########
 			controlP = (sensedLeft - 1) + sensedRight
 			print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
+
+			# counter robot force.
+			crf = 0
+
 			### TODO Observe the other robots
 			for r in robot_msgs.values():
 					if (r.robot_id == robotName):
@@ -355,8 +359,19 @@ def run():
 
 					# Vector to the other robot
 					d, theta = points_to_vector([robotX, robotY], [r.x, r.y])
+					# Robot force.
+					rf = 1 / (d**2)
 
-			trackPub.publish(controlP)
+					# is this robot considerable?
+					# if the other robot is in front of it (angle view is 120 degress)
+					if abs(theta - robotT) < (pi / 3) and  rf > 0.1:
+						if rf > crf:
+							crf = rf
+
+			p = Point32()
+			p.x = controlP
+			p.y = crf
+			trackPub.publish(p)
 
 
 		rospy.sleep(0.1)

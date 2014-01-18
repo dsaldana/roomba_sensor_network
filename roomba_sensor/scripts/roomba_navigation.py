@@ -34,7 +34,9 @@ def tracking_callback(sensedData):
 	global traking
 	global sensedValue
 
-	sensedValue = sensedData
+	# sensed data
+	sensedValue = sensedData.x
+	crr = sensedData.y
 	traking = True
 	print "Tracking ", sensedValue
 
@@ -66,7 +68,7 @@ def run():
 
 	# Tracking callback
 	topicName = "/" + robot_name + "/tracking"
-	rospy.Subscriber(topicName, Float32, tracking_callback)
+	rospy.Subscriber(topicName, Point32, tracking_callback)
 
 	## Object to get information from Gazebo
 	robot = RoombaLocalization(robot_name)	
@@ -88,11 +90,11 @@ def run():
 
 			vel = Twist()
 			vel.linear.x = 0.3 * lin_vel
-			vel.angular.z = 0.5 * -(sensedValue.data * P + (sensedValue.data - old_val) * D)
+			vel.angular.z = 0.5 * -(sensedValue * P + (sensedValue - old_val) * D)
 			
 			velPub.publish(vel)
 
-			old_val = sensedValue.data
+			old_val = sensedValue
 
 		else:
 			###### Navigation #####
