@@ -26,7 +26,7 @@
 	<param name="f_robots" value="8" />
 	<!-- PID for velocities -->
 	<param name="p_control_linear" value="0.4" /> 
-	<param name="p_control_angular" value="0.6" /> 
+	<param name="p_control_angular" value="1.5" /> 
 
 
 

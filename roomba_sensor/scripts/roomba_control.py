@@ -296,7 +296,7 @@ def run():
 					# TODO create a funcion, this code is above.
 					# Distances to the other robot
 					dx, dy = r.x - robotX, r.y - robotY
-					
+
 					# Magnitude. Coulomb law. Charge c=n_pts
 					c = f_robots *  (len(pf.particles) / len(cents))
 					fm = c / (dx**2 + dy**2)
@@ -311,8 +311,6 @@ def run():
 					# Positive or robot Force is in opposite direction.
 					F[0] -= u
 					F[1] -= v
-
-
 				
 			except Exception, e:
 				rospy.logerr("Error integrating the data from other robots. " + str(e))
