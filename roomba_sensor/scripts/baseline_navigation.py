@@ -120,7 +120,8 @@ def run():
 				# Angular velocity
 				av = 10
 				# Linear velocity
-				lv = exp(0.01 * spiral_counter++)
+				lv = exp(0.01 * spiral_counter)				
+				spiral_counter += 1
 
 				# Send control message
 				vel = Twist()

@@ -1,3 +1,5 @@
+/turtlebot_ds/launch/baseline_simulation.launch~
+/turtlebot_ds/launch/single_robot.launch~
 /roomba_sensor/src/roomba_sensor/ellipse.py~
 /roomba_sensor/src/roomba_sensor/fit_ellipse.py~
 /roomba_sensor/scripts/test/test_ellipse_aproximation2.py~
