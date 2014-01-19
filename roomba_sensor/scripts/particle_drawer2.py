@@ -88,7 +88,7 @@ def draw_points(points, color=(255,0,0)):
 	
 	if not draw_clusters:
 		for i in range(len(x)):
-			pygame.draw.circle(window, [0,255,0], (int(x[i]), int(y[i])), 2, 0)
+			pygame.draw.circle(window, color, (int(x[i]), int(y[i])), 2, 0)
 	else: 
 		k_groups = 9
 

@@ -16,9 +16,9 @@
 
 	<!-- Particle filter parameters -->
 	<param name="particles_number" value="3000" />
-	<param name="particle_movement" value="0.08" />
+	<param name="particle_movement" value="0.09" />
 	<!-- Particle drawer -->
-	<param name="draw_clusters" value="true" />
+	<param name="draw_clusters" value="false" />
 
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
