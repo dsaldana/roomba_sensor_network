@@ -77,6 +77,8 @@ def run():
 	######## Control Loop ###########
 	print "Start!"
 	old_val = -1
+	spiral_counter = 1
+
 	while not rospy.is_shutdown():
 		rospy.sleep(0.20)
 
@@ -112,12 +114,26 @@ def run():
 		else:
 			###### Navigation #####
 			[sX, sY, sT] = robot.get_position()
-			print "Navigating", [sX, sY, sT]
+			
+			###### Spiral exploration #####
+			if goal.z == -1:
+				# Angular velocity
+				av = 10
+				# Linear velocity
+				lv = exp(0.01 * spiral_counter++)
 
+				# Send control message
+				vel = Twist()
+				vel.linear.x = lv
+				vel.angular.z = av
+				velPub.publish(vel)
+
+			##### Navigate to a point. ###########
+			print "Navigating", [sX, sY, sT]
 			# Orientation
 			x = goal.x - sX 
 			y = goal.y - sY
-
+	
 			if(x == 0):
 				rospy.sleep(0.20)
 				continue

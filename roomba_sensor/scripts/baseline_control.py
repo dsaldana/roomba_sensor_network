@@ -261,87 +261,12 @@ def run():
 		
 		######## Exploring #################
 		if explore:
-			k_groups = 9
-			# 
-			x, y = [], []			
-			for p in pf.particles:
-				x.append(p.x)
-				y.append(p.y)
-
-			# Categorize in k groups and compute
-			# new centroids
-			np.random.seed(1)
-
-			if (k_skip < 0):	
-				cents, idx = kmeans2(np.array(zip(x, y)), k_groups)									
-				k_skip = 5
-			else:				
-				k_skip -= 1
-						
-				
-
-			# Total force
-			F = [0, 0]
-			# Foces by the clusters
-			fc = []			
-			for i in range(len(cents)):
-				c  = cents[i]
-
-				# points in centroid
-				n_pts = sum(idx == i)
-
-				# Vector to the centroid
-				d, theta = points_to_vector([robotX, robotY], c)
-
-				# Force. Coulomb law. Charge c=n_pts
-				fm = f_centroid * n_pts / (d**2)
-
-				# components
-				u,v = vector_components(fm, theta)		
-
-				F[0] += u
-				F[1] += v
-
-				fc.append([u,v])
-
 			
-			## Foces by other robots
-			fr = []
-			try:
-				for r in robot_msgs.values():
-					if (r.robot_id == robotName):
-						continue
-
-					# Vector to the other robot
-					d, theta = points_to_vector([robotX, robotY], [r.rx, r.ry])
-
-					# Foce, Coulombs law. Charge c=n_pts
-					k = f_robots *  (len(pf.particles) / len(cents))					
-					fm = k / (d**2)
-					
-					# Components
-					u, v = vector_components(fm, theta)		
-
-					# Positive or robot Force is in opposite direction.
-					F[0] -= u
-					F[1] -= v
-				
-			except Exception, e:
-				rospy.logerr("Error integrating the data from other robots. " + str(e))
-
-			
-			
-			cte =  10.0 / (len(pf.particles))
-			#cte = 0.5 * 1 / hypot(F[0] , F[1])
-			F = cte * F[0], cte * F[1]
-
-			print "----------Total force: ", F
-
-			goal = robotX + F[0], robotY + F[1]
 			
 			# Publish goal to navigate
 			p = Point32()
-			p.x, p.y = goal
+			#p.x, p.y = goal
+			p.z = -1
 			navPub.publish(p)
 
 		else:
