@@ -44,12 +44,17 @@ def tracking_callback(sensedData):
 def goal_callback(point):
 	global goal
 	global traking
+	global spiral_counter
 	traking = False
 	goal = point
+
+	if not point.z == -1:
+		spiral_counter = 10
 	#print "new goal ", [goal.x, goal.y,  goal.z]
 
 def run():
 	global traking
+	global spiral_counter
 	# Node roomba navigation
 	rospy.init_node('roomba_navigation')
 	

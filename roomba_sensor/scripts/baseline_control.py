@@ -182,6 +182,13 @@ def run():
 
 	k_skip = -1
 
+	# comming back in exploration
+	comming_back = False
+	initial_position = Point32()
+	ip = robot.get_position()
+	initial_position.x = ip[0]
+	initial_position.y = ip[1]
+
 	######## Control Loop
 	print "Start!"
 	while not rospy.is_shutdown():
@@ -262,12 +269,23 @@ def run():
 		######## Exploring #################
 		if explore:
 			##### Spiral exploration ######
-			
-			# Publish goal to navigate
-			p = Point32()
-			#p.x, p.y = goal
-			p.z = -1
-			navPub.publish(p)
+			if comming_back:				
+				# go to initial position
+				navPub.publish(initial_position)
+				# if it arrives to the initial position
+				if abs(robotX - initial_position.x) < 0.2 and abs(robotY - initial_position.y) < 0.2:
+					comming_back = False
+			else:
+				# Publish goal to navigate
+				p = Point32()
+				#p.x, p.y = goal
+				p.z = -1
+				navPub.publish(p)
+
+				# if robot is outside the map
+				if robotX < mapX1 or robotX > mapX2 or robotY < mapY1 or robotY > mapY2:
+					comming_back = True
+
 
 		else:
 			####### Tracking ##########
