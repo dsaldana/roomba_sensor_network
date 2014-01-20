@@ -46,7 +46,7 @@ def goal_callback(point):
 	global traking
 	traking = False
 	goal = point
-	print "new goal ", [goal.x, goal.y,  goal.z]
+	#print "new goal ", [goal.x, goal.y,  goal.z]
 
 def run():
 	global traking
@@ -77,7 +77,7 @@ def run():
 	######## Control Loop ###########
 	print "Start!"
 	old_val = -1
-	spiral_counter = 0
+	spiral_counter = 10
 
 	while not rospy.is_shutdown():
 		rospy.sleep(0.20)
@@ -117,20 +117,30 @@ def run():
 			
 			###### Spiral exploration #####
 			if goal.z == -1:
-				# Angular velocity
-				av = 0.4
-				# Linear velocity
-				lv = exp(0.01 * spiral_counter)				
-				spiral_counter += 1
 
-				lv=0.2
+				# Angular velocity
+				a = pi / 3
+				b = -0.01
+				av = a * exp (b * spiral_counter) 
+				# Linear velocity
+				#lv = exp(0.01 * spiral_counter)				
+				lv = 0.3 * (1 - exp(-spiral_counter)) 
+
+				spiral_counter += 1
+				print spiral_counter, " lv=", lv, " av=", av 
+				
+				maxLV = 0.5
+				if lv > maxLV:
+					lv = maxLV
+
+
 				# Send control message
 				vel = Twist()
 				vel.linear.x = lv
 				vel.angular.z = av
 				velPub.publish(vel)
 
-				print "lv=", lv
+				
 			else:
 				##### Navigate to a point. ###########
 				print "Navigating", [sX, sY, sT]
@@ -170,12 +180,12 @@ def run():
 
 				# velocity range
 				linear_r = [0.02, 0.5]
-				angular_r = [-pi, pi]
+				
 				
 				if vel.linear.x > linear_r[1]:
 					vel.linear.x = linear_r[1]
 				
-
+				angular_r = [-pi, pi]
 				if vel.angular.z > angular_r[1]: 
 					vel.angular.z = angular_r[1]
 				elif vel.angular.z < - angular_r[1]:
