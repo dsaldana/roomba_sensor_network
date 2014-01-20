@@ -148,7 +148,7 @@ def run():
 				
 			else:
 				##### Navigate to a point. ###########
-				print "Navigating", [sX, sY, sT]
+				print "Navigating ", [sX, sY, sT]
 				# Orientation
 				x = goal.x - sX 
 				y = goal.y - sY

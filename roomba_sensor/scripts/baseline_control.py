@@ -189,9 +189,14 @@ def run():
 	initial_position.x = ip[0]
 	initial_position.y = ip[1]
 
+	# atractive point
+	atracting_point = None
+
 	######## Control Loop
 	print "Start!"
 	while not rospy.is_shutdown():
+		rospy.sleep(0.1)
+
 		# Get robot position from gazebo
 		[robotX, robotY, robotT] = robot.get_position()		
 		# Camera position
@@ -225,6 +230,11 @@ def run():
 				an = PointR()
 				an.x, an.y = msg.rx, msg.ry
 				anomaly_points.append(an)
+
+				#if atracting_point == None:
+				atracting_point = Point32()
+					# where anomaly was sensed or identified.
+				atracting_point.x, atracting_point.y =  msg.rx, msg.ry
 		
 		# Particle filter: updade based on sensor value.
 		pf.update_particles(samples)
@@ -268,6 +278,12 @@ def run():
 		
 		######## Exploring #################
 		if explore:
+			# if exist an atracting point
+			if not atracting_point == None:
+				navPub.publish(atracting_point)
+				continue
+
+
 			##### Spiral exploration ######
 			if comming_back:				
 				# go to initial position
@@ -276,7 +292,7 @@ def run():
 				if abs(robotX - initial_position.x) < 0.2 and abs(robotY - initial_position.y) < 0.2:
 					comming_back = False
 			else:
-				# Publish goal to navigate
+				# Send -1 for spiral
 				p = Point32()
 				#p.x, p.y = goal
 				p.z = -1
@@ -318,7 +334,7 @@ def run():
 			trackPub.publish(p)
 
 
-		rospy.sleep(0.1)
+		
 
 
 if __name__ == '__main__':
