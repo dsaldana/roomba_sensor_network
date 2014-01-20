@@ -261,7 +261,7 @@ def run():
 		
 		######## Exploring #################
 		if explore:
-			
+			##### Spiral exploration ######
 			
 			# Publish goal to navigate
 			p = Point32()

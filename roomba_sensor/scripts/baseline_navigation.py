@@ -46,7 +46,7 @@ def goal_callback(point):
 	global traking
 	traking = False
 	goal = point
-	print "new goal ", [goal.x, goal.y]
+	print "new goal ", [goal.x, goal.y,  goal.z]
 
 def run():
 	global traking
@@ -77,7 +77,7 @@ def run():
 	######## Control Loop ###########
 	print "Start!"
 	old_val = -1
-	spiral_counter = 1
+	spiral_counter = 0
 
 	while not rospy.is_shutdown():
 		rospy.sleep(0.20)
@@ -118,69 +118,72 @@ def run():
 			###### Spiral exploration #####
 			if goal.z == -1:
 				# Angular velocity
-				av = 10
+				av = 0.4
 				# Linear velocity
 				lv = exp(0.01 * spiral_counter)				
 				spiral_counter += 1
 
+				lv=0.2
 				# Send control message
 				vel = Twist()
 				vel.linear.x = lv
 				vel.angular.z = av
 				velPub.publish(vel)
 
-			##### Navigate to a point. ###########
-			print "Navigating", [sX, sY, sT]
-			# Orientation
-			x = goal.x - sX 
-			y = goal.y - sY
-	
-			if(x == 0):
-				rospy.sleep(0.20)
-				continue
+				print "lv=", lv
+			else:
+				##### Navigate to a point. ###########
+				print "Navigating", [sX, sY, sT]
+				# Orientation
+				x = goal.x - sX 
+				y = goal.y - sY
+		
+				if(x == 0):
+					rospy.sleep(0.20)
+					continue
 
-			# The reference for the angle is the x axes.
-			t = atan(y / x) 
-			if  x < 0:
-				t += pi
-			t = cut_angle(t)
+				# The reference for the angle is the x axes.
+				t = atan(y / x) 
+				if  x < 0:
+					t += pi
+				t = cut_angle(t)
 
-			controlT = t - sT
-			controlT = cut_angle(controlT)		
-			
-			# Euclidean distance
-			d = sqrt(x*x + y*y)
+				controlT = t - sT
+				controlT = cut_angle(controlT)		
+				
+				# Euclidean distance
+				d = sqrt(x*x + y*y)
 
-			print  "distance=", d, " teta: ", degrees(controlT)
+				print  "distance=", d, " teta: ", degrees(controlT)
 
-			vel = Twist()
-			# for rial robot: vel.linear.x = 0.5 * d 
-			### P Control ###
+				vel = Twist()
+				# for rial robot: vel.linear.x = 0.5 * d 
+				### P Control ###
 
-			vel.linear.x = p_linear * d 
-			vel.angular.z = p_angular * controlT
+				vel.linear.x = p_linear * d 
+				vel.angular.z = p_angular * controlT
 
-			# For real robots: the relative position affect the axes.
-			if not simulated_robots:
-				vel.angular.z *= -1
+				# For real robots: the relative position affect the axes.
+				if not simulated_robots:
+					vel.angular.z *= -1
 
 
-			# velocity range
-			linear_r = [0.02, 0.5]
-			angular_r = [-pi, pi]
-			
-			if vel.linear.x > linear_r[1]:
-				vel.linear.x = linear_r[1]
-			
+				# velocity range
+				linear_r = [0.02, 0.5]
+				angular_r = [-pi, pi]
+				
+				if vel.linear.x > linear_r[1]:
+					vel.linear.x = linear_r[1]
+				
 
-			if vel.angular.z > angular_r[1]: 
-				vel.angular.z = angular_r[1]
-			elif vel.angular.z < - angular_r[1]:
-				vel.angular.z = - angular_r[1]
-			#if vel.angular.z < angular_r[0]:
-			#	vel.angular.z = 0
-			
-			velPub.publish(vel)
+				if vel.angular.z > angular_r[1]: 
+					vel.angular.z = angular_r[1]
+				elif vel.angular.z < - angular_r[1]:
+					vel.angular.z = - angular_r[1]
+				#if vel.angular.z < angular_r[0]:
+				#	vel.angular.z = 0
+				
+				velPub.publish(vel)
 
 		
 
