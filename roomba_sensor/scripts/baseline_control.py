@@ -278,6 +278,31 @@ def run():
 		
 		######## Exploring #################
 		if explore:
+			# possible collition
+			collition = False
+			for r in robot_msgs.values():
+				if (r.robot_id == robotName):
+					continue
+
+				# Vector to the other robot
+				d, theta = points_to_vector([robotX, robotY], [r.rx, r.ry])
+				# Robot force.
+				rf = 1 / (d**2)
+				print [r.rx, r.ry]#, "d=",d," theta=", theta 
+				# is this robot considerable?
+				# if the other robot is in front of it (angle view is 120 degress)
+				if abs(theta - robotT) < (pi / 2.5) and d < 0.6:
+					collition = True
+			if collition:
+				p = Point32()
+
+				af = 0.1
+				# Turn 90 degrees
+				p.x = robotX + af * cos(robotT + pi / 2) 
+				p.y = robotX + af * sin(robotT + pi / 2)
+				navPub.publish(p)
+				continue
+
 			# if exist an atracting point
 			if not atracting_point == None:
 				navPub.publish(atracting_point)
