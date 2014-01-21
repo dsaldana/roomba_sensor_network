@@ -10,7 +10,7 @@
   <node name="spawn_turtlebot_model" pkg="gazebo_ros" type="spawn_model"
         args="$(optenv ROBOT_INITIAL_POSE) -unpause -urdf -param robot_description -model turtlebot"/>
   
-  <!-- Odometry estimator -->
+  <!-- Odometry estimator 
   <node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
     <remap from="imu_data" to="turtlebot_node/imu/data"/>
     <remap from="robot_pose_ekf/odom" to="odom_combined"/>
@@ -21,12 +21,14 @@
     <param name="vo_used" value="false"/>
     <param name="output_frame" value="odom"/>
   </node>
-  
-  <!-- Velocity muxer -->
+	-->
+
+  <!-- Velocity muxer 
   <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
   <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
         args="load cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
     <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
     <remap from="cmd_vel_mux/output" to="turtlebot_node/cmd_vel" />
   </node>
+	-->
 </launch>
