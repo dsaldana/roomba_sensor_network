@@ -296,10 +296,10 @@ def run():
 			if collition:
 				p = Point32()
 
-				af = 0.1
+				af = 0.01
 				# Turn 90 degrees
-				p.x = robotX + af * cos(robotT + pi / 2) 
-				p.y = robotX + af * sin(robotT + pi / 2)
+				p.x = robotX + af * cos(robotT - pi / 2) 
+				p.y = robotX + af * sin(robotT - pi / 2)
 				navPub.publish(p)
 				continue
 
