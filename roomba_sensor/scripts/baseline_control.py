@@ -291,7 +291,7 @@ def run():
 				print [r.rx, r.ry]#, "d=",d," theta=", theta 
 				# is this robot considerable?
 				# if the other robot is in front of it (angle view is 120 degress)
-				if abs(theta - robotT) < (pi / 2.5) and d < 0.6:
+				if abs(theta - robotT) < (pi / 2.5) and d < 0.9:
 					collition = True
 			if collition:
 				p = Point32()
