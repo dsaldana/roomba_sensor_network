@@ -7,8 +7,8 @@
 	<param name="map_y1" value="-4.0" /> 
 	<param name="map_y2" value="4.0" /> 
 	<!-- Grid n=y-->
-	<param name="grid_n" value="20" /> 
-	<param name="grid_m" value="10" />
+	<param name="grid_n" value="8" /> 
+	<param name="grid_m" value="4" />
 
 	<!-- Sensor config -->
 	<param name="sensor_radio" value="0.45" />
@@ -19,7 +19,9 @@
 	<param name="particle_movement" value="0.09" />
 	<!-- Particle drawer -->
 	<param name="draw_clusters" value="false" />
-
+	<param name="draw_particles" value="false" />
+	<param name="draw_path" value="true" />
+	<param name="draw_anomaly" value="true" />
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
 	<param name="f_centroid" value="5" />
@@ -35,7 +37,7 @@
 	    <arg name="debug" value="false"/>
 
 		<!-- $(find turtlebot_ds)/worlds/simple.world -->
-	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
+	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly1.world"/>
   	</include>
   
 	<!-- Particle drawer -->  	

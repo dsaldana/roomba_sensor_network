@@ -137,6 +137,8 @@ def run():
 	f_centroid = rospy.get_param('/f_centroid', 1.0)
 	f_robots = rospy.get_param('/f_robots', 2.0)
 	
+	sensor_enabled = rospy.get_param('/sensor_enabled', False)
+
 	rospy.loginfo("Loading robot control.")
 
 	# Create the Publisher to control the robot.
@@ -148,8 +150,9 @@ def run():
 	partPub = rospy.Publisher("/" + robotName + "/particles", Particle)
 	
 	# Camera
-	topicName = "/" + robotName + "/front_cam/camera/image"
-	image_sub = rospy.Subscriber(topicName, Image, img_callback,  queue_size = 1)
+	if sensor_enabled:
+		topicName = "/" + robotName + "/front_cam/camera/image"
+		image_sub = rospy.Subscriber(topicName, Image, img_callback, queue_size = 1)
 
 	# Robot communication
 	# Subscriber for robot communication

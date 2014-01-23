@@ -44,6 +44,7 @@ draw_particles1 = rospy.get_param('/draw_particles', False)
 draw_anomaly = rospy.get_param('/draw_anomaly', False)
 draw_path = rospy.get_param('/draw_path', False)
 draw_ellipse = rospy.get_param('/draw_ellipse', False)
+draw_grid = rospy.get_param('/draw_grid', False)
 
 # set of points with robots' paths
 paths = {}
@@ -183,29 +184,37 @@ def draw_particles():
 	# Draw the canvas
 	window.fill((255, 255, 255))	
 
+	ilines = range(gn + 1)
+	jlines = range(gm + 1)
+
+	if not draw_grid:
+		ilines = [0, len(ilines)-1]
+		jlines = [0, len(jlines)-1]
+
 	# Draw rows
 	color = (170, 170, 170)
-	for i in range(gn + 1):
+	for i in ilines:
 		hr = my + i * dy
 		pygame.draw.line(window, color , (mx, hr ), (width - mx, hr))
 	# Draw columns
-	for j in range(gm + 1):
+	for j in jlines:
 		hc = mx + j * dx
 		pygame.draw.line(window, color, ( hc ,my), (hc, height - my))
 	
 	# Draw zeros
-	pygame.draw.line(window, (0, 0, 250), (mx / 2, my + dy * gn / 2),
-		(width - mx / 2, my + dy * gn / 2))
-	pygame.draw.line(window, (0, 0, 250), 
-		(mx + dx * gm / 2, my / 2),
-		(mx + dx * gm / 2, height - my / 2))
+	if draw_grid:
+		pygame.draw.line(window, (0, 0, 250), (mx / 2, my + dy * gn / 2),
+			(width - mx / 2, my + dy * gn / 2))
+		pygame.draw.line(window, (0, 0, 250), 
+			(mx + dx * gm / 2, my / 2),
+			(mx + dx * gm / 2, height - my / 2))
 	
 	# path colors
 	pcols = {"Robot4" : (0, 0, 200), "Robot2":(0, 200, 200),
 		"Robot3":(0, 0, 200), "Robot3":(200, 0, 200)}
 
 	# Draw each robot path
-	if True:
+	if draw_path:
 		for k, rp in paths.iteritems():
 			col = (0, 0, 200)
 			if k in pcols:
@@ -214,7 +223,6 @@ def draw_particles():
 			draw_path(rp, col)
 
 	# Draw particles
-	print draw_particles1
 	if draw_particles1:
 		draw_points(particles.particles,(0, 200, 0))
 	
@@ -271,7 +279,7 @@ def draw_particles():
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
-		if draw_particles1:
+		if draw_path:
 			save_path(orobot.robot_id, robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
