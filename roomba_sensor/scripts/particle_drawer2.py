@@ -42,7 +42,7 @@ goal.x, goal.y = 0.0 ,0.0
 draw_clusters = rospy.get_param('/draw_clusters', False)
 
 # set of points with robots' paths
-paths = []
+paths = {}
 
 def goal_callback(point):
 	global goal
@@ -76,11 +76,15 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
 
-def save_path(robotX, robotY, robotT):
+def save_path(robot_id, robotX, robotY, robotT):
 	global paths
 	p = Point32()
 	p.x, p.y, p.z = robotX, robotY, robotT
-	paths.append(p)
+
+	if not robot_id in paths:
+		paths[robot_id] = []
+
+	paths[robot_id].append(p)
 
 def draw_points(points, color=(255,0,0)):
 
@@ -178,8 +182,9 @@ def draw_particles():
 		(mx + dx * gm / 2, my / 2),
 		(mx + dx * gm / 2, height - my / 2))
 	
-	# Draw paths	
-	draw_points(paths,(0, 0, 200))
+	# Draw each robot path
+	for rp in paths.values():	
+		draw_points(rp,(0, 0, 200))
 
 	# Draw particles
 	draw_points(particles.particles,(0, 200, 0))
@@ -196,7 +201,8 @@ def draw_particles():
 	# ## End Write
 
 	# Fit the anomaly to an ellipse
-	if len(particles.anomaly) > 0:				
+	draw_ellipse = False
+	if len(particles.anomaly) > 0 and draw_ellipse:				
 		######## Draw ellipse aproximation
 		# Convert PointR to numpy
 		NE = len(particles.anomaly)
@@ -235,12 +241,12 @@ def draw_particles():
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
 		#save path
-		save_path(robotX, robotY, robotT)
+		save_path(orobot.robot_id, robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
 	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
 	#save path
-	save_path(robotX, robotY, robotT)
+	save_path(particles.mrobot.robot_id ,robotX, robotY, robotT)
 
 	# Draw the target
 	gx, gy = convertAxis(goal.x, goal.y)

@@ -9,3 +9,6 @@
 float32 x
 float32 y
 float32 z
+
+# Robot id
+string robot_id

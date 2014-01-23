@@ -218,6 +218,7 @@ def run():
 				an = PointR()
 				an.x, an.y = msg.rx, msg.ry
 				anomaly_points.append(an)
+				an.robot_id = msg.robot_id
 		
 		# Particle filter: updade based on sensor value.
 		pf.update_particles(samples)
