@@ -271,7 +271,8 @@ def draw_particles():
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
-		save_path(orobot.robot_id, robotX, robotY, robotT)
+		if draw_particles1:
+			save_path(orobot.robot_id, robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
 	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z

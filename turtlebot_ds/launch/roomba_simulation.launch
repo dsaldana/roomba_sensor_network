@@ -21,6 +21,7 @@
 	<param name="draw_clusters" value="false" />
 	<param name="draw_particles" value="false" />
 	<param name="draw_path" value="true" />
+	<param name="draw_anomaly" value="true" />
 
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
