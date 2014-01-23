@@ -41,6 +41,9 @@ goal.x, goal.y = 0.0 ,0.0
 
 draw_clusters = rospy.get_param('/draw_clusters', False)
 
+# set of points with robots' paths
+paths = []
+
 def goal_callback(point):
 	global goal
 	goal = point
@@ -73,6 +76,11 @@ def draw_robot(robotX, robotY, robotT, color=(0, 0, 170)):
 		(x2 + rd * cos(robotT), y2 - rd * sin(robotT)), linew)
 	
 
+def save_path(robotX, robotY, robotT):
+	global paths
+	p = Point32()
+	p.x, p.y, p.z = robotX, robotY, robotT
+	paths.append(p)
 
 def draw_points(points, color=(255,0,0)):
 
@@ -169,11 +177,14 @@ def draw_particles():
 	pygame.draw.line(window, (0, 0, 250), 
 		(mx + dx * gm / 2, my / 2),
 		(mx + dx * gm / 2, height - my / 2))
-		
+	
+	# Draw paths	
+	draw_points(paths,(0, 0, 200))
+
 	# Draw particles
 	draw_points(particles.particles,(0, 200, 0))
 	
-	# Draw anomaly
+	# Draw anomaly points
 	draw_points(particles.anomaly)
 
 	# # Write particles in a CSV file
@@ -217,28 +228,27 @@ def draw_particles():
 		except Exception, e:
 			print e
 		
-			
+		
 
 	# Draw the other robots
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
+		#save path
+		save_path(robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
 	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
-	
+	#save path
+	save_path(robotX, robotY, robotT)
+
 	# Draw the target
 	gx, gy = convertAxis(goal.x, goal.y)
-	#pygame.draw.circle(window, [0,250,250], (int(gx),
-	#	int(gy)), 20, 0)
 	pygame.draw.line(window, color , convertAxis(robotX, robotY), (gx, gy),5)
 
 	# Draw main robot	
 	draw_robot(robotX, robotY, robotT)
 
-	#print "magnitud", hypot(robotX-goal.x, robotY-goal.y)
-
-	#np.savetxt("robot.csv", [[robotX, robotY]], delimiter=",")
 
 	pygame.display.flip() 
 
@@ -252,8 +262,8 @@ def run():
 
 	# Suscribe
 	robot_name = rospy.get_param('~robot_name', 'Robot1')
-	rospy.Subscriber("/" + robot_name + "/particles", Particle, callback)
-	rospy.Subscriber("/" + robot_name + "/goal", Point32, goal_callback)			
+	rospy.Subscriber("/" + robot_name + "/particles", Particle, callback,  queue_size = 1)
+	rospy.Subscriber("/" + robot_name + "/goal", Point32, goal_callback,  queue_size = 1)			
 
 	# Window
 	pygame.RESIZABLE = True
