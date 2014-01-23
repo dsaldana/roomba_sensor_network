@@ -25,7 +25,7 @@ class ParticleFilter:
 	
 	# PF weights
 	weight_no_sensed = 1.0
-	weight_tracking_left = 1.2
+	weight_tracking_left = 1.5
 	weight_tracking_right = 0.01	
 	
 	# FIXME this if should not exist.
