@@ -223,6 +223,7 @@ def run():
 			# Other robot positions
 			orobot = PointR()
 			orobot.x, orobot.y, orobot.z = msg.rx, msg.ry,  msg.rtheta
+			orobot.robot_id = msg.robot_id
 			orobots.append(orobot)
 
 			if msg.value > 0:

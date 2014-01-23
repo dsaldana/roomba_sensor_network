@@ -205,12 +205,14 @@ def run():
 		
 		# Sensed values
 		samples = []
+		# FIXME this variable cotain all robots (even o mrobot)
 		orobots = []
 		for msg in robot_msgs.values():
 			samples.append([msg.x, msg.y,  msg.theta, msg.value])
 			# Other robot positions
 			orobot = PointR()
 			orobot.x, orobot.y, orobot.z = msg.rx, msg.ry,  msg.rtheta
+			orobot.robot_id = msg.robot_id
 			orobots.append(orobot)
 
 			if msg.value > 0:

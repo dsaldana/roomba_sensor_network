@@ -40,6 +40,10 @@ goal = Point32()
 goal.x, goal.y = 0.0 ,0.0
 
 draw_clusters = rospy.get_param('/draw_clusters', False)
+draw_particles1 = rospy.get_param('/draw_particles', False)
+draw_anomaly = rospy.get_param('/draw_anomaly', False)
+draw_path = rospy.get_param('/draw_path', False)
+draw_ellipse = rospy.get_param('/draw_ellipse', False)
 
 # set of points with robots' paths
 paths = {}
@@ -85,6 +89,20 @@ def save_path(robot_id, robotX, robotY, robotT):
 		paths[robot_id] = []
 
 	paths[robot_id].append(p)
+
+def draw_path(points, color=(255,0,0)):
+	if len(points) < 2:
+		return
+
+	lp = convertAxis(points[0].x, points[0].y)
+
+	for i in range(1, len(points)):
+		# end point
+		ep = convertAxis(points[i].x, points[i].y)
+		# draw line
+		pygame.draw.line(window, color, lp, ep)
+
+		lp = ep 
 
 def draw_points(points, color=(255,0,0)):
 
@@ -182,15 +200,28 @@ def draw_particles():
 		(mx + dx * gm / 2, my / 2),
 		(mx + dx * gm / 2, height - my / 2))
 	
+	# path colors
+	pcols = {"Robot4" : (0, 0, 200), "Robot2":(0, 200, 200),
+		"Robot3":(0, 0, 200), "Robot3":(200, 0, 200)}
+
 	# Draw each robot path
-	for rp in paths.values():	
-		draw_points(rp,(0, 0, 200))
+	if True:
+		for k, rp in paths.iteritems():
+			col = (0, 0, 200)
+			if k in pcols:
+				col = pcols[k]
+
+			draw_path(rp, col)
 
 	# Draw particles
-	draw_points(particles.particles,(0, 200, 0))
+	print draw_particles1
+	if draw_particles1:
+		draw_points(particles.particles,(0, 200, 0))
 	
 	# Draw anomaly points
-	draw_points(particles.anomaly)
+	if draw_anomaly:
+		draw_points(particles.anomaly)
+
 
 	# # Write particles in a CSV file
 	# u = []
@@ -201,7 +232,7 @@ def draw_particles():
 	# ## End Write
 
 	# Fit the anomaly to an ellipse
-	draw_ellipse = False
+
 	if len(particles.anomaly) > 0 and draw_ellipse:				
 		######## Draw ellipse aproximation
 		# Convert PointR to numpy
@@ -240,17 +271,14 @@ def draw_particles():
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
-		#save path
 		save_path(orobot.robot_id, robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
 	robotX, robotY, robotT = particles.mrobot.x , particles.mrobot.y, particles.mrobot.z
-	#save path
-	save_path(particles.mrobot.robot_id ,robotX, robotY, robotT)
 
 	# Draw the target
-	gx, gy = convertAxis(goal.x, goal.y)
-	pygame.draw.line(window, color , convertAxis(robotX, robotY), (gx, gy),5)
+	#gx, gy = convertAxis(goal.x, goal.y)
+	#pygame.draw.line(window, color , convertAxis(robotX, robotY), (gx, gy),5)
 
 	# Draw main robot	
 	draw_robot(robotX, robotY, robotT)
