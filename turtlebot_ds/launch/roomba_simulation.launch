@@ -19,7 +19,7 @@
 	<param name="particle_movement" value="0.08" />
 	<!-- Particle drawer -->
 	<param name="draw_clusters" value="false" />
-	<param name="draw_particles" value="false" />
+	<param name="draw_particles" value="true" />
 	<param name="draw_path" value="true" />
 	<param name="draw_anomaly" value="true" />
 
@@ -31,14 +31,14 @@
 	<param name="p_control_linear" value="0.4" /> 
 	<param name="p_control_angular" value="1.5" /> 
 
-	<param name="sensor_enabled" value="false" />
+	<param name="sensor_enabled" value="true" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 	    <arg name="use_sim_time" value="true"/>
 	    <arg name="debug" value="false"/>
 
 		<!-- $(find turtlebot_ds)/worlds/simple.world -->
-	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly1.world"/>
+	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly3.world"/>
   	</include>
   
 	<!-- Particle drawer -->  	

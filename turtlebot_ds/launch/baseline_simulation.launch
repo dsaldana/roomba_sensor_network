@@ -37,7 +37,7 @@
 	    <arg name="debug" value="false"/>
 
 		<!-- $(find turtlebot_ds)/worlds/simple.world -->
-	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly1.world"/>
+	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly3.world"/>
   	</include>
   
 	<!-- Particle drawer -->  	
