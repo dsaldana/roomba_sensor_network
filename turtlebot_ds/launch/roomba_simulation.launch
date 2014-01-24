@@ -20,7 +20,7 @@
 	<!-- Particle drawer -->
 	<param name="draw_clusters" value="false" />
 	<param name="draw_particles" value="false" />
-	<param name="draw_path" value="false" />
+	<param name="draw_path" value="true" />
 	<param name="draw_anomaly" value="true" />
 
 	<!-- Robot navigation -->
@@ -31,7 +31,7 @@
 	<param name="p_control_linear" value="0.4" /> 
 	<param name="p_control_angular" value="1.5" /> 
 
-
+	<param name="sensor_enabled" value="false" />
 
 	<include file="$(find gazebo_ros)/launch/empty_world.launch">
 	    <arg name="use_sim_time" value="true"/>

@@ -199,67 +199,67 @@
       <pose>-5 3 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>3887 350000000</sim_time>
-      <real_time>118 157288143</real_time>
-      <wall_time>1390521226 107006762</wall_time>
+      <sim_time>4385 270000000</sim_time>
+      <real_time>498 340706362</real_time>
+      <wall_time>1390530342 692483212</wall_time>
       <model name='fogo'>
-        <pose>-3.88247 2.48535 0 0 -0 0</pose>
+        <pose>-2.12349 -2.5447 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-3.88247 2.48535 0.001 0 -0 0</pose>
+          <pose>-2.12349 -2.5447 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='fogo_0'>
-        <pose>-4.44893 3.14583 0 0 -0 0</pose>
+        <pose>-2.53598 -2.03323 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-4.44893 3.14583 0.001 0 -0 0</pose>
+          <pose>-2.53598 -2.03323 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='fogo_1'>
-        <pose>-4.44452 2.54619 0 0 -0 0</pose>
+        <pose>-2.75619 -2.48108 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-4.44452 2.54619 0.001 0 -0 0</pose>
+          <pose>-2.75619 -2.48108 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='fogo_2'>
-        <pose>-3.31476 3.13729 0 0 -0 0</pose>
+        <pose>-1.41754 -1.56171 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-3.31476 3.13729 0.001 0 -0 0</pose>
+          <pose>-1.41754 -1.56171 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='fogo_3'>
-        <pose>-3.38152 2.56445 0 0 -0 0</pose>
+        <pose>-1.53187 -2.41618 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-3.38152 2.56445 0.001 0 -0 0</pose>
+          <pose>-1.53187 -2.41618 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='fogo_4'>
-        <pose>-3.88074 3.15212 0 0 -0 0</pose>
+        <pose>-1.8733 -1.88895 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-3.88074 3.15212 0.001 0 -0 0</pose>
+          <pose>-1.8733 -1.88895 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='fogo_5'>
-        <pose>-3.87985 2.80529 0 0 -0 0</pose>
+        <pose>-2.3971 -1.60808 0 0 -0 0</pose>
         <link name='chassis'>
-          <pose>-3.87985 2.80529 0.001 0 -0 0</pose>
+          <pose>-2.3971 -1.60808 0.001 0 -0 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
@@ -277,7 +277,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>-0.789922 0.982037 13.2908 2e-05 1.5698 1.52821</pose>
+        <pose>4.61991 -1.25716 19.0533 2e-05 1.5698 1.52821</pose>
         <view_controller>orbit</view_controller>
       </camera>
     </gui>

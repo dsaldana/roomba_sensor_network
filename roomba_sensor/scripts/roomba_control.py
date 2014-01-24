@@ -48,7 +48,6 @@ robotName = "r0"
 
 robot_msgs = {}
 
-
 # Callback for robot communication.
 def robot_comm(msg):
 	# Message from the same robot
@@ -63,7 +62,11 @@ def img_callback(img):
 	global sensedValue	
 	global sensedLeft
 	global sensedRight
+	
+	sensor_enabled = rospy.get_param('/sensor_enabled', True)
 
+	if not sensor_enabled:
+		return
 
 	#OpenCV matrix
 	mat = CvBridge().imgmsg_to_cv(img, "rgb8")
@@ -137,7 +140,6 @@ def run():
 	f_centroid = rospy.get_param('/f_centroid', 1.0)
 	f_robots = rospy.get_param('/f_robots', 2.0)
 	
-	sensor_enabled = rospy.get_param('/sensor_enabled', False)
 
 	rospy.loginfo("Loading robot control.")
 
@@ -150,9 +152,8 @@ def run():
 	partPub = rospy.Publisher("/" + robotName + "/particles", Particle)
 	
 	# Camera
-	if sensor_enabled:
-		topicName = "/" + robotName + "/front_cam/camera/image"
-		image_sub = rospy.Subscriber(topicName, Image, img_callback, queue_size = 1)
+	topicName = "/" + robotName + "/front_cam/camera/image"
+	image_sub = rospy.Subscriber(topicName, Image, img_callback, queue_size = 1)
 
 	# Robot communication
 	# Subscriber for robot communication

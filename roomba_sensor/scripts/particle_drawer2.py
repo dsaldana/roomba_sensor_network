@@ -42,7 +42,7 @@ goal.x, goal.y = 0.0 ,0.0
 draw_clusters = rospy.get_param('/draw_clusters', False)
 draw_particles1 = rospy.get_param('/draw_particles', False)
 draw_anomaly = rospy.get_param('/draw_anomaly', False)
-draw_path = rospy.get_param('/draw_path', False)
+draw_path1 = rospy.get_param('/draw_path', False)
 draw_ellipse = rospy.get_param('/draw_ellipse', False)
 draw_grid = rospy.get_param('/draw_grid', False)
 
@@ -214,7 +214,7 @@ def draw_particles():
 		"Robot3":(0, 0, 200), "Robot3":(200, 0, 200)}
 
 	# Draw each robot path
-	if draw_path:
+	if draw_path1:
 		for k, rp in paths.iteritems():
 			col = (0, 0, 200)
 			if k in pcols:
@@ -279,7 +279,7 @@ def draw_particles():
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
-		if draw_path:
+		if draw_path1:
 			save_path(orobot.robot_id, robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
