@@ -153,7 +153,9 @@ def draw_points(points, color=(255,0,0)):
 
 def callback(particles_msg):
 	global particles
+	global new_msg
 	particles = particles_msg
+	new_msg = True
 
 def draw_particles():
 	# Margin
@@ -216,11 +218,10 @@ def draw_particles():
 	# Draw each robot path
 	if draw_path1:
 		for k, rp in paths.iteritems():
-			col = (0, 0, 200)
+			color = (0, 0, 200)
 			if k in pcols:
-				col = pcols[k]
-
-			draw_path(rp, col)
+				color = pcols[k]
+			draw_path(rp, color)
 
 	# Draw particles
 	if draw_particles1:
@@ -232,11 +233,33 @@ def draw_particles():
 
 
 	# # Write particles in a CSV file
-	# u = []
+	u = []
 	# for p in particles.particles:
 	# 	u.append([p.x, p.y])
 
-	# np.savetxt("foo.csv", u, delimiter=",")
+	# np.savetxt("foo.csv", u, delimiter=",")	
+
+	if "Robot1" in paths and not particles.anomaly:
+		print "Writing"
+		path_size = len(paths["Robot1"])		
+
+		for i in range(1, path_size):
+			l = []
+			for rname in paths.keys():
+				if len(paths[rname]) > i:
+					l.append(paths[rname][i].x)
+					l.append(paths[rname][i].y)
+					l.append(paths[rname][i].z)
+			u.append(l)
+
+		
+		#Write path		
+		try:			
+			np.savetxt("path.csv", np.array(u) , delimiter=",")
+		except Exception, e:
+			print e
+			print u
+
 	# ## End Write
 
 	# Fit the anomaly to an ellipse
@@ -279,7 +302,7 @@ def draw_particles():
 	for orobot in particles.orobots:
 		robotX, robotY, robotT = orobot.x, orobot.y, orobot.z
 		draw_robot(robotX, robotY, robotT, (150, 150, 150))
-		if draw_path1:
+		if draw_path1 and new_msg:
 			save_path(orobot.robot_id, robotX, robotY, robotT)
 
 	# robot position (just for name reduction)
@@ -299,7 +322,8 @@ def draw_particles():
 
 
 def run():
-
+	global new_msg
+	new_msg = False
 	# Node roombaControl
 	rospy.init_node('particle_drawer')		
 
@@ -324,7 +348,7 @@ def run():
 		# Draw the particles
 		if particles is not None:
 			draw_particles()
-		
+		new_msg = False
 		
 
 

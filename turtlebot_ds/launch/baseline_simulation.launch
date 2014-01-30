@@ -20,7 +20,7 @@
 	<!-- Particle drawer -->
 	<param name="draw_clusters" value="false" />
 	<param name="draw_particles" value="false" />
-	<param name="draw_path" value="false" />
+	<param name="draw_path" value="true" />
 	<param name="draw_anomaly" value="true" />
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
@@ -37,7 +37,7 @@
 	    <arg name="debug" value="false"/>
 
 		<!-- $(find turtlebot_ds)/worlds/simple.world -->
-	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly5.world"/>
+	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly4.world"/>
   	</include>
   
 	<!-- Particle drawer -->  	
