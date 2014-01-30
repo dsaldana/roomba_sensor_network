@@ -239,26 +239,26 @@ def draw_particles():
 
 	# np.savetxt("foo.csv", u, delimiter=",")	
 
-	if "Robot1" in paths and not particles.anomaly:
-		print "Writing"
-		path_size = len(paths["Robot1"])		
+	# if "Robot1" in paths and not particles.anomaly:
+	# 	print "Writing"
+	# 	path_size = len(paths["Robot1"])		
 
-		for i in range(1, path_size):
-			l = []
-			for rname in paths.keys():
-				if len(paths[rname]) > i:
-					l.append(paths[rname][i].x)
-					l.append(paths[rname][i].y)
-					l.append(paths[rname][i].z)
-			u.append(l)
+	# 	for i in range(1, path_size):
+	# 		l = []
+	# 		for rname in paths.keys():
+	# 			if len(paths[rname]) > i:
+	# 				l.append(paths[rname][i].x)
+	# 				l.append(paths[rname][i].y)
+	# 				l.append(paths[rname][i].z)
+	# 		u.append(l)
 
 		
-		#Write path		
-		try:			
-			np.savetxt("path.csv", np.array(u) , delimiter=",")
-		except Exception, e:
-			print e
-			print u
+	# 	#Write path		
+	# 	try:			
+	# 		np.savetxt("path.csv", np.array(u) , delimiter=",")
+	# 	except Exception, e:
+	# 		print e
+	# 		print u
 
 	# ## End Write
 
