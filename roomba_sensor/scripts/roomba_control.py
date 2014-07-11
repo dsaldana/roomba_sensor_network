@@ -93,8 +93,8 @@ def img_callback(img):
 
     total = mat.rows * mat.cols * 1.0
     sensedValue = (pl + pr) / total
-    sensedLeft = (pl * 2.0) / (mat.rows)
-    sensedRight = (pr * 2.0) / (mat.rows)
+    sensedLeft = (pl * 2.0) / mat.rows
+    sensedRight = (pr * 2.0) / mat.rows
 
 
 #print [total, sensedValue, sensedLeft, sensedRight]

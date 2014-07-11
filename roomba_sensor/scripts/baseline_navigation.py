@@ -27,8 +27,13 @@ traking = False
 p_angular = rospy.get_param('/p_control_angular', 1.0)
 p_linear = rospy.get_param('/p_control_linear', 0.5)
 
+
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
+    """
+
+    :param sensedData:
+    """
     global traking
     global sensedValue
     global crf
@@ -41,6 +46,10 @@ def tracking_callback(sensedData):
 
 
 def goal_callback(point):
+    """
+
+    :param point:
+    """
     global goal
     global traking
     global spiral_counter
@@ -53,6 +62,9 @@ def goal_callback(point):
 
 
 def run():
+    """
+
+    """
     global traking
     global spiral_counter
     # Node roomba navigation

@@ -97,6 +97,12 @@ def save_path(robot_id, robotX, robotY, robotT):
 
 
 def draw_path(points, color=(255, 0, 0)):
+    """
+
+    :param points:
+    :param color:
+    :return:
+    """
     if len(points) < 2:
         return
 
@@ -112,6 +118,12 @@ def draw_path(points, color=(255, 0, 0)):
 
 
 def draw_points(points, color=(255, 0, 0)):
+    """
+
+    :param points:
+    :param color:
+    :return:
+    """
     if len(points) == 0:
         return
 
@@ -164,6 +176,10 @@ def callback(particles_msg):
 
 
 def draw_particles():
+    """
+    Draw the particles using  pygame.
+    :return:
+    """
     # Margin
     global mx
     global my

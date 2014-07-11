@@ -188,7 +188,7 @@ def run():
 
     k_skip = -1
 
-    # comming back in exploration
+    # coming back in exploration
     comming_back = False
     initial_position = Point32()
     ip = robot.get_position()
@@ -219,7 +219,6 @@ def run():
 
         # Particle filter: move the particles for simulating the anomaly's dynamics
         pf.move_particles()
-
 
         # Sensed values
         samples = []
@@ -282,7 +281,6 @@ def run():
             if rospy.get_rostime().secs - last_time_anomaly > max_tracking_time:
                 explore = True
 
-
         ######## Exploring #################
         if explore:
             # possible collition
@@ -333,7 +331,6 @@ def run():
                 # if robot is outside the map
                 if robotX < mapX1 or robotX > mapX2 or robotY < mapY1 or robotY > mapY2:
                     comming_back = True
-
 
         else:
             ####### Tracking ##########
