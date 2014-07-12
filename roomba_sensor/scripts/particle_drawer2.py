@@ -1,32 +1,23 @@
 #!/usr/bin/env python
-import rospy
-from std_msgs.msg import String
-from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point32
 
 from roomba_comm.msg import Particle
-from roomba_comm.msg import PointR
-from roomba_sensor.ellipse import fit_ellipse
-from roomba_sensor.ellipse import ellipse_box
-from roomba_sensor.ellipse import ellipse_points
+from roomba_sensor.geometric.ellipse import fit_ellipse
+from roomba_sensor.geometric.ellipse import ellipse_points
 
 
 # For plotting
 import numpy as np
-import sys
 import pygame
 from pygame.locals import *
 
-import time
-
 # Map configuration
+from roomba_sensor.geometric import polygon
 from roomba_sensor.map import *
 from math import *
 
 # Clustering
 from scipy.cluster.vq import kmeans2
-
-import random
 
 # Window size
 width, height = 750, 600
@@ -115,6 +106,28 @@ def draw_path(points, color=(255, 0, 0)):
         pygame.draw.line(window, color, lp, ep)
 
         lp = ep
+
+
+
+def draw_polygon(points, color=(255, 0, 0)):
+    if len(points) < 2:
+        return
+
+    ## Pre-process the points
+    # Identify the cycle beginning for the last point
+    first_point = polygon.identify_first_point_in_polygon(points)
+
+    # Convert axis
+    pts = []
+    for p in points[first_point:]:
+        x2, y2 = convertAxis(p.x, p.y)
+        pts.append((x2, y2))
+
+    # Eliminate the unnecessary points
+    pts = polygon.simplify_polygon(pts,10)
+    print len(pts)
+    ## Draw polygon
+    pygame.draw.polygon(window, color, pts)
 
 
 def draw_points(points, color=(255, 0, 0)):
@@ -251,7 +264,7 @@ def draw_particles():
 
     # Draw anomaly points
     if draw_anomaly:
-        draw_points(particles.anomaly)
+        draw_polygon(particles.anomaly)
 
 
     # # Write particles in a CSV file
@@ -361,8 +374,8 @@ def run():
             elif event.type == VIDEORESIZE:
                 window = pygame.display.set_mode(event.dict['size'],
                                                  HWSURFACE | DOUBLEBUF | RESIZABLE)
-            #else:
-            #print event
+                #else:
+                #print event
         # Draw the particles
         if particles is not None:
             draw_particles()
