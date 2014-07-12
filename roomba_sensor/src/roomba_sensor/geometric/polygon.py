@@ -1,4 +1,3 @@
-
 ### Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 import math
 
@@ -51,7 +50,7 @@ def simplify_polygon(points, gamma):
 def identify_first_point_in_polygon(points, ddd=0.5):
     """
     Identify the cycle beginning for the last point
-    :param points:
+    :param points: array of objects of PointX
     :param ddd: distance to the fist point
     """
 
@@ -76,8 +75,19 @@ def identify_first_point_in_polygon(points, ddd=0.5):
     return first_point
 
 
+def perimeter(points):
+    """
+    Perimeter delimited by a polygon defined by a set of points.
+    :param points: points are tuples of floats.
+    """
+    if len(points) < 3:
+        return 0
 
-### For test
-myline = [(0.0, 0.0), (1.0, 2.0), (2.0, 1.0)]
-simplified = simplify_polygon(myline, gamma = 2.0)
-print simplified
+    #distance between the last and the first point.
+    per = 0
+
+    for i in range(len(points)):
+        per += math.hypot(points[i - 1][0] - points[i][0], points[i - 1][1]- points[i][1])
+
+    return per
+

@@ -125,7 +125,8 @@ def draw_polygon(points, color=(255, 0, 0)):
 
     # Eliminate the unnecessary points
     pts = polygon.simplify_polygon(pts,10)
-    print len(pts)
+    print len(pts), polygon.perimeter(pts)
+
     ## Draw polygon
     pygame.draw.polygon(window, color, pts)
 

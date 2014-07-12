@@ -19,7 +19,7 @@ from math import *
 from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.particle_filter import ParticleFilter
 from roomba_sensor.grid_util import coords_to_grid
-
+from roomba_sensor.geometric.vector import points_to_vector, vector_components
 # Map configuration
 from roomba_sensor.map import *
 
@@ -95,32 +95,6 @@ def img_callback(img):
     sensedValue = (pl + pr) / total
     sensedLeft = (pl * 2.0) / mat.rows
     sensedRight = (pr * 2.0) / mat.rows
-
-
-#print [total, sensedValue, sensedLeft, sensedRight]
-
-# Convert two points to a verctor. 
-# Return magnitude and angle.
-def points_to_vector(p1, p2):
-    dx, dy = p2[0] - p1[0], p2[1] - p1[1]
-
-    # Magnitude. Coulomb law.
-    mag = sqrt(dx ** 2 + dy ** 2)
-
-    # Angle
-    theta = atan(dy / dx)
-
-    if dx < 0:
-        theta += pi
-
-    return mag, theta
-
-
-# Return x,y components.
-def vector_components(mag, theta):
-    # components
-    x, y = mag * cos(theta), mag * sin(theta)
-    return x, y
 
 
 def run():
@@ -204,7 +178,7 @@ def run():
 
         # Sensed values
         samples = []
-        # FIXME this variable cotain all robots (even o mrobot)
+        # FIXME this variable contain all robots (even o mrobot)
         orobots = []
         for msg in robot_msgs.values():
             samples.append([msg.x, msg.y, msg.theta, msg.value])

@@ -15,8 +15,8 @@
 import numpy as np
 from math import *
 
-points = [[-2,0], [2,0], [0.1, -0.9], [0, -1], [-2.0001,0.001]]
-cnt = np.array(points, dtype=np.float32)	
+points = [[-2, 0], [2, 0], [0.1, -0.9], [0, -1], [-2.0001, 0.001]]
+cnt = np.array(points, dtype=np.float32)
 #cnt = np.array(points)	
 
 #center2, axes, phi = cv2.fitEllipse(cnt)    
@@ -26,49 +26,44 @@ x = cnt[:, 0]
 y = cnt[:, 1]
 print x
 
-
-d1 = np.transpose([x*x, x*y, y*y])
+d1 = np.transpose([x * x, x * y, y * y])
 
 ones = [1] * len(x)
 d2 = np.transpose([x, y, ones])
 
-
-s1 = np.dot(d1.T,d1)
+s1 = np.dot(d1.T, d1)
 s2 = np.dot(d1.T, d2)
 s3 = np.dot(d2.T, d2)
 
-
-
 t = np.dot(-np.linalg.inv(s3), s2.T)
 
-m =  s1 + np.dot(s2,T)
-m = np.array([m[2] / 2, -m[1], m[0]/2])
+m = s1 + np.dot(s2, T)
+m = np.array([m[2] / 2, -m[1], m[0] / 2])
 
 d, evec = np.linalg.eig(m)
 
-cond = 4 * evec[0] * evec[2] - evec[1]**2
+cond = 4 * evec[0] * evec[2] - evec[1] ** 2
 
-a = evec[:, np.nonzero(cond>0)]
-a1 = a[:,0][:,0]
+a = evec[:, np.nonzero(cond > 0)]
+a1 = a[:, 0][:, 0]
 
-f = np.r_[a1, np.dot(T,a1)]
+f = np.r_[a1, np.dot(T, a1)]
 
 
 
 # calculate the center and lengths of the semi-axes
-b2 = f[1] ** 2 / 4 
-center = [f[2] * f[3] / 2 - b2 * f[4], 
-	(f[0] * f[4] / 2 - f[1] * f[3] / 4)] / (b2 - f[0] * f[2])
+b2 = f[1] ** 2 / 4
+center = [f[2] * f[3] / 2 - b2 * f[4],
+          (f[0] * f[4] / 2 - f[1] * f[3] / 4)] / (b2 - f[0] * f[2])
 
+num = 2 * (f[0] * f[4] ** 2 / 4 + f[2] * f[3] ** 2 / 4 + f[5] * b2 - f[1] * f[3] * f[4] / 4 - f[0] * f[2] * f[5])
 
-num = 2 * (f[0] * f[4]**2 / 4 + f[2] * f[3]**2 / 4 + f[5] * b2 - f[1]*f[3]*f[4]/4 - f[0]*f[2]*f[5])
-
-den1 = b2 - f[0]*f[2]
-den2 = sqrt((f[0] - f[2])**2 + 4*b2)
+den1 = b2 - f[0] * f[2]
+den2 = sqrt((f[0] - f[2]) ** 2 + 4 * b2)
 den3 = f[0] + f[2]
 
 # axes
-semi_axes = [ sqrt(num / (den1 * (den2 - den3))), sqrt(num / (den1 * (-den2 - den3)))]
+semi_axes = [sqrt(num / (den1 * (den2 - den3))), sqrt(num / (den1 * (-den2 - den3)))]
 
 # calculate the angle of rotation
 term = (f[0] - f[2]) / f[1]
