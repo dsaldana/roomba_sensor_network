@@ -1,4 +1,3 @@
-
 import rospy
 
 # Gazebo
@@ -21,148 +20,143 @@ d = rospy.get_param('/sensor_distance', 0.5)
 ##### Localization for virtual or physical robot.
 #######################################################
 class RoombaLocalization:
+    def __init__(self, robotName):
+        simulated_robots = rospy.get_param('/simulated_robots', False)
+        # Object to get information from Gazebo
+        self.robot = None
 
-	def __init__(self, robotName):
-		simulated_robots = rospy.get_param('/simulated_robots', False)
-		# Object to get information from Gazebo		
-		self.robot = None
+        if simulated_robots:
+            rospy.loginfo("Working with simulated robots.")
+            # Localization by Gazebo
+            self.robot = RoombaGazebo(robotName)
+        else:
+            rospy.loginfo("Working with physical robots.")
+            # Localization by ar_alvar
+            self.robot = RealRoomba(robotName)
 
-		if simulated_robots:
-			rospy.loginfo("Working with simulated robots.")
-			# Localization by Gazebo
-			self.robot = RoombaGazebo(robotName)
-		else:
-			rospy.loginfo("Working with physical robots.")
-			# Localization by ar_alvar
-			self.robot = RealRoomba(robotName)
+    def get_position(self):
+        return self.robot.get_position()
 
-	def get_position(self):
-		return self.robot.get_position()
-
-	def get_sensor_position(self):
-		return self.robot.get_sensor_position()
-
-
+    def get_sensor_position(self):
+        return self.robot.get_sensor_position()
 
 
 ######################################
 ### Localization from Gazebo.
 ######################################
 class RoombaGazebo:
+    def __init__(self, robotName):
+        print "RoombaGazebo"
+        self.robotName = robotName
+        self.positionServer = None
+        self.load()
 
 
-	def __init__(self, robotName):
-		print "RoombaGazebo"
-		self.robotName = robotName
-		self.positionServer = None
-		self.load()
+    def load(self):
+        rospy.logerr("waiting model state service from Gazebo")
+        rospy.wait_for_service('/gazebo/get_model_state')
+        self.positionServer = rospy.ServiceProxy('/gazebo/get_model_state',
+                                                 gazebo_msgs.srv.GetModelState)
 
 
-	def load(self):		
-		rospy.logerr("waiting model state service from Gazebo")
-		rospy.wait_for_service('/gazebo/get_model_state')		
-		self.positionServer = rospy.ServiceProxy('/gazebo/get_model_state', 
-			gazebo_msgs.srv.GetModelState)
+    def get_position(self):
+        try:
+            resp = self.positionServer(self.robotName, "world")
+            robotX = resp.pose.position.x
+            robotY = resp.pose.position.y
+            # the reference for the angle is the y axes.
+            quat = [resp.pose.orientation.w,
+                    resp.pose.orientation.x,
+                    resp.pose.orientation.y,
+                    resp.pose.orientation.z]
+
+            euler = euler_from_quaternion(quat)
+            # That minus is a little bit strage but it works well.
+            robotT = cut_angle(- euler[0] + pi)
+
+            return [robotX, robotY, robotT]
+
+        except rospy.ServiceException, e:
+            print "Service call to gazebo failed: %s" % e
 
 
-	def get_position(self):
-		try:			
-			resp = self.positionServer(self.robotName, "world")
-			robotX = resp.pose.position.x
-			robotY = resp.pose.position.y
-			# the reference for the angle is the y axes.			
-			quat = [resp.pose.orientation.w, 
-				resp.pose.orientation.x,
-				resp.pose.orientation.y, 
-				resp.pose.orientation.z]
+    def get_sensor_position(self):
+        [robotX, robotY, robotT] = self.get_position()
 
-			euler = euler_from_quaternion(quat)
-			# That minus is a little bit strage but it works well.
-			robotT =  cut_angle(- euler[0] + pi)
+        camX = robotX + d * cos(robotT)
+        camY = robotY + d * sin(robotT)
 
-			return [robotX, robotY, robotT]
-
-		except rospy.ServiceException, e:
-			print "Service call to gazebo failed: %s" %e
-
-
-	def get_sensor_position(self):
-		[robotX, robotY, robotT] = self.get_position()
-
-		camX = robotX + d * cos(robotT)
-		camY = robotY + d * sin(robotT)
-
-		return [camX, camY, robotT]
-		
+        return [camX, camY, robotT]
 
 
 from ar_track_alvar.msg import AlvarMarkers
 
-class ArLocator:	
-	poses = {}
-	def __init__(self):
-		self.load()
-	
-	def load(self):		
-		#rospy.Subscriber("/tf", TFMessage, self.callback_maker)
-		rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self.callback_maker)
 
-	def callback_maker(self, msg_positions):
+class ArLocator:
+    poses = {}
 
-		for marker in msg_positions.markers:
-			detected_robot = "Robot%i" % marker.id
-			self.poses[detected_robot] = marker.pose.pose
+    def __init__(self):
+        self.load()
 
-	
-	def get_robot_position(self, robotname):		
-		if robotname in self.poses:
-			return self.poses[robotname]
-		else:
-			return None
-		
+    def load(self):
+        #rospy.Subscriber("/tf", TFMessage, self.callback_maker)
+        rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self.callback_maker)
+
+    def callback_maker(self, msg_positions):
+
+        for marker in msg_positions.markers:
+            detected_robot = "Robot%i" % marker.id
+            self.poses[detected_robot] = marker.pose.pose
+
+
+    def get_robot_position(self, robotname):
+        if robotname in self.poses:
+            return self.poses[robotname]
+        else:
+            return None
+
 
 ######################################################################
 # This class gets the robot position based on ar_track_alvar package.	
 ######################################################################
 class RealRoomba:
+    locator = None
 
-	locator = None
-	
-	def __init__(self, robotName):
-		print "Real romba localization"
-		self.robotName = robotName
-		self.positionServer = None
-		
-		if(self.locator == None):
-			self.locator = ArLocator()
-		#locator.add_robot(robotName)
+    def __init__(self, robotName):
+        print "Real romba localization"
+        self.robotName = robotName
+        self.positionServer = None
 
-	def get_position(self):
-		pose = self.locator.get_robot_position(self.robotName)
-		
-		if pose == None:
-			rospy.logerr("No robot position")
-			return [0, 0, 0]
+        if (self.locator == None):
+            self.locator = ArLocator()
+        #locator.add_robot(robotName)
 
-		robotX, robotY = pose.position.x, pose.position.y
-			
-		# the reference for the angle is the y axes.			
-		quat = [pose.orientation.w, 				
-				pose.orientation.x, 
-				pose.orientation.y,
-				pose.orientation.z]
+    def get_position(self):
+        pose = self.locator.get_robot_position(self.robotName)
 
-		euler = euler_from_quaternion(quat)
+        if pose == None:
+            rospy.logerr("No robot position")
+            return [0, 0, 0]
 
-		## FIXME It works, I dont know why.
-		robotT = cut_angle(-euler[0] + pi)
+        robotX, robotY = pose.position.x, pose.position.y
 
-		return [robotX, robotY, robotT]
+        # the reference for the angle is the y axes.
+        quat = [pose.orientation.w,
+                pose.orientation.x,
+                pose.orientation.y,
+                pose.orientation.z]
 
-	def get_sensor_position(self):
-		[robotX, robotY, robotT] = self.get_position()
+        euler = euler_from_quaternion(quat)
 
-		camX = robotX + d * cos(robotT)
-		camY = robotY + d * sin(robotT)
+        ## FIXME It works, I dont know why.
+        robotT = cut_angle(-euler[0] + pi)
 
-		return [camX, camY, robotT]
+        return [robotX, robotY, robotT]
+
+    def get_sensor_position(self):
+        [robotX, robotY, robotT] = self.get_position()
+
+        camX = robotX + d * cos(robotT)
+        camY = robotY + d * sin(robotT)
+
+        return [camX, camY, robotT]
