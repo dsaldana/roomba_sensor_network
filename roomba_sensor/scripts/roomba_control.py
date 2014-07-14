@@ -9,6 +9,7 @@ from roomba_comm.msg import PointR
 from roomba_comm.msg import SensedValue
 
 
+
 # OpenCV
 from cv_bridge import CvBridge
 import cv
@@ -18,7 +19,6 @@ from math import *
 
 from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.particle_filter import ParticleFilter
-from roomba_sensor.grid_util import coords_to_grid
 from roomba_sensor.geometric.vector import points_to_vector, vector_components
 # Map configuration
 from roomba_sensor.map import *
@@ -162,6 +162,9 @@ def run():
     #Points where an amonaly was detected.
     anomaly_points = []
 
+    # Path line in anomaly detection for each robot.
+    anomaly_lines = {}
+
     cents = None
 
     k_skip = -1
@@ -186,7 +189,6 @@ def run():
         # Particle filter: move the particles for simulating the anomaly's dynamics
         pf.move_particles()
 
-
         # Sensed values
         samples = []
         # FIXME this variable contain all robots (even o mrobot)
@@ -206,6 +208,11 @@ def run():
                 anomaly_points.append(an)
                 an.robot_id = msg.robot_id
 
+                ### Anomaly lines
+                if msg.robot_id not in anomaly_lines:
+                    anomaly_lines[msg.robot_id] = []
+                anomaly_lines[msg.robot_id].append((msg.rx, msg.ry))
+
         robot_msgs.clear()
 
         # Particle filter: update based on sensor value.
@@ -224,19 +231,7 @@ def run():
         msg_parts.anomaly = anomaly_points
         particle_pub.publish(msg_parts)
 
-
-        ##### Plan in grid ####
-        # Get a matrix with the number of particles for each cell.
-        #grid = pf.particles_in_grid()
-
-        # Convert sensor position to grid cell
-        spi, spj = coords_to_grid(cam_x, cam_y)
-
-
-        # Where to navigate
-        goalX = None
-        goalY = None
-
+        #
         #### Evaluate Sensed value
         # The flag for exploring change only if  the robot does not
         # sense an anomaly in a n seconds (n = max_tracking_time).
@@ -246,7 +241,6 @@ def run():
         else:
             if rospy.get_rostime().secs - last_time_anomaly > max_tracking_time:
                 explore = True
-
 
         ######## Exploring #################
         if explore:
@@ -261,17 +255,15 @@ def run():
             # new centroids
             np.random.seed(1)
 
-            if (k_skip < 0):
+            if k_skip < 0:
                 cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
                 k_skip = 5
             else:
                 k_skip -= 1
 
-
-
             # Total force
-            F = [0, 0]
-            # Foces by the clusters
+            total_force = [0, 0]
+            # Forces by the clusters
             fc = []
             for i in range(len(cents)):
                 c = cents[i]
@@ -288,8 +280,8 @@ def run():
                 # components
                 u, v = vector_components(fm, theta)
 
-                F[0] += u
-                F[1] += v
+                total_force[0] += u
+                total_force[1] += v
 
                 fc.append([u, v])
 
@@ -312,19 +304,18 @@ def run():
                     u, v = vector_components(fm, theta)
 
                     # Positive or robot Force is in opposite direction.
-                    F[0] -= u
-                    F[1] -= v
+                    total_force[0] -= u
+                    total_force[1] -= v
 
             except Exception, e:
                 rospy.logerr("Error integrating the data from other robots. " + str(e))
 
             cte = 10.0 / (len(pf.particles))
-            #cte = 0.5 * 1 / hypot(F[0] , F[1])
-            F = cte * F[0], cte * F[1]
+            total_force = cte * total_force[0], cte * total_force[1]
 
-            print "----------Total force: ", F
+            print "----------Total force: ", total_force
 
-            goal = robot_x + F[0], robot_y + F[1]
+            goal = robot_x + total_force[0], robot_y + total_force[1]
 
             # Publish goal to navigate
             p = Point32()
@@ -333,8 +324,7 @@ def run():
 
         else:
             ####### Tracking ##########
-            controlP = (sensedLeft - 1) + sensedRight
-            #print "l=", sensedLeft, " r=",sensedRight, " control=", controlP
+            control_p = (sensedLeft - 1) + sensedRight
 
             # counter robot force.
             crf = 0
@@ -350,13 +340,13 @@ def run():
                 rf = 1 / (d ** 2)
                 print [r.rx, r.ry]  # , "d=",d," theta=", theta
                 # is this robot considerable?
-                # if the other robot is in front of it (angle view is 120 degress)
+                # if the other robot is in front of it (angle view is 120 degrees)
                 if abs(theta - robot_t) < (pi / 3):
                     if rf > crf:
                         crf = rf
 
             p = Point32()
-            p.x = controlP
+            p.x = control_p
             p.y = crf
             #print "f=", crf
             track_pub.publish(p)

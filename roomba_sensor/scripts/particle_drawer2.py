@@ -123,11 +123,11 @@ def draw_polygon(points, color=(255, 0, 0)):
         pts.append((x2, y2))
 
     # Eliminate the unnecessary points
-    pts = polygon.simplify_polygon(pts,10)
+    pts = polygon.simplify_polygon(pts, 10)
     print len(pts), polygon.perimeter(pts)
 
     ## Draw polygon
-    if len(pts)>2:
+    if len(pts) > 2:
         pygame.draw.polygon(window, color, pts)
 
 
@@ -165,7 +165,6 @@ def draw_points(points, color=(255, 0, 0)):
             cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
 
             np.savetxt("cents.csv", cents, delimiter=",")
-
 
             # convert groups to rbg 3-tuples.
             colors = ([([0, 255, 0], [255, 0, 0], [0, 0, 255],
