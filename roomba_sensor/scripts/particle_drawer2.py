@@ -108,7 +108,6 @@ def draw_path(points, color=(255, 0, 0)):
         lp = ep
 
 
-
 def draw_polygon(points, color=(255, 0, 0)):
     if len(points) < 2:
         return
@@ -128,7 +127,8 @@ def draw_polygon(points, color=(255, 0, 0)):
     print len(pts), polygon.perimeter(pts)
 
     ## Draw polygon
-    pygame.draw.polygon(window, color, pts)
+    if len(pts)>2:
+        pygame.draw.polygon(window, color, pts)
 
 
 def draw_points(points, color=(255, 0, 0)):
