@@ -11,6 +11,7 @@ from roomba_comm.msg import SensedValue
 
 
 
+
 # OpenCV
 from cv_bridge import CvBridge
 import cv
@@ -195,7 +196,8 @@ def run():
         samples = []
         # This variable contain all robots (even this robot)
         orobots = []
-        for from_robot, msg in robot_msgs.iteritems():
+
+        for msg in robot_msgs.values():
             samples.append([msg.x, msg.y, msg.theta, msg.value])
             # Other robot positions
             orobot = PointR()
@@ -217,7 +219,6 @@ def run():
         robot_msgs.clear()
 
         # Process anomaly lines
-
         ap.process()
 
 
@@ -235,7 +236,7 @@ def run():
         msg_parts.mrobot = mrobot
         msg_parts.orobots = orobots
         # msg_parts.anomaly = anomaly_points
-        msg_parts.anomaly =ap.get_anomaly_points()
+        msg_parts.anomaly = ap.get_anomaly_points()
         particle_pub.publish(msg_parts)
 
         #
@@ -320,7 +321,7 @@ def run():
             cte = 10.0 / (len(pf.particles))
             total_force = cte * total_force[0], cte * total_force[1]
 
-            print "----------Total force: ", total_force
+            # print "----------Total force: ", total_force
 
             goal = robot_x + total_force[0], robot_y + total_force[1]
 
@@ -345,7 +346,7 @@ def run():
                 d, theta = points_to_vector([robot_x, robot_y], [r.rx, r.ry])
                 # Robot force.
                 rf = 1 / (d ** 2)
-                print [r.rx, r.ry]  # , "d=",d," theta=", theta
+                # print [r.rx, r.ry]  # , "d=",d," theta=", theta
                 # is this robot considerable?
                 # if the other robot is in front of it (angle view is 120 degrees)
                 if abs(theta - robot_t) < (pi / 3):
