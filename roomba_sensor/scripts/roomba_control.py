@@ -10,12 +10,14 @@ from roomba_comm.msg import SensedValue
 
 
 
+
 # OpenCV
 from cv_bridge import CvBridge
 import cv
 
 # Math
 from math import *
+from roomba_sensor.geometric.anomaly_polygon import AnomalyPolygon
 
 from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.particle_filter import ParticleFilter
@@ -163,7 +165,7 @@ def run():
     anomaly_points = []
 
     # Path line in anomaly detection for each robot.
-    anomaly_lines = {}
+    ap = AnomalyPolygon(robotName)
 
     cents = None
 
@@ -191,7 +193,7 @@ def run():
 
         # Sensed values
         samples = []
-        # FIXME this variable contain all robots (even o mrobot)
+        # This variable contain all robots (even this robot)
         orobots = []
         for from_robot, msg in robot_msgs.iteritems():
             samples.append([msg.x, msg.y, msg.theta, msg.value])
@@ -208,12 +210,16 @@ def run():
                 anomaly_points.append(an)
                 an.robot_id = msg.robot_id
 
-                ### Anomaly lines
-                if msg.robot_id not in anomaly_lines:
-                    anomaly_lines[msg.robot_id] = []
-                anomaly_lines[msg.robot_id].append((msg.rx, msg.ry))
+                ### Anomaly polygon
+                ap.add_anomaly_point(msg.robot_id, (msg.rx, msg.ry))
 
+        # All messages are read
         robot_msgs.clear()
+
+        # Process anomaly lines
+
+        ap.process()
+
 
         # Particle filter: update based on sensor value.
         pf.update_particles(samples)
@@ -228,7 +234,8 @@ def run():
         mrobot.x, mrobot.y, mrobot.z = robot_x, robot_y, robot_t
         msg_parts.mrobot = mrobot
         msg_parts.orobots = orobots
-        msg_parts.anomaly = anomaly_points
+        # msg_parts.anomaly = anomaly_points
+        msg_parts.anomaly =ap.get_anomaly_points()
         particle_pub.publish(msg_parts)
 
         #

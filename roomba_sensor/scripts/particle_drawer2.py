@@ -112,15 +112,15 @@ def draw_polygon(points, color=(255, 0, 0)):
     if len(points) < 2:
         return
 
-    ## Pre-process the points
-    # Identify the cycle beginning for the last point
-    first_point = polygon.identify_first_point_in_polygon(points)
-
     # Convert axis
     pts = []
-    for p in points[first_point:]:
+    for p in points:
         x2, y2 = convertAxis(p.x, p.y)
         pts.append((x2, y2))
+
+    ## Pre-process the points
+    # Identify the cycle beginning for the last point
+    first_point = polygon.identify_first_point_in_polygon(pts)
 
     # Eliminate the unnecessary points
     pts = polygon.simplify_polygon(pts, 10)
@@ -264,8 +264,8 @@ def draw_particles():
 
     # Draw anomaly points
     if draw_anomaly:
-        draw_polygon(particles.anomaly)
-
+        # draw_polygon(particles.anomaly)
+        draw_points(particles.anomaly)
 
     # # Write particles in a CSV file
     u = []
