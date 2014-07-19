@@ -17,7 +17,7 @@ A robotic sensor network based on roomba robots.
 
 
     # To see the particles for robot 1
-    $ rosrun roomba_sensor particle_drawer.py
+    $ rosrun roomba_sensor particle_drawer2.py
 
     # To see the robot cam
     $ rosrun image_view image_view image:=/Robot1/front_cam/camera/image

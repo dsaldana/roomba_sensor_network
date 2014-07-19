@@ -18,7 +18,7 @@ import cv
 
 # Math
 from math import *
-from roomba_sensor.geometric.anomaly_polygon import AnomalyPolygon
+from roomba_sensor.geometric.AnomalyManager import AnomalyManager
 
 from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.particle_filter import ParticleFilter
@@ -166,7 +166,7 @@ def run():
     anomaly_points = []
 
     # Path line in anomaly detection for each robot.
-    ap = AnomalyPolygon(robotName)
+    ap = AnomalyManager(robotName)
 
     cents = None
 
