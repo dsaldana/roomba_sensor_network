@@ -1,160 +1,152 @@
+from math import *
+import random
+import copy
 
 from roomba_comm.msg import PointR
-
-
 from roomba_sensor.map import *
 from roomba_sensor.util import cut_angle
 
 
-from math import *
-
-import random
-import copy
-
 class ParticleFilter:
-	# Number of particles
-	N = rospy.get_param('/particles_number', 5000)
+    # Number of particles
+    N = rospy.get_param('/particles_number', 5000)
 
-	# Particle movement (standard deviation)
-	sd_mov = rospy.get_param('/particle_movement', 0.1)
+    # Particle movement (standard deviation)
+    sd_mov = rospy.get_param('/particle_movement', 0.1)
 
-	# radio to cover
-	r = rospy.get_param('/sensor_radio', 0.5)
+    # radio to cover
+    r = rospy.get_param('/sensor_radio', 0.5)
 
-	simulated_robots = rospy.get_param('simulated_robots', True)
-	
-	# PF weights
-	weight_no_sensed = 1.0
-	weight_tracking_left = 1.3
-	weight_tracking_right = 0.01	
-	
-	# FIXME this if should not exist.
-	if not simulated_robots:
-		weight_tracking_left = 0.01
-		weight_tracking_right = 1.2
-	
+    simulated_robots = rospy.get_param('simulated_robots', True)
 
-	weight_out_of_map = 0.01
-	weight_sensed_zero = 0.1
+    # PF weights
+    weight_no_sensed = 1.0
+    weight_tracking_left = 1.3
+    weight_tracking_right = 0.01
 
-	def __init__(self):
+    # FIXME this if should not exist.
+    if not simulated_robots:
+        weight_tracking_left = 0.01
+        weight_tracking_right = 1.2
 
-		# Sparce the initial particles
-		self.particles = []
-		for i in range(self.N):
-			p = PointR()
-			# Position
-			p.x = random.random() * mapLX + mapX1
-			p.y = random.random() * mapLY + mapY1
-			# weight
-			p.z = 1.0 / self.N
-			self.particles.append(p)
+    weight_out_of_map = 0.01
+    weight_sensed_zero = 0.1
 
+    def __init__(self):
 
-	def move_particles(self):		
-		# Move the particles
-		for p in self.particles:			
-			# Normal fuction
-			p.x = random.normalvariate(p.x, self.sd_mov)
-			p.y = random.normalvariate(p.y, self.sd_mov)
+        # Sparce the initial particles
+        self.particles = []
+        for i in range(self.N):
+            p = PointR()
+            # Position
+            p.x = random.random() * mapLX + mapX1
+            p.y = random.random() * mapLY + mapY1
+            # weight
+            p.z = 1.0 / self.N
+            self.particles.append(p)
 
 
-	def resample(self):		
-				
-		index =  int(random.random() * self.N)
-		
-		# weights
-		w = [0] * self.N
-		for i in range(self.N):
-			w[i] = self.particles[i].z
-
-		# resampled particles
-		rp = [0] * self.N
-
-		# resample
-		beta = 0.0
-		mx = max (w)
-		for i in range(self.N):
-			beta += random.random() * 2.0 * mx
-			while beta > w[index]:
-				beta -= w[index]
-				index = (index + 1) % self.N
-			rp[i] = copy.deepcopy(self.particles[index])	
-
-		for p in rp:
-			p.z = 1.0 / self.N
-
-		self.particles = rp
-		#return rp
+    def move_particles(self):
+        # Move the particles
+        for p in self.particles:
+            # Normal fuction
+            p.x = random.normalvariate(p.x, self.sd_mov)
+            p.y = random.normalvariate(p.y, self.sd_mov)
 
 
-	# Update particle weights based on sensed values
-	def update_particles(self, sensedVals):
-		for [senX, senY, senT, senVal] in sensedVals:			  
+    def resample(self):
 
-			# Update particles
-			for p in self.particles:
-				# If the particles in the robot area.
-			
-				if sqrt((senX - p.x)**2 + (senY - p.y)**2) < self.r:
-					if(senVal == 0):
-						p.z *= self.weight_sensed_zero
-					else:
-						# If the anomaly was sensed
-						# The robot follows the anomaly in counterclock
-						# direction. Then, at left has anomaly and at
-						# right has nothing.											
-						left = self.evaluateSide([senX, senY], [p.x, p.y], senT)
-						if left:
-							p.z *= self.weight_tracking_left 
-						else:
-							p.z *= self.weight_tracking_right 
-				else:
-					# particle was not sensed
-					p.z *= self.weight_no_sensed
-					
+        index = int(random.random() * self.N)
 
-				# if the particles is outside the map.
-				# FIXME elif
-				if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
-					p.z = p.z * self.weight_out_of_map
+        # weights
+        w = [0] * self.N
+        for i in range(self.N):
+            w[i] = self.particles[i].z
 
-	def particles_in_grid(self):
-		# Particle position in grid n rows and m columns
-		grid = [[0 for j in xrange(gn)] for i in xrange(gm)]
-		for p in self.particles:
-			# Particle in grid
-			if(p.x > mapX1 and p.x < mapX2 and p.y > mapY1 and p.y < mapY2):
-				i = int((p.y- mapY1) / gdy)
-				j = int((p.x- mapX1) / gdx)
-				#print "i,j",[i,j], ",",[p.y,p.x]
-				grid[i][j] += 1
-		return grid
+        # resampled particles
+        rp = [0] * self.N
+
+        # resample
+        beta = 0.0
+        mx = max(w)
+        for i in range(self.N):
+            beta += random.random() * 2.0 * mx
+            while beta > w[index]:
+                beta -= w[index]
+                index = (index + 1) % self.N
+            rp[i] = copy.deepcopy(self.particles[index])
+
+        for p in rp:
+            p.z = 1.0 / self.N
+
+        self.particles = rp
+
+    #return rp
 
 
-	# Evaluate if the particle is in the right or left of
-	# the robot.
-	# r: robot position
-	# p: particle position
-	# t: robot orientation
-	def evaluateSide(self, r, p, t):
-		# Normal vector of robot
-		#r2 = [r[0] + cos(t), r[1] + sin(t)] - r
-		# Normal vector of particle
-		p2 = [p[0] - r[0], p[1] - r[1]]
-		#p2 /= sqrt(dotproduct(p2,p2))
+    # Update particle weights based on sensed values
+    def update_particles(self, sensedVals):
+        for [senX, senY, senT, senVal] in sensedVals:
 
-		#teta = degrees(acos(-dotproduct(r2,p2)))
+            # Update particles
+            for p in self.particles:
+                # If the particles in the robot area.
+
+                if sqrt((senX - p.x) ** 2 + (senY - p.y) ** 2) < self.r:
+                    if (senVal == 0):
+                        p.z *= self.weight_sensed_zero
+                    else:
+                        # If the anomaly was sensed
+                        # The robot follows the anomaly in counterclock
+                        # direction. Then, at left has anomaly and at
+                        # right has nothing.
+                        left = self.evaluateSide([senX, senY], [p.x, p.y], senT)
+                        if left:
+                            p.z *= self.weight_tracking_left
+                        else:
+                            p.z *= self.weight_tracking_right
+                else:
+                    # particle was not sensed
+                    p.z *= self.weight_no_sensed
 
 
-		pteta = atan(p2[1] / p2[0])
-		if(p2[0] < 0):
-			pteta += pi
+                # if the particles is outside the map.
+                # FIXME elif
+                if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
+                    p.z = p.z * self.weight_out_of_map
 
-		pteta = cut_angle(pteta)
+    def particles_in_grid(self):
+        # Particle position in grid n rows and m columns
+        grid = [[0 for j in xrange(gn)] for i in xrange(gm)]
+        for p in self.particles:
+            # Particle in grid
+            if (p.x > mapX1 and p.x < mapX2 and p.y > mapY1 and p.y < mapY2):
+                i = int((p.y - mapY1) / gdy)
+                j = int((p.x - mapX1) / gdx)
+                #print "i,j",[i,j], ",",[p.y,p.x]
+                grid[i][j] += 1
+        return grid
 
-		result = cut_angle(pteta - t)
+    def evaluateSide(self, r, p, t):
+        """
+        Evaluate if the particle is in the right or left of
+        the robot.
+        :param r: robot position
+        :param p: particle position
+        :param t: robot orientation
+        :return:
+        """
+        # Normal vector of particle
+        p2 = [p[0] - r[0], p[1] - r[1]]
 
-		return (result>0)
+        pteta = atan(p2[1] / p2[0])
+        if p2[0] < 0:
+            pteta += pi
+
+        pteta = cut_angle(pteta)
+
+        result = cut_angle(pteta - t)
+
+        return result > 0
 
 
