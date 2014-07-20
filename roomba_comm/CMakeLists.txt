@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  #geometry_msgs
   message_generation
   message_runtime
 )
@@ -51,6 +52,7 @@ find_package(catkin REQUIRED COMPONENTS
    SensedValue.msg
    Particle.msg
    PointR.msg
+   Point.msg
 #   Message2.msg
  )
 
@@ -70,8 +72,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
-   #DEPENDENCIES
-  #std_msgs  # Or other packages containing msgs
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+#  geometry_msgs
  )
 
 ###################################
@@ -86,7 +89,8 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES roomba_comm
- # CATKIN_DEPENDS message_generation message_runtime
+# CATKIN_DEPENDS message_generation message_runtime
+#  CATKIN_DEPENDS geometry_msgs
 #  DEPENDS system_lib
 )
 

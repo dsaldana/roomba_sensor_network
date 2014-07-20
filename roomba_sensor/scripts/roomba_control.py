@@ -59,20 +59,21 @@ def run():
         robot_position = robot.get_position()
         [robot_x, robot_y, robot_t] = robot_position
 
+        # Read all messages from other robots.
+        orobots, sampled_points, polygons = communicator.read_inbox(am)
+
         # Send the info to other robots.
         communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
-        # Particle filter: move the particles for simulating the anomaly's dynamics
-        pf.move_particles()
-
-        # Read all messages from other robots.
-        orobots, samples = communicator.read_inbox(am)
 
         # Process anomaly lines
         am.process()
 
+        # Particle filter: move the particles for simulating the anomaly's dynamics
+        pf.move_particles()
         # Particle filter: update based on sensor value.
-        pf.update_particles(samples)
+        #TODO add polygons
+        pf.update_particles(sampled_points)
 
         # Particle filter: Re-sampling.
         pf.resample()

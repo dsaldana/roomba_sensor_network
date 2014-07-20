@@ -1,12 +1,10 @@
-
-from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point32
+import rospy
 
 from roomba_comm.msg import Particle
 from roomba_comm.msg import PointR
+from roomba_comm.msg import Point
 from roomba_comm.msg import SensedValue
-
-import rospy
 
 
 class Communicator(object):
@@ -45,20 +43,31 @@ class Communicator(object):
         Read last message from each robot.
         :param am: anomaly manager
         :return:
+            robot_positions: position for each robot.
+            sensed_points: position and value for each sensed point [x, y, th, value]
+            polygons: detected anomalies {id_robot:[polygon, closed, time]}
         """
         # This variable contain all robots (even this robot)
-        orobots = []
+        robot_positions = []
         # Sensed values
-        samples = []
+        sensed_points = []
 
+        # Anomaly polygons {id_robot:[polygon, closed, time]}
+        polygons = {}
         for msg in self.robot_msgs.values():
-            samples.append([msg.x, msg.y, msg.theta, msg.value])
-            # Other robot positions
-            orobot = PointR()
-            orobot.x, orobot.y, orobot.z = msg.rx, msg.ry, msg.rtheta
-            orobot.robot_id = msg.robot_id
-            orobots.append(orobot)
+            sensed_points.append([msg.x, msg.y, msg.theta, msg.value])
+            # Robot position
+            rp = PointR()
+            rp.x, rp.y, rp.z = msg.rx, msg.ry, msg.rtheta
+            rp.robot_id = msg.robot_id
+            robot_positions.append(rp)
 
+            # Polygon
+            if msg.anomaly:
+                polygon = [(p.x, p.y) for p in msg.anomaly.points]
+                polygons[msg.robot_id] = [polygon, msg.closed_anomaly, msg.time_of_detection]
+
+            # If detected anomaly
             if msg.value > 0:
                 # new point with anomaly
                 an = PointR()
@@ -71,15 +80,31 @@ class Communicator(object):
         # All messages are read
         self.robot_msgs.clear()
 
-        return orobots, samples
+        return robot_positions, sensed_points, polygons
 
-    def send_sensed_value(self, sensed_val, camera_position, robot_position):
+    def send_sensed_value(self, sensed_val, camera_position, robot_position,
+                          polygon=None, closed_anomaly=False, time_of_detection=None):
+        """
+
+        :param sensed_val:
+        :param camera_position:
+        :param robot_position:
+        :param polygon: list of tuples (x,y)
+        :param closed_anomaly:
+        :param time_of_detection:
+        """
         smsg = SensedValue()
         smsg.x, smsg.y, smsg.theta = camera_position
         smsg.rx, smsg.ry, smsg.rtheta = robot_position
-
         smsg.robot_id = self.robot_name
         smsg.value = sensed_val
+
+        # for anomaly in polygon
+        if polygon is not None:
+            smsg.anomaly = [Point(i[0], i[1]) for i in polygon]
+            smsg.closed_anomaly = closed_anomaly
+            smsg.time_of_detection = time_of_detection
+        #Publish
         self.sensor_pub.publish(smsg)
 
     def publish_particles(self, particles, robot_position, orobots, anomaly_points):
@@ -89,8 +114,8 @@ class Communicator(object):
         mrobot.x, mrobot.y, mrobot.z = robot_position
         msg_parts.mrobot = mrobot
         msg_parts.orobots = orobots
-        # msg_parts.anomaly = anomaly_points
         msg_parts.anomaly = anomaly_points
+
         self.particle_pub.publish(msg_parts)
 
     def publish_goal(self, goal):
@@ -98,7 +123,7 @@ class Communicator(object):
         p.x, p.y = goal
         self.nav_pub.publish(p)
 
-    def publish_track(self,control_p, crf):
+    def publish_track(self, control_p, crf):
         p = Point32()
         p.x = control_p
         p.y = crf

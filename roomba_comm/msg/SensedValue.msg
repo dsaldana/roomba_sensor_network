@@ -14,3 +14,10 @@ float32 rtheta
 # Sensed value
 float32 value
 time time2
+
+# Polygon
+Point[] anomaly
+# Anomaly is full of robots or not
+bool closed_anomaly
+# When robot detected the anomaly
+time time_of_detection
