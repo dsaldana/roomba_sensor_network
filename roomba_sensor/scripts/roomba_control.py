@@ -1,26 +1,22 @@
 #!/usr/bin/env python
 
 # Numpy
-import numpy as np
 
 import rospy
 
 
-# Clustering
-from scipy.cluster.vq import kmeans2
+
 # Math
 from math import *
+from roomba_sensor.gradient_descent import GradientDescent
 
 from roomba_sensor.communicator import Communicator
 from roomba_sensor.geometric.AnomalyManager import AnomalyManager
 from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.particle_filter import ParticleFilter
-from roomba_sensor.geometric.vector import points_to_vector, vector_components
-
+from roomba_sensor.geometric.vector import points_to_vector
 
 from roomba_sensor.sensor_camera import Camera
-
-
 
 
 def run():
@@ -30,24 +26,22 @@ def run():
 
     # Robot's name is an argument
     robot_name = rospy.get_param('~robot_name', 'Robot1')
-
-    # Constant in columbs law. Force by centroid.
-    f_centroid = rospy.get_param('/f_centroid', 1.0)
-    f_robots = rospy.get_param('/f_robots', 2.0)
-
     rospy.loginfo("Loading robot control for " + robot_name)
 
     # Communication
     communicator = Communicator(robot_name)
-
     # Camera
     camera = Camera(robot_name)
+    # Gradient descent
+    planner = GradientDescent(robot_name)
+    ## Robot Localization
+    robot = RoombaLocalization(robot_name)
+    # Path line in anomaly detection for each robot.
+    am = AnomalyManager(robot_name)
+
 
     # Initialize Particles
     pf = ParticleFilter()
-
-    ## Robot Localization
-    robot = RoombaLocalization(robot_name)
 
     # Explore flag. False for tracking
     explore = True
@@ -57,15 +51,9 @@ def run():
     # last time that an anomaly was detected
     last_time_anomaly = 0
 
-    # Path line in anomaly detection for each robot.
-    am = AnomalyManager(robot_name)
 
-    cents = None
-
-    k_skip = -1
 
     ######## Control Loop ###################
-    print "Start!"
     while not rospy.is_shutdown():
         # Get robot position from gazebo
         robot_position = robot.get_position()
@@ -105,74 +93,11 @@ def run():
 
         ######## Exploring #################
         if explore:
-            k_groups = 9
-            #
-            x, y = [], []
-            for p in pf.particles:
-                x.append(p.x)
-                y.append(p.y)
-
-            # Categorize in k groups and compute
-            # new centroids
-            np.random.seed(1)
-
-            if k_skip < 0:
-                cents, idx = kmeans2(np.array(zip(x, y)), k_groups)
-                k_skip = 5
-            else:
-                k_skip -= 1
 
             # Total force
-            total_force = [0, 0]
-            # Forces by the clusters
-            fc = []
-            for i in range(len(cents)):
-                c = cents[i]
-
-                # points in centroid
-                n_pts = sum(idx == i)
-
-                # Vector to the centroid
-                d, theta = points_to_vector([robot_x, robot_y], c)
-
-                # Force. Coulomb law. Charge c=n_pts
-                fm = f_centroid * n_pts / (d ** 2)
-
-                # components
-                u, v = vector_components(fm, theta)
-
-                total_force[0] += u
-                total_force[1] += v
-
-                fc.append([u, v])
-
-            ## Forces by other robots
-            try:
-                for r in communicator.robot_msgs.values():
-                    if r.robot_id == robot_name:
-                        continue
-
-                    # Vector to the other robot
-                    d, theta = points_to_vector([robot_x, robot_y], [r.rx, r.ry])
-
-                    # Foce, Coulombs law. Charge c=n_pts
-                    k = f_robots * (len(pf.particles) / len(cents))
-                    fm = k / (d ** 2)
-
-                    # Components
-                    u, v = vector_components(fm, theta)
-
-                    # Positive or robot Force is in opposite direction.
-                    total_force[0] -= u
-                    total_force[1] -= v
-
-            except Exception, e:
-                rospy.logerr("Error integrating the data from other robots. " + str(e))
-
-            cte = 10.0 / (len(pf.particles))
-            total_force = cte * total_force[0], cte * total_force[1]
+            total_force = planner.compute_forces(pf, robot_x, robot_y, communicator.robot_msgs.values())
+            # Compute goal
             goal = robot_x + total_force[0], robot_y + total_force[1]
-
             # Publish goal to navigate
             communicator.publish_goal(goal)
 
@@ -192,7 +117,6 @@ def run():
                 d, theta = points_to_vector([robot_x, robot_y], [r.rx, r.ry])
                 # Robot force.
                 rf = 1 / (d ** 2)
-                # print [r.rx, r.ry]  # , "d=",d," theta=", theta
                 # is this robot considerable?
                 # if the other robot is in front of it (angle view is 120 degrees)
                 if abs(theta - robot_t) < (pi / 3):
