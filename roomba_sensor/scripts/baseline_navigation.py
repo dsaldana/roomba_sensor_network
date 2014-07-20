@@ -1,17 +1,10 @@
 #!/usr/bin/env python
 from math import *
-import random
-import copy
 
 import rospy
-from std_msgs.msg import String
-from std_msgs.msg import Float32
 from geometry_msgs.msg import Twist
-from geometry_msgs.msg import Polygon
 from geometry_msgs.msg import Point32
 
-from roomba_comm.msg import SensedValue
-from roomba_sensor.sensor import Sensor
 from roomba_sensor.roomba import RoombaLocalization
 from roomba_sensor.util import cut_angle
 

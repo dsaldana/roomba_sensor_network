@@ -3,7 +3,7 @@
 # Particles
 PointR[] particles
 
-#Marin robot
+#Main robot
 PointR mrobot
 
 # Other robots
