@@ -15,7 +15,7 @@ def _vec2d_mult(p1, p2):
     return p1[0] * p2[0] + p1[1] * p2[1]
 
 
-def simplify_polygon(points, gamma):
+def simplify_polyline(points, gamma):
     """Does Ramer-Douglas-Peucker simplification of a curve with `dist`
     threshold.
 
@@ -44,8 +44,8 @@ def simplify_polygon(points, gamma):
         return [begin, end]
 
     pos = dist_sq.index(maxdist)
-    return (simplify_polygon(points[:pos + 2], gamma) +
-            simplify_polygon(points[pos + 1:], gamma)[1:])
+    return (simplify_polyline(points[:pos + 2], gamma) +
+            simplify_polyline(points[pos + 1:], gamma)[1:])
 
 
 def identify_first_point_in_polygon(points, ddd=0.5):

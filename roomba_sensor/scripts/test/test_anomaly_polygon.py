@@ -11,7 +11,7 @@ class TestAnomalyPolygon(unittest.TestCase):
 
     def test_simplify(self):
 
-        new_line = polygon.simplify_polygon(a, 0.01)
+        new_line = polygon.simplify_polyline(a, 0.01)
         print len(new_line), len(a)
 
 

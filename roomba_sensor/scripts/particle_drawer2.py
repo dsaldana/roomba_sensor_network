@@ -128,7 +128,7 @@ def draw_polygon(points, color=(255, 0, 0)):
     first_point = polygon.identify_first_point_in_polygon(pts)
 
     # Eliminate the unnecessary points
-    pts = polygon.simplify_polygon(pts, 10)
+    pts = polygon.simplify_polyline(pts, 10)
     print len(pts), polygon.perimeter(pts)
 
     ## Draw polygon
