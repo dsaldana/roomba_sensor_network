@@ -8,8 +8,6 @@ from ar_track_alvar.msg import AlvarMarkers
 
 from math import *
 from roomba_sensor.util import cut_angle
-from roomba_sensor.particle_filter import ParticleFilter
-
 
 
 

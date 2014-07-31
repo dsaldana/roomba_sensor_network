@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
 # Numpy
+import math
 
 import rospy
-
-
-
 # Math
-from math import *
 from roomba_sensor.gradient_descent import GradientDescent
 
 from roomba_sensor.communicator import Communicator
@@ -43,58 +40,45 @@ def run():
     # Initialize Particles
     pf = ParticleFilter()
 
-    # Explore flag. False for tracking
-    explore = True
-
-    # Time for tracking without sensing anomaly.
-    max_tracking_time = 5
-    # last time that an anomaly was detected
-    last_time_anomaly = 0
-
-
-
+    ##
     ######## Control Loop ###################
     while not rospy.is_shutdown():
+        rospy.sleep(0.1)
+
         # Get robot position from gazebo
         robot_position = robot.get_position()
+
         [robot_x, robot_y, robot_t] = robot_position
 
         # Read all messages from other robots.
-        orobots, sampled_points, polygons = communicator.read_inbox(am)
+        orobots, sensed_points, anomaly_polygons = communicator.read_inbox()
+
+        am.add_sensed_points(sensed_points)
+        am.data_polygons = anomaly_polygons
 
         # Send the info to other robots.
-        communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
-
-
-        # Process anomaly lines
-        am.process()
+        if am.is_polygon_identified:
+            # FIXME compute closed_anomaly and time of detection
+            communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
+                                            polygon=am.polyline, closed_anomaly=False, time_of_detection=0)
+        else:
+            communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
         # Particle filter: move the particles for simulating the anomaly's dynamics
         pf.move_particles()
         # Particle filter: update based on sensor value.
         #TODO add polygons
-        pf.update_particles(sampled_points)
+        pf.update_particles(sensed_points.values(), anomaly_polygons)
 
         # Particle filter: Re-sampling.
         pf.resample()
 
         # Publish particles
-        communicator.publish_particles(pf.particles, robot_position, orobots, am.get_anomaly_points())
+        communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
-        #
-        #### Evaluate Sensed value
-        # The flag for exploring change only if  the robot does not
-        # sense an anomaly in a n seconds (n = max_tracking_time).
-        if camera.sensed_value > 0:
-            explore = False
-            last_time_anomaly = rospy.get_rostime().secs
-        else:
-            if rospy.get_rostime().secs - last_time_anomaly > max_tracking_time:
-                explore = True
-
+        # print anomaly_polygons
         ######## Exploring #################
-        if explore:
-
+        if not am.sensed_anomaly:
             # Total force
             total_force = planner.compute_forces(pf, robot_x, robot_y, communicator.robot_msgs.values())
             # Compute goal
@@ -104,12 +88,17 @@ def run():
 
         else:
             ####### Tracking ##########
+            # TODO Identify if there is an identified anomaly close.
+            am.modify_polygon()
+            # TODO Fuse the anomaly
+            # Compute Proportional control for steering
             control_p = (camera.sensed_left - 1) + camera.sensed_right
 
             # counter robot force.
             crf = 0
 
-            ### TODO Observe the other robots
+            # Observe the other robots to avoid coalitions controlling the
+            # linear velocity.
             for r in communicator.robot_msgs.values():
                 if r.robot_id == robot_name:
                     continue
@@ -120,14 +109,11 @@ def run():
                 rf = 1 / (d ** 2)
                 # is this robot considerable?
                 # if the other robot is in front of it (angle view is 120 degrees)
-                if abs(theta - robot_t) < (pi / 3):
+                if abs(theta - robot_t) < (math.pi / 3):
                     if rf > crf:
                         crf = rf
 
             communicator.publish_track(control_p, crf)
-
-        rospy.sleep(0.1)
-
 
 if __name__ == '__main__':
     try:

@@ -1,6 +1,6 @@
 ### Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString, Point, LinearRing
 
 
 def _vec2d_dist(p1, p2):
@@ -8,7 +8,7 @@ def _vec2d_dist(p1, p2):
 
 
 def _vec2d_sub(p1, p2):
-    return (p1[0] - p2[0], p1[1] - p2[1])
+    return p1[0] - p2[0], p1[1] - p2[1]
 
 
 def _vec2d_mult(p1, p2):
@@ -23,8 +23,8 @@ def simplify_polygon(points, gamma):
 
     Usage is like so:
 
-    >>> myline = [(0.0, 0.0), (1.0, 2.0), (2.0, 1.0)]
-    >>> simplified = simplify_polygon(myline, gamma = 2.0)
+    > myline = [(0.0, 0.0), (1.0, 2.0), (2.0, 1.0)]
+    > simplified = simplify_polygon(myline, gamma = 2.0)
     """
 
     if len(points) < 3:
@@ -83,6 +83,34 @@ def identify_first_point_in_polygon(points, ddd=0.5):
     return first_point
 
 
+def fuse_point_to_polygon(point, polygon):
+    """
+
+    :param point:
+    :param polygon:
+    """
+    p = Point(point)
+    min_distance = float("inf")
+    min_index = -1
+    # Identify the nearest line segment.
+    for i in range(len(polygon)):
+        seg = polygon[i:i + 2]
+        if len(seg) < 2:
+            #close the polygon
+            seg = [polygon[-1]] + [polygon[0]]
+
+        line_segment = LineString(seg)
+        dist = p.distance(line_segment)
+        # print seg, dist
+        if dist < min_distance:
+            min_distance = dist
+            min_index = i
+
+    # print min_distance, min_index
+    # fused_polygon
+    return polygon[min_index + 1:] + polygon[:min_index + 1] + [point]
+
+
 def perimeter(points):
     """
     Perimeter delimited by a polygon defined by a set of points.
@@ -126,3 +154,16 @@ def lines_fusion(line1, line2):
 
     # no fusion
     return line1
+
+
+def distance_point_to_polygon(point, poly):
+    """
+    Compute the minimum distance from a point to a polygon
+    :param point:
+    :param poly:
+    :return: the distance
+    """
+    p = Point(point)
+    pol = LinearRing(poly)
+
+    return p.distance(pol)

@@ -29,8 +29,8 @@ class Camera(object):
         :param img: received image from local camera
         :return:
         """
-        sensor_enabled = self.rospy.get_param('/sensor_enabled', True)
-
+        # sensor_enabled = self.rospy.get_param('/sensor_enabled', True)
+        sensor_enabled = True
         if not sensor_enabled:
             return
 

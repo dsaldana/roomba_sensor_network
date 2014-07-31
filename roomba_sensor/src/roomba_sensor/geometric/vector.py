@@ -13,6 +13,9 @@ def points_to_vector(p1, p2):
     # Magnitude. Coulomb law.
     mag = sqrt(dx ** 2 + dy ** 2)
 
+    if dx == 0:
+        dx = 0.000001
+
     # Angle
     theta = atan(dy / dx)
 

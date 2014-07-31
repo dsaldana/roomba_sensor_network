@@ -20,21 +20,19 @@ class ParticleFilter:
     simulated_robots = rospy.get_param('simulated_robots', True)
 
     # PF weights
-    weight_no_sensed = 1.0
-    weight_tracking_left = 1.3
-    weight_tracking_right = 0.01
-
-    # FIXME this if should not exist.
-    if not simulated_robots:
-        weight_tracking_left = 0.01
-        weight_tracking_right = 1.2
-
-    weight_out_of_map = 0.01
-    weight_sensed_zero = 0.1
+    _WEIGHT_NO_SENSED = 1.0
+    _WEIGHT_TRACKING_LEFT = 1.3
+    _WEIGHT_TRACKING_RIGHT = 0.01
+    _WEIGHT_OUT_OF_MAP = 0.01
+    _WEIGHT_SENSED_ZERO = 0.1
 
     def __init__(self):
+        # real robots has a different behaviour (it can be fixed).
+        if not self.simulated_robots:
+            self._WEIGHT_TRACKING_LEFT = 0.01
+            self._WEIGHT_TRACKING_RIGHT = 1.2
 
-        # Sparce the initial particles
+        # Sparse the initial particles
         self.particles = []
         for i in range(self.N):
             p = PointR()
@@ -45,14 +43,17 @@ class ParticleFilter:
             p.z = 1.0 / self.N
             self.particles.append(p)
 
-
     def move_particles(self):
+        """
+        Randon movement for all the particles, based on
+        normal distribution
+
+        """
         # Move the particles
         for p in self.particles:
             # Normal fuction
             p.x = random.normalvariate(p.x, self.sd_mov)
             p.y = random.normalvariate(p.y, self.sd_mov)
-
 
     def resample(self):
 
@@ -81,20 +82,23 @@ class ParticleFilter:
 
         self.particles = rp
 
-    #return rp
+    def update_particles(self, sensed_values, polygons):
+        """
+        Update particle weights based on sensed values.
+        :param sensed_values:
+        :param polygons:
+        """
+        #todo joint the polygons polygons
 
-
-    # Update particle weights based on sensed values
-    def update_particles(self, sensedVals):
-        for [senX, senY, senT, senVal] in sensedVals:
+        for [senX, senY, senT, sen_val] in sensed_values:
 
             # Update particles
             for p in self.particles:
                 # If the particles in the robot area.
 
                 if sqrt((senX - p.x) ** 2 + (senY - p.y) ** 2) < self.r:
-                    if (senVal == 0):
-                        p.z *= self.weight_sensed_zero
+                    if sen_val == 0:
+                        p.z *= self._WEIGHT_SENSED_ZERO
                     else:
                         # If the anomaly was sensed
                         # The robot follows the anomaly in counterclock
@@ -102,28 +106,30 @@ class ParticleFilter:
                         # right has nothing.
                         left = self.evaluateSide([senX, senY], [p.x, p.y], senT)
                         if left:
-                            p.z *= self.weight_tracking_left
+                            p.z *= self._WEIGHT_TRACKING_LEFT
                         else:
-                            p.z *= self.weight_tracking_right
+                            p.z *= self._WEIGHT_TRACKING_RIGHT
                 else:
                     # particle was not sensed
-                    p.z *= self.weight_no_sensed
+                    p.z *= self._WEIGHT_NO_SENSED
 
-
-                # if the particles is outside the map.
+                # if the particles are outside the map.
                 # FIXME elif
                 if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
-                    p.z = p.z * self.weight_out_of_map
+                    p.z *= self._WEIGHT_OUT_OF_MAP
 
     def particles_in_grid(self):
-        # Particle position in grid n rows and m columns
+        """
+        Particle position in grid n rows and m columns
+
+        :return: grid with particles
+        """
         grid = [[0 for j in xrange(gn)] for i in xrange(gm)]
         for p in self.particles:
             # Particle in grid
-            if (p.x > mapX1 and p.x < mapX2 and p.y > mapY1 and p.y < mapY2):
+            if mapX1 < p.x < mapX2 and mapY1 < p.y < mapY2:
                 i = int((p.y - mapY1) / gdy)
                 j = int((p.x - mapX1) / gdx)
-                #print "i,j",[i,j], ",",[p.y,p.x]
                 grid[i][j] += 1
         return grid
 

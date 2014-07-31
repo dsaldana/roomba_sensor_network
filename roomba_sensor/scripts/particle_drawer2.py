@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+# For plotting
+import numpy as np
+import pygame
+from pygame.locals import *
+# Clustering
+from scipy.cluster.vq import kmeans2
+
+
+
 from geometry_msgs.msg import Point32
 
 from roomba_comm.msg import Particle
@@ -6,18 +16,13 @@ from roomba_sensor.geometric.ellipse import fit_ellipse
 from roomba_sensor.geometric.ellipse import ellipse_points
 
 
-# For plotting
-import numpy as np
-import pygame
-from pygame.locals import *
 
 # Map configuration
 from roomba_sensor.geometric import polygon
 from roomba_sensor.map import *
 from math import *
 
-# Clustering
-from scipy.cluster.vq import kmeans2
+
 
 # Window size
 width, height = 750, 600
