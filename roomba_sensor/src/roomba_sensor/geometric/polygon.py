@@ -1,6 +1,6 @@
 ### Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 
-from shapely.geometry import LineString, Point, LinearRing
+from shapely.geometry import LineString, Point, LinearRing, Polygon
 
 
 def _vec2d_dist(p1, p2):
@@ -66,7 +66,7 @@ def identify_first_point_in_polygon(points, ddd=0.5):
     # Distance between last point and a line segment
     distance_point_line = 2 * ddd
 
-    while not (distance_point_line < ddd and perimeter(points[first_point:]) > 2):
+    while not (distance_point_line < ddd and line_perimeter(points[first_point:]) > 2):
         # next segment
         first_point -= 1
 
@@ -111,13 +111,22 @@ def fuse_point_to_polygon(point, polygon):
     return polygon[min_index + 1:] + polygon[:min_index + 1] + [point]
 
 
-def perimeter(points):
+def line_perimeter(points):
     """
     Perimeter delimited by a polygon defined by a set of points.
     :param points: points are tuples of floats.
     """
     l = LineString(points)
     return l.length
+
+
+def polygon_perimeter (poly):
+    """
+    Perimeter delimited by a polygon defined by a set of points.
+    :param poly: polygon defined by a set of points (tuples of floats).
+    """
+    pol = Polygon(poly)
+    return pol.length
 
 
 def lines_fusion(line1, line2):
@@ -167,3 +176,27 @@ def distance_point_to_polygon(point, poly):
     pol = LinearRing(poly)
 
     return p.distance(pol)
+
+
+def point_in_polygon(point, poly):
+    """
+    Determines if a point p is inside a polygon
+    :param point:
+    :param poly: polygon list of tuples (x,y)
+    """
+    p = Point(point)
+    pol = Polygon(poly)
+    return p.within(pol)
+
+
+def polygons_intersect(poly1, poly2):
+    """
+    Identify if two polygons intersect.
+    :param poly1:
+    :param poly2:
+    :return: true if intersection
+    """
+    pol1 = Polygon(poly1)
+    pol2 = Polygon(poly2)
+    print poly1, poly2
+    return pol1.intersection(pol2).area > 0
