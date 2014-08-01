@@ -129,7 +129,7 @@ def draw_polygon(points, color=(255, 0, 0)):
 
     # Eliminate the unnecessary points
     pts = polygon.simplify_polyline(pts, 10)
-    print len(pts), polygon.perimeter(pts)
+    print len(pts), polygon.line_perimeter(pts)
 
     ## Draw polygon
     if len(pts) > 2:

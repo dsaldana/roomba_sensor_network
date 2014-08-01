@@ -56,11 +56,12 @@ def run():
         am.add_sensed_points(sensed_points)
         am.data_polygons = anomaly_polygons
 
+        print am.anomaly_full, am.is_polygon_identified
         # Send the info to other robots.
         if am.is_polygon_identified:
-            # FIXME compute closed_anomaly and time of detection
+            # FIXME compute and time of detection
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
-                                            polygon=am.polyline, closed_anomaly=False, time_of_detection=0)
+                                           polygon=am.polyline, closed_anomaly=am.anomaly_full, time_of_detection=0)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
@@ -88,9 +89,12 @@ def run():
 
         else:
             ####### Tracking ##########
-            # TODO Identify if there is an identified anomaly close.
+            # modify the polygon with sensed data and other robot's data
             am.modify_polygon()
-            # TODO Fuse the anomaly
+
+            # close the polygon if necessary
+            am.evaluate_anomaly_full()
+
             # Compute Proportional control for steering
             control_p = (camera.sensed_left - 1) + camera.sensed_right
 
@@ -114,6 +118,7 @@ def run():
                         crf = rf
 
             communicator.publish_track(control_p, crf)
+
 
 if __name__ == '__main__':
     try:
