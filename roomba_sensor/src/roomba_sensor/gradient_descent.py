@@ -1,15 +1,13 @@
+
 import rospy
-import numpy as np
-# Clustering
-from scipy.cluster.vq import kmeans2
 
 from roomba_sensor.geometric.vector import points_to_vector, vector_components
 
 
-
-
 class GradientDescent(object):
-    _K_GROUPS = 9
+    """
+    Gradient descent method for robot navigation.
+    """
 
     def __init__(self, robot_name):
         self.robot_name = robot_name
@@ -21,70 +19,52 @@ class GradientDescent(object):
         self._F_CENTROID = rospy.get_param('/f_centroid', 1.0)
         self._F_ROBOTS = rospy.get_param('/f_robots', 2.0)
 
+
     def compute_forces(self, pf, robot_x, robot_y, robots):
-
-        x, y = [], []
+        """
+        Computes the total force to navigate with the
+        gradient descent method. Robot tries to go away from
+        other robots and attracted by particles.
+        :param pf: particles
+        :param robot_x: x position
+        :param robot_y: y position
+        :param robots: other robots with r.x and r.y
+        :return:
+        """
+        # Vector from robot to particles. distance and angle
+        fx, fy = 0, 0
         for p in pf.particles:
-            x.append(p.x)
-            y.append(p.y)
-
-        # Categorize in k groups and compute
-        # new centroids
-        np.random.seed(1)
-
-        if self.k_skip < 0:
-            self.cents, self.idx = kmeans2(np.array(zip(x, y)), self._K_GROUPS)
-            self.k_skip = 5
-        else:
-            self.k_skip -= 1
-
-        total_force = [0, 0]
-
-        # Forces by the clusters
-        fc = []
-        for i in range(len(self.cents)):
-            c = self.cents[i]
-
-            # points in centroid
-            n_pts = sum(self.idx == i)
-
-            # Vector to the centroid
-            d, theta = points_to_vector([robot_x, robot_y], c)
+            # Force from robot to particles
+            d, theta = points_to_vector([robot_x, robot_y], [p.x, p.y])
 
             # Force. Coulomb law. Charge c=n_pts
-            fm = self._F_CENTROID * n_pts / (d ** 2)
+            fm = self._F_CENTROID / (d ** 2)
 
-            # components
-            u, v = vector_components(fm, theta)
+            # New vector of force
+            x, y = vector_components(fm, theta)
+            fx += x
+            fy += y
 
-            total_force[0] += u
-            total_force[1] += v
+        ## Vector from robot to other robots
 
-            fc.append([u, v])
+        for r in robots:
+            if r.robot_id == self.robot_name:
+                continue
+            # force from other robot to our robot
+            d, theta = points_to_vector([r.rx, r.ry],[robot_x, robot_y])
 
-        ## Forces by other robots
-        try:
-            for r in robots:
-                if r.robot_id == self.robot_name:
-                    continue
+            # Constant of proportionality
+            k = self._F_ROBOTS * (len(pf.particles) / len(self.cents))
+            # Force, Coulombs law. Charge per particle
+            fm = k / (d ** 2)
 
-                # Vector to the other robot
-                d, theta = points_to_vector([robot_x, robot_y], [r.rx, r.ry])
+            x, y = vector_components(fm, theta)
+            fx += x
+            fy += y
 
-                # Foce, Coulombs law. Charge c=n_pts
-                k = self._F_ROBOTS * (len(pf.particles) / len(self.cents))
-                fm = k / (d ** 2)
+        # TODO forces by obstacles
 
-                # Components
-                u, v = vector_components(fm, theta)
-
-                # Positive or robot Force is in opposite direction.
-                total_force[0] -= u
-                total_force[1] -= v
-
-        except Exception, e:
-            rospy.logerr("Error integrating the data from other robots. " + str(e))
-
-        cte = 10.0 / (len(pf.particles))
-        total_force = cte * total_force[0], cte * total_force[1]
+        # Reducing force
+        cte = 10.0 / len(pf.particles)
+        total_force = cte * fx, cte * fy
         return total_force
