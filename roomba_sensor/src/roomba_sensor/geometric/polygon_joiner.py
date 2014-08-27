@@ -13,14 +13,21 @@ class PolygonJoiner(object):
             #fixme
             pol_data = polygon.fix_polygon(pol_data)
 
-            full = pol_data[1]
-            pol = Polygon(pol_data[0])
+            try:
+                #fixme
+                pol_data = polygon.fix_polygon(pol_data)
 
-            print "full,p2=", self.full_area, ",", pol
-            if full:
-                self.full_area = self.full_area.union(pol)
-            else:
-                self.open_area = self.open_area.union(pol)
+                full = pol_data[1]
+                pol = Polygon(pol_data[0])
+
+                print "full,p2=", self.full_area, ",", pol
+                if full:
+                    self.full_area = self.full_area.union(pol)
+                else:
+                    self.open_area = self.open_area.union(pol)
+
+            except Exception:
+                print "Error Joining polygons", SystemError.message
 
     def point_in_open_anomaly(self, point):
         p = Point(point)

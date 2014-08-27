@@ -14,36 +14,43 @@ goal.x = 0.0000001
 goal.y = 0.0000001
 
 # state
-traking = False
+tracking = False
 
-# P Control factors
-p_angular = rospy.get_param('/p_control_angular', 1.0)
+# P Control constants for navigation
 p_linear = rospy.get_param('/p_control_linear', 0.5)
+p_angular = rospy.get_param('/p_control_angular', 1.0)
 
+
+# PD Control for tracking
+# P = pi / 4
+# D = pi / 1
+P = pi / 2
+D = pi / 0.1
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
-    global traking
+
+    global tracking
     global sensedValue
     global crf
 
     # sensed data
     sensedValue = sensedData.x
     crf = sensedData.y
-    traking = True
+    tracking = True
     print "Tracking=", sensedValue, " force=", crf
 
 
 def goal_callback(point):
     global goal
-    global traking
-    traking = False
+    global tracking
+    tracking = False
     goal = point
     print "new goal ", [goal.x, goal.y]
 
 
 def run():
-    global traking
+    global tracking
     # Node roomba navigation
     rospy.init_node('roomba_navigation')
 
@@ -77,7 +84,7 @@ def run():
         #if (traking is None):
         #	continue
         #TODO implement tracking in another module.
-        if traking:
+        if tracking:
             ###### Tracking ######
             # Max speed for tracking.
             lin_vel = 0.4
@@ -92,8 +99,6 @@ def run():
                 if lin_vel < 0:
                     lin_vel = 0
 
-            P = pi / 4
-            D = pi / 2
 
             vel = Twist()
             vel.linear.x = 0.3 * lin_vel

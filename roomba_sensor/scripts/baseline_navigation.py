@@ -14,7 +14,7 @@ goal.x = 0.0000001
 goal.y = 0.0000001
 
 # state
-traking = False
+tracking = False
 
 # P Control factors
 p_angular = rospy.get_param('/p_control_angular', 1.0)
@@ -27,7 +27,7 @@ def tracking_callback(sensedData):
 
     :param sensedData:
     """
-    global traking
+    global tracking
     global sensedValue
     global crf
 
@@ -44,7 +44,7 @@ def goal_callback(point):
     :param point:
     """
     global goal
-    global traking
+    global tracking
     global spiral_counter
     traking = False
     goal = point
@@ -58,7 +58,7 @@ def run():
     """
 
     """
-    global traking
+    global tracking
     global spiral_counter
     # Node roomba navigation
     rospy.init_node('roomba_navigation')

@@ -6,7 +6,8 @@ PERIMETER_PER_ROBOT = 0.1
 
 MIN_DISTANCE_POLYGON = 0.5
 
-_SIMPLIFY_TH = 0.01
+# Distance to simplify polygons.
+_SIMPLIFY_TH = 0.08
 
 # Time for tracking without sensing anomaly.
 _MAX_TRACKING_TIME = 5
