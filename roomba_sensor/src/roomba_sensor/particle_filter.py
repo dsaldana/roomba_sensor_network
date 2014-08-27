@@ -5,6 +5,7 @@ import copy
 from roomba_comm.msg import PointR
 from roomba_sensor.map import *
 from roomba_sensor.util import cut_angle
+from roomba_sensor.geometric.polygon_joiner import PolygonJoiner
 
 
 class ParticleFilter:
@@ -51,7 +52,7 @@ class ParticleFilter:
         """
         # Move the particles
         for p in self.particles:
-            # Normal fuction
+            # Normal function
             p.x = random.normalvariate(p.x, self.sd_mov)
             p.y = random.normalvariate(p.y, self.sd_mov)
 
@@ -82,21 +83,28 @@ class ParticleFilter:
 
         self.particles = rp
 
-    def update_particles(self, sensed_values, polygons):
+    def update_particles(self, sensed_values, data_polygons):
         """
         Update particle weights based on sensed values.
         :param sensed_values:
-        :param polygons:
+        :param data_polygons:
         """
-        #todo joint the polygons polygons
+        # joint the polygons
+        anomaly_area = PolygonJoiner(data_polygons)
 
         for [senX, senY, senT, sen_val] in sensed_values:
 
             # Update particles
             for p in self.particles:
-                # If the particles in the robot area.
+                # Particle in open area
+                if anomaly_area.point_in_full_anomaly((p.x, p.y)):
+                    p.z = 0
+                # open anomaly
+                elif anomaly_area.point_in_open_anomaly((p.x, p.y)):
+                    p.z *= self._WEIGHT_TRACKING_LEFT
 
-                if sqrt((senX - p.x) ** 2 + (senY - p.y) ** 2) < self.r:
+                # If the particles in the robot area.
+                elif sqrt((senX - p.x) ** 2 + (senY - p.y) ** 2) < self.r:
                     if sen_val == 0:
                         p.z *= self._WEIGHT_SENSED_ZERO
                     else:
@@ -104,13 +112,14 @@ class ParticleFilter:
                         # The robot follows the anomaly in counterclock
                         # direction. Then, at left has anomaly and at
                         # right has nothing.
-                        left = self.evaluateSide([senX, senY], [p.x, p.y], senT)
+                        left = self.evaluate_side([senX, senY], [p.x, p.y], senT)
                         if left:
                             p.z *= self._WEIGHT_TRACKING_LEFT
                         else:
                             p.z *= self._WEIGHT_TRACKING_RIGHT
+
+                # particle was not sensed
                 else:
-                    # particle was not sensed
                     p.z *= self._WEIGHT_NO_SENSED
 
                 # if the particles are outside the map.
@@ -133,7 +142,7 @@ class ParticleFilter:
                 grid[i][j] += 1
         return grid
 
-    def evaluateSide(self, r, p, t):
+    def evaluate_side(self, r, p, t):
         """
         Evaluate if the particle is in the right or left of
         the robot.
@@ -154,5 +163,6 @@ class ParticleFilter:
         result = cut_angle(pteta - t)
 
         return result > 0
+
 
 

@@ -1,0 +1,10 @@
+
+
+## Test control
+rosnode kill /Robot1/rcontrol
+rosrun roomba_sensor roomba_control.py
+
+
+## Test navigation
+rosnode kill /Robot1/rnavigation
+rosrun roomba_sensor roomba_navigation.py

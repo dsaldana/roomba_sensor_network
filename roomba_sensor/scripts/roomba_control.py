@@ -43,8 +43,6 @@ def run():
     ##
     ######## Control Loop ###################
     while not rospy.is_shutdown():
-        rospy.sleep(0.1)
-
         # Get robot position from gazebo
         robot_position = robot.get_position()
 
@@ -59,7 +57,7 @@ def run():
         print am.anomaly_full, am.is_polygon_identified
         # Send the info to other robots.
         if am.is_polygon_identified:
-            # FIXME compute and time of detection
+            # Includes time of detection and closed anomaly
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
                                            polygon=am.polyline, closed_anomaly=am.anomaly_full, time_of_detection=0)
         else:
@@ -67,8 +65,11 @@ def run():
 
         # Particle filter: move the particles for simulating the anomaly's dynamics
         pf.move_particles()
-        # Particle filter: update based on sensor value.
-        #TODO add polygons
+
+        #FIXME quiza esto deberia estar en otro lugar
+        am.fix_polygon()
+
+        # Particle filter: update based on sensor value and detected anomalies.
         pf.update_particles(sensed_points.values(), anomaly_polygons)
 
         # Particle filter: Re-sampling.
@@ -95,6 +96,9 @@ def run():
             # close the polygon if necessary
             am.evaluate_anomaly_full()
 
+            #FIXME quiza esto deberia estar en otro lugar
+            am.fix_polygon()
+
             # Compute Proportional control for steering
             control_p = (camera.sensed_left - 1) + camera.sensed_right
 
@@ -118,6 +122,7 @@ def run():
                         crf = rf
 
             communicator.publish_track(control_p, crf)
+        rospy.sleep(0.1)
 
 
 if __name__ == '__main__':

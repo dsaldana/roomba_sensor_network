@@ -107,8 +107,13 @@ def fuse_point_to_polygon(point, polygon):
             min_index = i
 
     # print min_distance, min_index
-    # fused_polygon
-    return polygon[min_index + 1:] + polygon[:min_index + 1] + [point]
+    fused_polygon = polygon[min_index + 1:] + polygon[:min_index + 1] + [point]
+    aa = identify_first_point_in_polygon(fused_polygon)
+    print "FUSING", aa
+
+    return fused_polygon
+    # min_index + 2 works, the first point is deleted
+    # return polygon[min_index + 1:] + [point]
 
 
 def line_perimeter(points):
@@ -120,7 +125,7 @@ def line_perimeter(points):
     return l.length
 
 
-def polygon_perimeter (poly):
+def polygon_perimeter(poly):
     """
     Perimeter delimited by a polygon defined by a set of points.
     :param poly: polygon defined by a set of points (tuples of floats).
@@ -198,5 +203,32 @@ def polygons_intersect(poly1, poly2):
     """
     pol1 = Polygon(poly1)
     pol2 = Polygon(poly2)
-    print poly1, poly2
+    print "p1,p2=", poly1, ",", poly2
     return pol1.intersection(pol2).area > 0
+
+
+def fix_polygon(poly):
+    """
+    Fix if the polygon is bad formed.
+    :param poly:
+    :return:
+    """
+    print poly
+    if len(poly) <= 3:
+        return poly
+
+    pol = Polygon(poly)
+
+    if pol.is_valid:
+        return poly
+
+    final_line = LineString([poly[0], poly[-1]])
+
+    for i in range(len(poly) - 2, 0, -1):
+        l = LineString(poly[i:i + 2])
+
+        if l.intersects(final_line):
+            poly1 = poly[:i ] + [poly[-1]]
+            return fix_polygon(poly1)
+
+    return poly

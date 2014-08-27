@@ -2,7 +2,7 @@ import rospy
 
 from roomba_sensor.geometric import polygon
 
-PERIMETER_PER_ROBOT = 100.1
+PERIMETER_PER_ROBOT = 0.1
 
 MIN_DISTANCE_POLYGON = 0.5
 
@@ -198,3 +198,14 @@ class AnomalyManager(object):
 
         # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
         self.anomaly_full = perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
+
+        ## should I go out of the full anomaly?
+
+    def fix_polygon(self):
+        """
+        Fix if the polygon is bad formed.
+        """
+        if len(self.polyline) < 5:
+            return
+
+        self.polyline = polygon.fix_polygon(self.polyline)
