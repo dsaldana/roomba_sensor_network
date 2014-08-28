@@ -19,7 +19,7 @@ from roomba_sensor.geometric.ellipse import ellipse_points
 
 # Map configuration
 from roomba_sensor.geometric import polygon
-from roomba_sensor.map import *
+from roomba_sensor.params.map import *
 from math import *
 
 

@@ -3,8 +3,9 @@ import random
 import copy
 
 from roomba_comm.msg import PointR
-from roomba_sensor.map import *
-from roomba_sensor.util import cut_angle
+
+from roomba_sensor.params.map import *
+from roomba_sensor.util.angle import cut_angle
 from roomba_sensor.geometric.polygon_joiner import PolygonJoiner
 
 

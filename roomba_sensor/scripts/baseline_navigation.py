@@ -5,8 +5,8 @@ import rospy
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point32
 
-from roomba_sensor.roomba import RoombaLocalization
-from roomba_sensor.util import cut_angle
+from roomba_sensor.localization import RoombaLocalization
+from roomba_sensor.util.angle import cut_angle
 
 
 goal = Point32()

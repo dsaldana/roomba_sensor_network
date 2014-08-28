@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-from std_msgs.msg import String
-from std_msgs.msg import Float32
 # Image
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
@@ -10,32 +8,24 @@ from roomba_comm.msg import Particle
 from roomba_comm.msg import PointR
 from roomba_comm.msg import SensedValue
 
-import rospy
 # OpenCV
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 import cv
 
 # Math
 from math import *
-import random
 
-from roomba_sensor.roomba import RoombaLocalization
-from roomba_sensor.particle_filter import ParticleFilter
-from roomba_sensor.grid_util import bread_first_search
-from roomba_sensor.grid_util import validate_index
-from roomba_sensor.grid_util import coords_to_grid
-from roomba_sensor.grid_util import grid_to_coords
-from roomba_sensor.grid_util import maximum_neightbor
+from roomba_sensor.localization import RoombaLocalization
+from roomba_sensor.control.particlefilter import ParticleFilter
+from roomba_sensor.util.grid_util import coords_to_grid
 
 # Map configuration
-from roomba_sensor.map import *
+from roomba_sensor.params.map import *
 
 
 # Numpy
-import numpy as np
 
 # Clustering
-from scipy.cluster.vq import kmeans2
 
 
 # Sensed value by the camera

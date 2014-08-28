@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 
-from roomba_sensor.roomba import RealRoomba
+from roomba_sensor.localization import RealRoomba
 from roomba_comm.msg import Particle
 from roomba_comm.msg import PointR
 

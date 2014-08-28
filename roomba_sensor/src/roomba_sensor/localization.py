@@ -7,7 +7,7 @@ from tf.transformations import euler_from_quaternion
 from ar_track_alvar.msg import AlvarMarkers
 
 from math import *
-from roomba_sensor.util import cut_angle
+from roomba_sensor.util.angle import cut_angle
 
 
 
@@ -18,7 +18,7 @@ d = rospy.get_param('/sensor_distance', 0.5)
 ##### Localization for virtual or physical robot.
 #######################################################
 class RoombaLocalization:
-    def __init__(self, robotName):
+    def __init__(self, robot_name):
         simulated_robots = rospy.get_param('/simulated_robots', False)
         # Object to get information from Gazebo
         self.robot = None
@@ -26,11 +26,11 @@ class RoombaLocalization:
         if simulated_robots:
             rospy.loginfo("Working with simulated robots.")
             # Localization by Gazebo
-            self.robot = RoombaGazebo(robotName)
+            self.robot = RoombaGazebo(robot_name)
         else:
             rospy.loginfo("Working with physical robots.")
             # Localization by ar_alvar
-            self.robot = RealRoomba(robotName)
+            self.robot = RealRoomba(robot_name)
 
     def get_position(self):
         return self.robot.get_position()
@@ -125,14 +125,14 @@ class RealRoomba:
         self.robotName = robotName
         self.positionServer = None
 
-        if (self.locator == None):
+        if self.locator == None:
             self.locator = ArLocator()
         #locator.add_robot(robotName)
 
     def get_position(self):
         pose = self.locator.get_robot_position(self.robotName)
 
-        if pose == None:
+        if pose is None:
             rospy.logerr("No robot position")
             return [0, 0, 0]
 
@@ -154,7 +154,7 @@ class RealRoomba:
     def get_sensor_position(self):
         [robotX, robotY, robotT] = self.get_position()
 
-        camX = robotX + d * cos(robotT)
-        camY = robotY + d * sin(robotT)
+        cam_x = robotX + d * cos(robotT)
+        cam_y = robotY + d * sin(robotT)
 
-        return [camX, camY, robotT]
+        return [cam_x, cam_y, robotT]

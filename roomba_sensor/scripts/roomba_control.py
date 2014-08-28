@@ -5,15 +5,15 @@ import math
 
 import rospy
 # Math
-from roomba_sensor.gradient_descent import GradientDescent
+from roomba_sensor.control.gradientdescent import GradientDescent
 
-from roomba_sensor.communicator import Communicator
+from roomba_sensor.comm.communicator import Communicator
 from roomba_sensor.geometric.AnomalyManager import AnomalyManager
-from roomba_sensor.roomba import RoombaLocalization
-from roomba_sensor.particle_filter import ParticleFilter
+from roomba_sensor.localization import RoombaLocalization
+from roomba_sensor.control.particlefilter import ParticleFilter
 from roomba_sensor.geometric.vector import points_to_vector
 
-from roomba_sensor.sensor_camera import Camera
+from roomba_sensor.sensor.sensor_camera import Camera
 
 
 def run():
