@@ -53,11 +53,11 @@ class Camera(object):
         # for j in xrange(mat.cols / 2):
         # if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[
         # i, j] < threshold_other:
-        #             pl = j
+        # pl = j
         #
-        #     for j in xrange(int(mat.cols / 2) + 1, mat.cols):
-        #         if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[
-        #             i, j] < threshold_other:
+        # for j in xrange(int(mat.cols / 2) + 1, mat.cols):
+        # if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[
+        # i, j] < threshold_other:
         #             pr = j - int(mat.cols / 2)
 
         # Take just a row/line of the image
@@ -67,12 +67,14 @@ class Camera(object):
         blue_line = blue[line_index]
 
         # Take the left half of the line
-        half = int(len(red_line) / 2)
+        half = len(red_line) / 2
 
         f = (red_line > threshold_value) * (green_line < threshold_other) * (blue_line < threshold_other)
 
         # normalized values
         self.sensed_value = sum(f) / (1.0 * len(f))
-        self.sensed_left = sum(f[:half]) / (len(f[:half]))
-        self.sensed_right = sum(f[half + 1:]) / (len(f[half + 1:]))
+        self.sensed_left = sum(f[:half]) / (1.0 * len(f[:half]))
+        self.sensed_right = sum(f[half + 1:]) / (1.0 * len(f[half + 1:]))
+
+        print "s:", self.sensed_value, self.sensed_left, self.sensed_right
 

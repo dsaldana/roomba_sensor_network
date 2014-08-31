@@ -54,7 +54,7 @@ def run():
         am.add_sensed_points(sensed_points)
         am.data_polygons = anomaly_polygons
 
-        print am.anomaly_full, am.is_polygon_identified
+        # print am.anomaly_full, am.is_polygon_identified
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly

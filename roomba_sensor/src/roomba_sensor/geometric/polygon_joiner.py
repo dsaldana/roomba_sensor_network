@@ -20,7 +20,7 @@ class PolygonJoiner(object):
                 full = pol_data[1]
                 pol = Polygon(pol_data[0])
 
-                print "full,p2=", self.full_area, ",", pol
+                # print "full,p2=", self.full_area, ",", pol
                 if full:
                     self.full_area = self.full_area.union(pol)
                 else:
