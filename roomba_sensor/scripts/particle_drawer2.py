@@ -112,7 +112,6 @@ def draw_path(points, color=(255, 0, 0)):
 
         lp = ep
 
-
 def draw_polygon(points, color=(255, 0, 0)):
     if len(points) < 2:
         return
@@ -184,6 +183,7 @@ def draw_points(points, color=(255, 0, 0)):
         except Exception, e:
             print e
     return
+
 
 
 def callback(particles_msg):

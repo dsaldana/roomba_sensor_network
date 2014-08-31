@@ -4,11 +4,16 @@ roomba_sensor_network
 A robotic sensor network based on roomba robots.
 
 * Required ROS Packages
-    - ros-hydro-hector-sensors-description
+    - ros-hydro-hector-sensors-description (https://github.com/tu-darmstadt-ros-pkg/hector_models/tree/indigo-devel)
     - ros-hydro-turtlebot-simulator
     - ros-hydro-desktop-full*
 
-* Copy the folder doc/gazebomodels/1fogo to ~/.gazebo/models/
+* Python packages:
+    - shapely
+    - pygame
+    - scipy
+
+* Copy the folder 1fogo from doc/gazebomodels/ to ~/.gazebo/models/
 
 * Run for simulated robots
     ```bash

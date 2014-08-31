@@ -53,20 +53,20 @@
    		<arg name="robot_pose" value="-x 2.5 -y 2.5 -z 0"/>
   	</include>
 
- 
- 	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot2"/>
-   		<arg name="robot_pose" value="-x -2.5 -y -2.5 -z 0"/>
-  	</include>
+ <!---->
+ 	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+   		<!--<arg name="robot_id" value="Robot2"/>-->
+   		<!--<arg name="robot_pose" value="-x -2.5 -y -2.5 -z 0"/>-->
+  	<!--</include>-->
 
 
-	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot3"/>
-   		<arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>
-  	</include>
+	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+   		<!--<arg name="robot_id" value="Robot3"/>-->
+   		<!--<arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>-->
+  	<!--</include>-->
 
-	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot4"/>
-   		<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>
-  	</include>
+	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+   		<!--<arg name="robot_id" value="Robot4"/>-->
+   		<!--<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>-->
+  	<!--</include>-->
 </launch>

@@ -4,11 +4,11 @@
   <arg name="algorithm" default="roomba"/> 
 
 
-  <arg name="base"  value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> 
+  <!--<arg name="base"  value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> -->
 
   <!--Robots -->
     <group ns="$(arg robot_id)">
-		<include file="$(find turtlebot_ds)/launch/includes/$(arg base).launch.xml">
+		<include file="$(find turtlebot_ds)/launch/includes/kobuki_ds.launch.xml">
 	    	<arg name="base" value="create"/>
 	    	<arg name="init_pose" value="$(arg robot_pose)" />
 	    	<arg name="robot_name"  value="$(arg robot_id)" />
