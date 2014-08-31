@@ -15,7 +15,7 @@ from roomba_sensor.geometric.vector import points_to_vector
 from roomba_sensor.sensor.sensor_camera import Camera
 
 
-GRAPHIC_DEBUG = False
+GRAPHIC_DEBUG = True
 
 
 def run():
@@ -135,10 +135,11 @@ def run():
             display.clear()
             display.draw_robot(robot_position[:2], robot_position[2])
 
-            for r, p in anomaly_polygons.items():
-                # poly = [(pol.x, pol.y) for pol in p]
-                # print p[1], p[2]
-                display.draw_polygon(p[0])
+            display.draw_path(am.polyline)
+            # for r, p in anomaly_polygons.items():
+            #     # poly = [(pol.x, pol.y) for pol in p]
+            #     print p[1], p[2]
+
 
             display.draw()
 

@@ -113,8 +113,7 @@ def run():
                 # elif vel.angular.z < - max_angle:
                 #     vel.angular.z = - max_angle
 
-                # print lin_vel,degrees(vel.angular.z)
-                print degrees(vel.angular.z), sensedValue, old_val
+                # print degrees(vel.angular.z), sensedValue, old_val
                 velPub.publish(vel)
 
                 old_val = sensedValue
