@@ -63,7 +63,7 @@ def run():
 
     # Create the Publisher to control the robot.
     topicName = "/" + robot_name + "/commands/velocity"
-    velPub = rospy.Publisher(topicName, Twist)
+    velPub = rospy.Publisher(topicName, Twist, queue_size=3)
 
     topicName = "/" + robot_name + "/goal"
     rospy.Subscriber(topicName, Point32, goal_callback, queue_size=1)
