@@ -15,7 +15,7 @@ goal.y = 0.0000001
 
 # state
 tracking = False
-
+new_tracking_msg = False
 # P Control constants for navigation
 p_linear = rospy.get_param('/p_control_linear', 0.5)
 p_angular = rospy.get_param('/p_control_angular', 1.0)
@@ -24,20 +24,21 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # PD Control for tracking
 # P = pi / 4
 # D = pi / 1
-P_TRACKING = pi / 1.5
-D_TRACKING = pi / 0.1
+P_TRACKING = 0.70
+D_TRACKING = 0.5
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
     global tracking
     global sensedValue
     global crf
+    global new_tracking_msg
 
     # sensed data
     sensedValue = sensedData.x
     crf = sensedData.y
     tracking = True
-    print "Tracking=", sensedValue, " force=", crf
+    new_tracking_msg = True
 
 
 def goal_callback(point):
@@ -45,11 +46,12 @@ def goal_callback(point):
     global tracking
     tracking = False
     goal = point
-    print "new goal ", [goal.x, goal.y]
 
 
 def run():
     global tracking
+    global new_tracking_msg
+
     # Node roomba navigation
     rospy.init_node('roomba_navigation')
 
@@ -62,7 +64,7 @@ def run():
 
     # Create the Publisher to control the robot.
     topicName = "/" + robot_name + "/commands/velocity"
-    velPub = rospy.Publisher(topicName, Twist, queue_size=3)
+    velPub = rospy.Publisher(topicName, Twist, queue_size=1)
 
     topicName = "/" + robot_name + "/goal"
     rospy.Subscriber(topicName, Point32, goal_callback, queue_size=1)
@@ -71,40 +73,51 @@ def run():
     topicName = "/" + robot_name + "/tracking"
     rospy.Subscriber(topicName, Point32, tracking_callback, queue_size=1)
 
-    ## Object to get information from Gazebo
+    # # Object to get information from Gazebo
     robot = RoombaLocalization(robot_name)
 
-    ######## Control Loop ###########
+    # ####### Control Loop ###########
     print "Start!"
     old_val = 0
     while not rospy.is_shutdown():
-        rospy.sleep(0.20)
+        rospy.sleep(0.1)
 
-        #if (traking is None):
-        #	continue
-        #TODO implement tracking in another module.
+        # if (traking is None):
+        # continue
+        # TODO implement tracking in another module.
         if tracking:
-            ###### Tracking ######
-            # Max speed for tracking.
-            lin_vel = 0.4
-            # if there is a robot to crash.
-            if crf > 0:
-                # input force crf: i = [0 , 1.2]
-                # output o = [0.4, 0]
-                # mappint i to o: x = (2 - i) * 0.4
-                cm = 4.5
-                lin_vel *= (cm - crf) / cm
+            if new_tracking_msg:
+                new_tracking_msg = False
 
-                if lin_vel < 0:
-                    lin_vel = 0
+                ###### Tracking ######
+                # Max speed for tracking.
+                lin_vel = 0.4
+                # if there is a robot to crash.
+                if crf > 0:
+                    # input force crf: i = [0 , 1.2]
+                    # output o = [0.4, 0]
+                    # mappint i to o: x = (2 - i) * 0.4
+                    cm = 4.5
+                    lin_vel *= (cm - crf) / cm
 
-            vel = Twist()
-            vel.linear.x = 0.3 * lin_vel
-            vel.angular.z = 0.5 * -(sensedValue * P_TRACKING + (sensedValue - old_val) * D_TRACKING)
+                    if lin_vel < 0:
+                        lin_vel = 0
 
-            velPub.publish(vel)
+                vel = Twist()
+                vel.linear.x = 0.3 * lin_vel
+                vel.angular.z = -(sensedValue * P_TRACKING + (sensedValue - old_val) * D_TRACKING)
 
-            old_val = sensedValue
+                # max_angle = pi / 3
+                # if vel.angular.z > max_angle:
+                #     vel.angular.z = max_angle
+                # elif vel.angular.z < - max_angle:
+                #     vel.angular.z = - max_angle
+
+                # print lin_vel,degrees(vel.angular.z)
+                print degrees(vel.angular.z), sensedValue, old_val
+                velPub.publish(vel)
+
+                old_val = sensedValue
 
         else:
             old_val = 0

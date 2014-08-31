@@ -6,10 +6,11 @@ import cv2 as cv
 from sensor_msgs.msg import Image
 
 threshold_value = 160
-threshold_other = 160
+threshold_other = 200
+
 
 class Camera(object):
-    def __init__(self, robotName):
+    def __init__(self, robot_name):
         self.rospy = rospy
         # Sensed value by the camera. How many pixes are
         # in the row divided by the pixes in the line.
@@ -20,7 +21,7 @@ class Camera(object):
         self.sensed_right = 0
 
         # Subscribe to the sensor topic
-        topic_name = "/" + robotName + "/front_cam/camera/image"
+        topic_name = "/" + robot_name + "/front_cam/camera/image"
         rospy.Subscriber(topic_name, Image, self.img_callback, queue_size=1)
 
 
@@ -31,11 +32,6 @@ class Camera(object):
         :param img: received image from local camera
         :return:
         """
-        # sensor_enabled = self.rospy.get_param('/sensor_enabled', True)
-        sensor_enabled = True
-        if not sensor_enabled:
-            return
-
         # OpenCV matrix
         mat = CvBridge().imgmsg_to_cv2(img, "rgb8")
 
@@ -46,7 +42,7 @@ class Camera(object):
         blue = split_image[2]  # Blue image
 
         # Take just a row/line of the image
-        line_index = -1
+        line_index = len(red) / 2
         red_line = red[line_index]
         green_line = green[line_index]
         blue_line = blue[line_index]
@@ -62,5 +58,7 @@ class Camera(object):
         self.sensed_left = sum(f[:half]) / (1.0 * len(f[:half]))
         self.sensed_right = sum(f[half + 1:]) / (1.0 * len(f[half + 1:]))
 
-        # print "s:", self.sensed_value, self.sensed_left, self.sensed_right
+        if self.sensed_left < self.sensed_right:
+            self.sensed_value = self.sensed_left
 
+        # print "s:", self.sensed_value, self.sensed_left, self.sensed_right

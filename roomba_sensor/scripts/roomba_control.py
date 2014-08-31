@@ -15,7 +15,7 @@ from roomba_sensor.geometric.vector import points_to_vector
 from roomba_sensor.sensor.sensor_camera import Camera
 
 
-GRAPHIC_DEBUG = True
+GRAPHIC_DEBUG = False
 
 
 def run():
@@ -46,7 +46,7 @@ def run():
         display = RobotDrawer()
 
     # #
-    ######## Control Loop ###################
+    # ####### Control Loop ###################
     while not rospy.is_shutdown():
         # Get robot position from gazebo
         robot_position = robot.get_position()
@@ -71,7 +71,7 @@ def run():
         # Particle filter: move the particles for simulating the anomaly's dynamics
         pf.move_particles()
 
-        #FIXME quiza esto deberia estar en otro lugar
+        # FIXME quiza esto deberia estar en otro lugar
         am.fix_polygon()
 
         # Particle filter: update based on sensor value and detected anomalies.
@@ -105,7 +105,10 @@ def run():
             am.fix_polygon()
 
             # Compute Proportional control for steering
-            control_p = (camera.sensed_left - 1) + camera.sensed_right
+            # control_p = (camera.sensed_left - 1) + camera.sensed_right
+
+            # Convert a value from [0, 1] to a value in the interval [-1, 1].
+            control_p = camera.sensed_value * 2 - 1
 
             # counter robot force.
             crf = 0
@@ -133,7 +136,9 @@ def run():
             display.draw_robot(robot_position[:2], robot_position[2])
 
             for r, p in anomaly_polygons.items():
-                display.draw_polygon(p)
+                # poly = [(pol.x, pol.y) for pol in p]
+                # print p[1], p[2]
+                display.draw_polygon(p[0])
 
             display.draw()
 
