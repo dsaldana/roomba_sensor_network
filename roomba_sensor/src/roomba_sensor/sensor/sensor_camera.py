@@ -5,6 +5,8 @@ import cv2 as cv
 
 from sensor_msgs.msg import Image
 
+threshold_value = 160
+threshold_other = 160
 
 class Camera(object):
     def __init__(self, robotName):
@@ -41,24 +43,6 @@ class Camera(object):
         red = split_image[0]  # Red image
         green = split_image[1]  # Green image
         blue = split_image[2]  # Blue image
-
-        # How many white pixels in the left and right
-        pl, pr = 0, 0
-
-        threshold_value = 160
-        threshold_other = 160
-
-        # Count the pixels in the middle row of the image.
-        # for i in [int(mat.rows / 2)]:
-        # for j in xrange(mat.cols / 2):
-        # if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[
-        # i, j] < threshold_other:
-        # pl = j
-        #
-        # for j in xrange(int(mat.cols / 2) + 1, mat.cols):
-        # if red_channel[i, j] > threshold_value and green_channel[i, j] < threshold_other and blue_channel[
-        # i, j] < threshold_other:
-        #             pr = j - int(mat.cols / 2)
 
         # Take just a row/line of the image
         line_index = -1

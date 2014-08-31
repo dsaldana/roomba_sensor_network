@@ -24,8 +24,8 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # PD Control for tracking
 # P = pi / 4
 # D = pi / 1
-P = pi / 2
-D = pi / 0.1
+P_TRACKING = pi / 1.5
+D_TRACKING = pi / 0.3
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
@@ -77,7 +77,7 @@ def run():
 
     ######## Control Loop ###########
     print "Start!"
-    old_val = -1
+    old_val = 0
     while not rospy.is_shutdown():
         rospy.sleep(0.20)
 
@@ -102,13 +102,14 @@ def run():
 
             vel = Twist()
             vel.linear.x = 0.3 * lin_vel
-            vel.angular.z = 0.5 * -(sensedValue * P + (sensedValue - old_val) * D)
+            vel.angular.z = 0.5 * -(sensedValue * P_TRACKING + (sensedValue - old_val) * D_TRACKING)
 
             velPub.publish(vel)
 
             old_val = sensedValue
 
         else:
+            old_val = 0
             ###### Navigation #####
             [sX, sY, sT] = robot.get_position()
             print "Navigating", [sX, sY, sT]
@@ -147,7 +148,7 @@ def run():
                 vel.angular.z *= -1
 
             # velocity range
-            linear_r = [0.02, 0.5]
+            linear_r = [0.02, 0.2]
             angular_r = [-pi, pi]
 
             if vel.linear.x > linear_r[1]:

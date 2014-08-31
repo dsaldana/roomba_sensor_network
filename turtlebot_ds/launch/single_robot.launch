@@ -14,13 +14,13 @@
 	    	<arg name="robot_name"  value="$(arg robot_id)" />
 		</include>
 
-	 	<!--<node pkg="roomba_sensor" type="$(arg algorithm)_control.py" name="rcontrol">-->
-			<!--<param name="robot_name" value="$(arg robot_id)"/>-->
-	  	<!--</node>-->
-		<!---->
-		<!--<node pkg="roomba_sensor" type="$(arg algorithm)_navigation.py" name="rnavigation">-->
-			<!--<param name="robot_name" value="$(arg robot_id)"/>-->
-	  	<!--</node>-->
+	 	<node pkg="roomba_sensor" type="$(arg algorithm)_control.py" name="rcontrol">
+			<param name="robot_name" value="$(arg robot_id)"/>
+	  	</node>
+
+		<node pkg="roomba_sensor" type="$(arg algorithm)_navigation.py" name="rnavigation">
+			<param name="robot_name" value="$(arg robot_id)"/>
+	  	</node>
 
   </group>
 
