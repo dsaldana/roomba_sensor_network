@@ -19,8 +19,9 @@ class Camera(object):
         # How many white pixels in the right
         self.sensed_right = 0
 
+        # Subscribe to the sensor topic
         topic_name = "/" + robotName + "/front_cam/camera/image"
-        image_sub = rospy.Subscriber(topic_name, Image, self.img_callback, queue_size=1)
+        rospy.Subscriber(topic_name, Image, self.img_callback, queue_size=1)
 
 
     def img_callback(self, img):
@@ -53,6 +54,7 @@ class Camera(object):
         # Take the left half of the line
         half = len(red_line) / 2
 
+        # Sensor function
         f = (red_line > threshold_value) * (green_line < threshold_other) * (blue_line < threshold_other)
 
         # normalized values
@@ -60,5 +62,5 @@ class Camera(object):
         self.sensed_left = sum(f[:half]) / (1.0 * len(f[:half]))
         self.sensed_right = sum(f[half + 1:]) / (1.0 * len(f[half + 1:]))
 
-        print "s:", self.sensed_value, self.sensed_left, self.sensed_right
+        # print "s:", self.sensed_value, self.sensed_left, self.sensed_right
 

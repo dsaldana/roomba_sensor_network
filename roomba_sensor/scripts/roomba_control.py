@@ -2,7 +2,6 @@
 
 # Numpy
 import math
-
 import rospy
 # Math
 from roomba_sensor.control.gradientdescent import GradientDescent
@@ -16,8 +15,11 @@ from roomba_sensor.geometric.vector import points_to_vector
 from roomba_sensor.sensor.sensor_camera import Camera
 
 
+GRAPHIC_DEBUG = True
+
+
 def run():
-    ######### Initialization ##################
+    # ######## Initialization ##################
     # Node roomba_control
     rospy.init_node('roomba_control')
 
@@ -31,16 +33,19 @@ def run():
     camera = Camera(robot_name)
     # Gradient descent
     planner = GradientDescent(robot_name)
-    ## Robot Localization
+    # # Robot Localization
     robot = RoombaLocalization(robot_name)
     # Path line in anomaly detection for each robot.
     am = AnomalyManager(robot_name)
-
-
     # Initialize Particles
     pf = ParticleFilter()
 
-    ##
+    if GRAPHIC_DEBUG:
+        from roomba_sensor.viewer.robotdrawer import RobotDrawer
+
+        display = RobotDrawer()
+
+    # #
     ######## Control Loop ###################
     while not rospy.is_shutdown():
         # Get robot position from gazebo
@@ -122,6 +127,16 @@ def run():
                         crf = rf
 
             communicator.publish_track(control_p, crf)
+
+        if GRAPHIC_DEBUG:
+            display.clear()
+            display.draw_robot(robot_position[:2], robot_position[2])
+
+            for r, p in anomaly_polygons.items():
+                display.draw_polygon(p)
+
+            display.draw()
+
         rospy.sleep(0.1)
 
 

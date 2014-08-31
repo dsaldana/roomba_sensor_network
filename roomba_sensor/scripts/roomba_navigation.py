@@ -25,11 +25,10 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # P = pi / 4
 # D = pi / 1
 P_TRACKING = pi / 1.5
-D_TRACKING = pi / 0.3
+D_TRACKING = pi / 0.1
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
-
     global tracking
     global sensedValue
     global crf
@@ -54,7 +53,7 @@ def run():
     # Node roomba navigation
     rospy.init_node('roomba_navigation')
 
-    ######### Initialization ##################
+    # ######## Initialization ##################
     # Robot's name is an argument
     global robot_name
     robot_name = rospy.get_param('~robot_name', 'Robot1')
@@ -98,7 +97,6 @@ def run():
 
                 if lin_vel < 0:
                     lin_vel = 0
-
 
             vel = Twist()
             vel.linear.x = 0.3 * lin_vel

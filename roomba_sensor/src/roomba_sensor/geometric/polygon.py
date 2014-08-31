@@ -109,7 +109,7 @@ def fuse_point_to_polygon(point, polygon):
     # print min_distance, min_index
     fused_polygon = polygon[min_index + 1:] + polygon[:min_index + 1] + [point]
     aa = identify_first_point_in_polygon(fused_polygon)
-    print "FUSING", aa
+    # print "FUSING", aa
 
     return fused_polygon
     # min_index + 2 works, the first point is deleted
@@ -203,7 +203,7 @@ def polygons_intersect(poly1, poly2):
     """
     pol1 = Polygon(poly1)
     pol2 = Polygon(poly2)
-    print "p1,p2=", poly1, ",", poly2
+    # print "p1,p2=", poly1, ",", poly2
     return pol1.intersection(pol2).area > 0
 
 
@@ -213,7 +213,7 @@ def fix_polygon(poly):
     :param poly:
     :return:
     """
-    print poly
+    # print poly
     if len(poly) <= 3:
         return poly
 
