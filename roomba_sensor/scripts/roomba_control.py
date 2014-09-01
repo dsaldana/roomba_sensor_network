@@ -59,7 +59,6 @@ def run():
         am.add_sensed_points(sensed_points)
         am.data_polygons = anomaly_polygons
 
-        # print am.anomaly_full, am.is_polygon_identified
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
@@ -68,22 +67,16 @@ def run():
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
-        # Particle filter: move the particles for simulating the anomaly's dynamics
+        ################# Particle Filter ###############
+        # Move the particles for simulating the anomaly's dynamics
         pf.move_particles()
-
-        # FIXME quiza esto deberia estar en otro lugar
-        am.fix_polygon()
-
-        # Particle filter: update based on sensor value and detected anomalies.
+        # Update based on sensor value and detected anomalies.
         pf.update_particles(sensed_points.values(), anomaly_polygons)
-
-        # Particle filter: Re-sampling.
+        # Re-sampling.
         pf.resample()
-
         # Publish particles
         communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
-        # print anomaly_polygons
         ######## Exploring #################
         if not am.sensed_anomaly:
             # Total force
@@ -94,19 +87,19 @@ def run():
             communicator.publish_goal(goal)
 
         else:
-            ####### Tracking ##########
+            ######### Tracking ############
+            # Fix the polygon if it is bad formed
+            # am.fix_polygon()
+
             # modify the polygon with sensed data and other robot's data
             am.modify_polygon()
 
             # close the polygon if necessary
             am.evaluate_anomaly_full()
 
-            #FIXME quiza esto deberia estar en otro lugar
-            am.fix_polygon()
-
-            # Compute Proportional control for steering
-            # control_p = (camera.sensed_left - 1) + camera.sensed_right
-
+            # am.fix_polygon()
+            print am.is_polygon_identified
+            # Compute Proportional control for steering.
             # Convert a value from [0, 1] to a value in the interval [-1, 1].
             control_p = camera.sensed_value * 2 - 1
 
@@ -128,7 +121,7 @@ def run():
                 if abs(theta - robot_t) < (math.pi / 3):
                     if rf > crf:
                         crf = rf
-
+            # Send control command
             communicator.publish_track(control_p, crf)
 
         if GRAPHIC_DEBUG:

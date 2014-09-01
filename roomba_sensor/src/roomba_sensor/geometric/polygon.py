@@ -1,4 +1,4 @@
-### Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
+# ## Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 
 from shapely.geometry import LineString, Point, LinearRing, Polygon
 
@@ -209,7 +209,7 @@ def polygons_intersect(poly1, poly2):
 
 def fix_polygon(poly):
     """
-    Fix if the polygon is bad formed.
+    Fix the polygon if it is bad formed.
     :param poly:
     :return:
     """
@@ -228,7 +228,7 @@ def fix_polygon(poly):
         l = LineString(poly[i:i + 2])
 
         if l.intersects(final_line):
-            poly1 = poly[:i ] + [poly[-1]]
+            poly1 = poly[:i] + [poly[-1]]
             return fix_polygon(poly1)
 
     return poly
