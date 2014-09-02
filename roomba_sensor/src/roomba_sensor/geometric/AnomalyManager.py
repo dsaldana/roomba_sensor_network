@@ -2,7 +2,7 @@ import rospy
 
 from roomba_sensor.geometric import polygon
 
-PERIMETER_PER_ROBOT = 0.1
+PERIMETER_PER_ROBOT = 10000.1
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -192,7 +192,7 @@ class AnomalyManager(object):
         Evaluate if the anomaly is full of robots. Report full if necessary.
         :return True if there is no space for mor robots
         """
-        return False
+        return True
         # No anomaly
         if not self.is_polygon_identified:
             return False

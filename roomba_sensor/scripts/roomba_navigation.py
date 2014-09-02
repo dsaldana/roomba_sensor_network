@@ -6,6 +6,7 @@ from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Point32
 
 from roomba_sensor.localization import RoombaLocalization
+from roomba_sensor.sensor.sensor_camera import Camera
 from roomba_sensor.util.angle import cut_angle
 
 
@@ -15,10 +16,11 @@ goal.y = 0.0000001
 
 # state
 tracking = False
-new_tracking_msg = False
+# new_tracking_msg = False
 # P Control constants for navigation
 p_linear = rospy.get_param('/p_control_linear', 0.5)
 p_angular = rospy.get_param('/p_control_angular', 1.0)
+
 
 
 # PD Control for tracking
@@ -30,15 +32,15 @@ D_TRACKING = 0.5
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
     global tracking
-    global sensedValue
+    # global sensedValue
     global crf
-    global new_tracking_msg
+    # global new_tracking_msg
 
     # sensed data
-    sensedValue = sensedData.x
+    # sensedValue = sensedData.x
     crf = sensedData.y
     tracking = True
-    new_tracking_msg = True
+    # new_tracking_msg = True
 
 
 def goal_callback(point):
@@ -50,7 +52,7 @@ def goal_callback(point):
 
 def run():
     global tracking
-    global new_tracking_msg
+    # global new_tracking_msg
 
     # Node roomba navigation
     rospy.init_node('roomba_navigation')
@@ -61,6 +63,8 @@ def run():
     robot_name = rospy.get_param('~robot_name', 'Robot1')
     simulated_robots = rospy.get_param('/simulated_robots', False)
 
+    # Camera
+    camera = Camera(robot_name)
 
     # Create the Publisher to control the robot.
     topicName = "/" + robot_name + "/commands/velocity"
@@ -86,41 +90,42 @@ def run():
         # continue
         # TODO implement tracking in another module.
         if tracking:
-            if new_tracking_msg:
-                new_tracking_msg = False
+            # if new_tracking_msg:
+            #     new_tracking_msg = False
 
-                ###### Tracking ######
-                # Max speed for tracking.
-                lin_vel = 0.4
-                # if there is a robot to crash.
-                if crf > 0:
-                    # input force crf: i = [0 , 1.2]
-                    # output o = [0.4, 0]
-                    # mappint i to o: x = (2 - i) * 0.4
-                    cm = 4.5
-                    lin_vel *= (cm - crf) / cm
+            # ##### Tracking ######
+            sensedValue = camera.sensed_value * 2 - 1
+            # Max speed for tracking.
+            lin_vel = 0.4
+            # if there is a robot to crash.
+            if crf > 0:
+                # input force crf: i = [0 , 1.2]
+                # output o = [0.4, 0]
+                # mappint i to o: x = (2 - i) * 0.4
+                cm = 4.5
+                lin_vel *= (cm - crf) / cm
 
-                    if lin_vel < 0:
-                        lin_vel = 0
+                if lin_vel < 0:
+                    lin_vel = 0
 
-                vel = Twist()
-                vel.linear.x = 0.3 * lin_vel
-                vel.angular.z = -(sensedValue * P_TRACKING + (sensedValue - old_val) * D_TRACKING)
+            vel = Twist()
+            vel.linear.x = 0.3 * lin_vel
+            vel.angular.z = -(sensedValue * P_TRACKING + (sensedValue - old_val) * D_TRACKING)
 
-                # max_angle = pi / 3
-                # if vel.angular.z > max_angle:
-                #     vel.angular.z = max_angle
-                # elif vel.angular.z < - max_angle:
-                #     vel.angular.z = - max_angle
+            # max_angle = pi / 3
+            # if vel.angular.z > max_angle:
+            #     vel.angular.z = max_angle
+            # elif vel.angular.z < - max_angle:
+            #     vel.angular.z = - max_angle
 
-                # print degrees(vel.angular.z), sensedValue, old_val
-                velPub.publish(vel)
+            # print degrees(vel.angular.z), sensedValue, old_val
+            velPub.publish(vel)
 
-                old_val = sensedValue
+            old_val = sensedValue
 
         else:
             old_val = 0
-            ###### Navigation #####
+            # ##### Navigation #####
             [sX, sY, sT] = robot.get_position()
             print "Navigating", [sX, sY, sT]
 

@@ -32,6 +32,9 @@ class Drawer(object):
         self.window = pygame.display.set_mode((width, height), HWSURFACE | DOUBLEBUF | RESIZABLE)
         self.update_constants()
 
+    def set_title(self, title):
+        pygame.display.set_caption(title)
+
     def _convert_axis_p(self, p):
         x2, y2 = self._convert_axis(p[0], p[1])
         return [x2, y2]

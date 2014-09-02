@@ -44,6 +44,7 @@ def run():
         from roomba_sensor.viewer.robotdrawer import RobotDrawer
 
         display = RobotDrawer()
+        display.set_title(robot_name)
 
     # #
     # ####### Control Loop ###################
@@ -67,7 +68,7 @@ def run():
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
-        ################# Particle Filter ###############
+        # ################ Particle Filter ###############
         # Move the particles for simulating the anomaly's dynamics
         pf.move_particles()
         # Update based on sensor value and detected anomalies.
@@ -77,7 +78,7 @@ def run():
         # Publish particles
         communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
-        ######## Exploring #################
+        # ####### Exploring #################
         if not am.sensed_anomaly:
             # Total force
             total_force = planner.compute_forces(pf, robot_x, robot_y, communicator.robot_msgs.values())
@@ -128,12 +129,18 @@ def run():
             display.clear()
             display.draw_robot(robot_position[:2], robot_position[2])
 
+            # Draw polygon
             if am.is_polygon_identified:
-                display.draw_polygon(am.polyline)
+                display.draw_polygon(am.polyline, stroke=0, color=(0, 0, 180, 50))
+
+            # Draw polyline
             display.draw_path(am.polyline)
-            # for r, p in anomaly_polygons.items():
-            #     # poly = [(pol.x, pol.y) for pol in p]
-            #     print p[1], p[2]
+            # Particles
+            for p in pf.particles:
+                display.draw_circle((p.x, p.y), radio=0.04, color=(0,150,0))
+
+            for r, p in anomaly_polygons.items():
+                display.draw_polygon(p[0], stroke=2, color=(0, 180, 180, 50))
 
 
             display.draw()
