@@ -1,4 +1,3 @@
-
 import rospy
 
 from roomba_sensor.geometric.vector import points_to_vector, vector_components
@@ -11,7 +10,6 @@ class GradientDescent(object):
 
     def __init__(self, robot_name):
         self.robot_name = robot_name
-        self.cents = None
         self.k_skip = -1
         self.idx = None
 
@@ -45,16 +43,16 @@ class GradientDescent(object):
             fx += x
             fy += y
 
-        ## Vector from robot to other robots
+        # # Vector from robot to other robots
 
         for r in robots:
             if r.robot_id == self.robot_name:
                 continue
             # force from other robot to our robot
-            d, theta = points_to_vector([r.rx, r.ry],[robot_x, robot_y])
+            d, theta = points_to_vector([r.rx, r.ry], [robot_x, robot_y])
 
             # Constant of proportionality
-            k = self._F_ROBOTS * (len(pf.particles) / len(self.cents))
+            k = self._F_ROBOTS * len(pf.particles) / d
             # Force, Coulombs law. Charge per particle
             fm = k / (d ** 2)
 

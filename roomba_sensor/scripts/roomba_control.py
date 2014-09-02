@@ -128,6 +128,8 @@ def run():
             display.clear()
             display.draw_robot(robot_position[:2], robot_position[2])
 
+            if am.is_polygon_identified:
+                display.draw_polygon(am.polyline)
             display.draw_path(am.polyline)
             # for r, p in anomaly_polygons.items():
             #     # poly = [(pol.x, pol.y) for pol in p]

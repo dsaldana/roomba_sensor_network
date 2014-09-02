@@ -117,11 +117,12 @@ class AnomalyManager(object):
 
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
+            self.is_polygon_identified = polyline_closes
         #     if len(self.polyline[first_point:]) < 3:
         #         self.is_polygon_identified = False
         # else:
             ## Check if the main_line closes to create a polygon
-            self.is_polygon_identified = polyline_closes
+
 
         ## if the own polygon is closed, modify it
         if self.is_polygon_identified:
@@ -132,36 +133,36 @@ class AnomalyManager(object):
 
             if self.polygon_time is None:
                 self.polygon_time = rospy.get_rostime()
-        # else:
-        #     ## near to other polygon?
-        #     for id_robot, pol_data in self.data_polygons.items():
-        #         # same robot or anomaly is full.
-        #         if self._id_robot == id_robot or pol_data[1]:
-        #             continue
-        #
-        #         last_location = self.robot_location
-        #         distance = polygon.distance_point_to_polygon(last_location, pol_data[0])
-        #
-        #         if distance < MIN_DISTANCE_POLYGON:
-        #             self.polyline = polygon.fuse_point_to_polygon(last_location, pol_data[0])
-        #             self.is_polygon_identified = True
-        #             self.polygon_time = rospy.get_rostime()
-        #             break
+        else:
+            ## near to other polygon?
+            for id_robot, pol_data in self.data_polygons.items():
+                # same robot or anomaly is full.
+                if self._id_robot == id_robot or pol_data[1]:
+                    continue
 
-                    # todo if there is not a near polygon, try with segment
-                    # if not self.closed_polygon:
-                    #     # Other robots
-                    #     robots_anomaly = []
-                    #     ## Check if other lines are near to fuse
-                    #     for robot_i, line in self._anomaly_lines.iteritems():
-                    #         ### try to fuse
-                    #         fused_line = polygon.lines_fusion(self.polyline, line)
-                    #         # if it was fused
-                    #         if self.polyline != fused_line:
-                    #             robots_anomaly.append(robot_i)
-                    #             self.polyline = fused_line
-                    #             self._anomaly_lines[robot_i] = fused_line
-                    #             break
+                last_location = self.robot_location
+                distance = polygon.distance_point_to_polygon(last_location, pol_data[0])
+
+                if distance < MIN_DISTANCE_POLYGON:
+                    self.polyline = polygon.fuse_point_to_polygon(last_location, pol_data[0])
+                    self.is_polygon_identified = True
+                    self.polygon_time = rospy.get_rostime()
+                    break
+
+            # todo if there is not a near polygon, try with segment
+            # if not self.closed_polygon:
+            #     # Other robots
+            #     robots_anomaly = []
+            #     ## Check if other lines are near to fuse
+            #     for robot_i, line in self._anomaly_lines.iteritems():
+            #         ### try to fuse
+            #         fused_line = polygon.lines_fusion(self.polyline, line)
+            #         # if it was fused
+            #         if self.polyline != fused_line:
+            #             robots_anomaly.append(robot_i)
+            #             self.polyline = fused_line
+            #             self._anomaly_lines[robot_i] = fused_line
+            #             break
 
     def _in_wrong_polygon(self):
         """
@@ -191,6 +192,7 @@ class AnomalyManager(object):
         Evaluate if the anomaly is full of robots. Report full if necessary.
         :return True if there is no space for mor robots
         """
+        return False
         # No anomaly
         if not self.is_polygon_identified:
             return False
