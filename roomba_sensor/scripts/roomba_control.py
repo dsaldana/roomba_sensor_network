@@ -68,7 +68,7 @@ def run():
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
-                                           polygon=am.polyline, closed_anomaly=am.anomaly_full, time_of_detection=0)
+                                           polygon=am.get_simplyfied_polygon(), closed_anomaly=am.anomaly_full, time_of_detection=0)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
