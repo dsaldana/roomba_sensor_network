@@ -68,7 +68,8 @@ def run():
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
-                                           polygon=am.get_simplyfied_polygon(), closed_anomaly=am.anomaly_full, time_of_detection=0)
+                                           polygon=am.get_simplyfied_polygon(), closed_anomaly=am.anomaly_full,
+                                           time_of_detection=0)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
@@ -82,6 +83,7 @@ def run():
         # Publish particles
         communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
+        print "sensed anomaly: ", am.sensed_anomaly, camera.sensed_value > 0
         # ####### Exploring #################
         if not am.sensed_anomaly:
             # Total force
@@ -93,16 +95,12 @@ def run():
 
         else:
             # ######## Tracking ############
-            # Fix the polygon if it is bad formed
-            # am.fix_polygon()
-
             # modify the polygon with sensed data and other robot's data
             am.modify_polygon(sensed_xy)
 
             # close the polygon if necessary
             am.evaluate_anomaly_full()
 
-            # am.fix_polygon()
             # Compute Proportional control for steering.
             # Convert a value from [0, 1] to a value in the interval [-1, 1].
             control_p = camera.sensed_value * 2 - 1
@@ -148,7 +146,7 @@ def run():
 
             display.draw()
 
-        rospy.sleep(0.1)
+        rospy.sleep(0.3)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ import rospy
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 1.1
+PERIMETER_PER_ROBOT = 3.1
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -41,13 +41,15 @@ class AnomalyManager(object):
     def add_local_sensed_point(self, sensed_value, sensed_position):
         """
         register the last sensed point for our robot.
-        :param sensed_value:
-        :param sensed_position:
+        :param sensed_value: value between 0 and 1.
+        :param sensed_position: (x, y)
         """
         # Wrong polygon? and update the timeout.
         self._process_sensed_value(sensed_value, sensed_position)
 
-        self.polyline.append((sensed_position[0], sensed_position[1]))
+        if sensed_value > 0:
+            self.polyline.append((sensed_position[0], sensed_position[1]))
+
         # ## Simplify polyline.
         # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
 
@@ -94,7 +96,7 @@ class AnomalyManager(object):
             if self._in_wrong_polygon(sensed_position):
                 # Treat this case as a non detection.
                 sensed_val = 0.0
-                return self._process_sensed_value(sensed_val)
+                return self._process_sensed_value(sensed_val, sensed_position)
             else:
                 self.sensed_anomaly = True
                 self._last_time_anomaly = rospy.get_rostime().secs
@@ -105,7 +107,7 @@ class AnomalyManager(object):
                 self.polyline = []
                 self.polygon_time = None
                 self.is_polygon_identified = False
-                print "Timeout, polygon lost."
+                # print "Timeout, polygon lost."
 
     def modify_polygon(self, sensed_location):
         """
@@ -124,7 +126,7 @@ class AnomalyManager(object):
             # if len(self.polyline[first_point:]) < 3:
             # self.is_polygon_identified = False
             # else:
-            ## Check if the main_line closes to create a polygon
+            # # Check if the main_line closes to create a polygon
 
 
         # # if the own polygon is closed, modify it
@@ -154,16 +156,20 @@ class AnomalyManager(object):
             print "not near polygon"
             # if there is not a near polygon, try with near segments
             if not self.is_polygon_identified:
-                ## Check if other lines are near to fuse
+                # # Check if other lines are near to fuse
                 for robot_i, line in self._anomaly_lines.iteritems():
 
-                    ### try to fuse the line segment
-                    fused_line = polygon.lines_fusion(self.polyline, line)
+                    try:
+                        ### try to fuse the line segment
+                        fused_line = polygon.lines_fusion(self.polyline, line)
 
-                    print "fused line: ", polyline_length(fused_line) > polyline_length(self.polyline)
-                    # if it was fused
-                    if polyline_length(fused_line) > polyline_length(self.polyline):
-                        self.polyline = fused_line
+                        # print "fused line: ", polyline_length(fused_line) > polyline_length(self.polyline)
+                        # if it was fused
+                        if polyline_length(fused_line) > polyline_length(self.polyline):
+                            self.polyline = fused_line
+
+                    except:
+                        print "Error fusing lines"
 
 
     def _in_wrong_polygon(self, sensed_location):

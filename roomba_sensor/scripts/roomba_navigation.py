@@ -90,6 +90,9 @@ def run():
         # continue
         # TODO implement tracking in another module.
         if tracking:
+        # if True:
+        #     crf = 0
+
             # if new_tracking_msg:
             # new_tracking_msg = False
 
@@ -102,11 +105,15 @@ def run():
                 # input force crf: i = [0 , 1.2]
                 # output o = [0.4, 0]
                 # mappint i to o: x = (2 - i) * 0.4
-                cm = 4.5
+                cm = 1.5
                 lin_vel *= (cm - crf) / cm
 
                 if lin_vel < 0:
                     lin_vel = 0
+
+            # print camera.sensed_value
+            if camera.sensed_value > 0.7:
+                lin_vel = 0
 
             vel = Twist()
             vel.linear.x = 0.3 * lin_vel
@@ -119,6 +126,7 @@ def run():
             #     vel.angular.z = - max_angle
 
             # print degrees(vel.angular.z), sensedValue, old_val
+
             velPub.publish(vel)
 
             old_val = sensedValue
@@ -127,7 +135,7 @@ def run():
             old_val = 0
             # ##### Navigation #####
             [sX, sY, sT] = robot.get_position()
-            print "Navigating", [sX, sY, sT]
+            # print "Navigating", [sX, sY, sT]
 
             # Orientation
             x = goal.x - sX
