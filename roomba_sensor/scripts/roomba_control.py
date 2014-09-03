@@ -51,14 +51,18 @@ def run():
     while not rospy.is_shutdown():
         # Get robot position from gazebo
         robot_position = robot.get_position()
+        sensed_xy = robot.get_sensor_position()[:2]
 
         [robot_x, robot_y, robot_t] = robot_position
 
         # Read all messages from other robots.
         orobots, sensed_points, anomaly_polygons = communicator.read_inbox()
 
+        # Anomaly manager process sensed point
+        am.add_local_sensed_point(camera.sensed_value, sensed_xy)
         am.add_sensed_points(sensed_points)
         am.data_polygons = anomaly_polygons
+
 
         # Send the info to other robots.
         if am.is_polygon_identified:
@@ -88,12 +92,12 @@ def run():
             communicator.publish_goal(goal)
 
         else:
-            ######### Tracking ############
+            # ######## Tracking ############
             # Fix the polygon if it is bad formed
             # am.fix_polygon()
 
             # modify the polygon with sensed data and other robot's data
-            am.modify_polygon()
+            am.modify_polygon(sensed_xy)
 
             # close the polygon if necessary
             am.evaluate_anomaly_full()
@@ -127,17 +131,16 @@ def run():
         if GRAPHIC_DEBUG:
             display.clear()
 
-             # Draw polygon
+            # Draw polygon
             if am.is_polygon_identified:
                 display.draw_polygon(am.polyline, stroke=0, color=(0, 0, 180, 50))
 
             # Particles
             for p in pf.particles:
-                display.draw_circle((p.x, p.y), radio=0.04, color=(0,150,0))
+                display.draw_circle((p.x, p.y), radio=0.04, color=(0, 150, 0))
 
             for r, p in anomaly_polygons.items():
                 display.draw_polygon(p[0], stroke=2, color=(0, 180, 180, 50))
-
 
             display.draw_robot(robot_position[:2], robot_position[2])
             # Draw polyline

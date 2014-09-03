@@ -1,5 +1,9 @@
 
 
+roslaunch turtlebot_ds roomba_simulation.launch
+
+
+
 ## Test control
 rosnode kill /Robot1/rcontrol
 rosrun roomba_sensor roomba_control.py

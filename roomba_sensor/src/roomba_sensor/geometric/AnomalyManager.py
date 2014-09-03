@@ -36,63 +36,65 @@ class AnomalyManager(object):
         self._last_time_anomaly = 0
         # polygons: detected anomalies {id_robot:[polygon, closed, time]}
         self.data_polygons = {}
-        self.robot_location = None
+
+
+    def add_local_sensed_point(self, sensed_value, sensed_position):
+        """
+        register the last sensed point for our robot.
+        :param sensed_value:
+        :param sensed_position:
+        """
+        # Wrong polygon? and update the timeout.
+        self._process_sensed_value(sensed_value, sensed_position)
+
+        self.polyline.append((sensed_position[0], sensed_position[1]))
+        # ## Simplify polyline.
+        # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
 
     def add_sensed_points(self, sensed_points):
         """
-        Add a new anomaly point to the main_line or to
-        the anomaly lines for all robots.
+        Feed polyline for all the other robots.
         :param sensed_points: position and value for each sensed point {id_robot :[x, y, th, value]}
         """
-        # register the last sensed point for our robot.
-        if self._id_robot in sensed_points:
-            # Wrong polygon? and update the timeout.
-            self._process_sensed_value(sensed_points[self._id_robot])
-
         # read each sensed point
         for robot_id, sensed_point in sensed_points.items():
-            point = (sensed_point[0], sensed_point[1])
             if robot_id == self._id_robot:
-                self.polyline.append(point)
+                continue
 
-                # ## Simplify polyline.
-                # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
-                return
+            point = (sensed_point[0], sensed_point[1])
 
             # if not sensed an anomaly
             if not sensed_point[3] > 0:
                 continue
 
-            # Add line to other robots
+            # if polyline for robot i was not created.
             if robot_id not in self._anomaly_lines:
                 self._anomaly_lines[robot_id] = []
 
+            # Add line to other robots
             self._anomaly_lines[robot_id].append(point)
 
             # Simplify
             # if len(self._anomaly_lines) > 3:
-            #     self._anomaly_lines[robot_id] = polygon.simplify_polyline(self._anomaly_lines[robot_id],_SIMPLIFY_TH)
+            # self._anomaly_lines[robot_id] = polygon.simplify_polyline(self._anomaly_lines[robot_id],_SIMPLIFY_TH)
 
-    def _process_sensed_value(self, sensed):
+    def _process_sensed_value(self, sensed_val, sensed_position):
         """
         Evaluates if the detected anomaly is in a wrong polygon.
         Also maintains the timeout for tracking the anomaly.
 
         :param sensed [x, y, th, value]
         """
-        # # Extract robot location
-        self.robot_location = (sensed[0], sensed[1])
 
-        #### Evaluate Sensed value
+        # ### Evaluate Sensed value
         # The flag for exploring change only if  the robot does not
         # sense an anomaly in a n seconds (n = max_tracking_time).
-        if sensed[3] > 0:
+        if sensed_val > 0:
             # if the sensed value is in a closed polygon, , there is no sensed anomaly
-            if self._in_wrong_polygon():
-                new_sensed = sensed[:]
+            if self._in_wrong_polygon(sensed_position):
                 # Treat this case as a non detection.
-                new_sensed[3] = 0.0
-                return self._process_sensed_value(new_sensed)
+                sensed_val = 0.0
+                return self._process_sensed_value(sensed_val)
             else:
                 self.sensed_anomaly = True
                 self._last_time_anomaly = rospy.get_rostime().secs
@@ -105,7 +107,7 @@ class AnomalyManager(object):
                 self.is_polygon_identified = False
                 print "Timeout, polygon lost."
 
-    def modify_polygon(self):
+    def modify_polygon(self, sensed_location):
         """
         Modify the polygon of the anomaly.
         1. if it has its own polygon, modify it adding the new point.
@@ -119,13 +121,13 @@ class AnomalyManager(object):
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
             self.is_polygon_identified = polyline_closes
-            #     if len(self.polyline[first_point:]) < 3:
-            #         self.is_polygon_identified = False
+            # if len(self.polyline[first_point:]) < 3:
+            # self.is_polygon_identified = False
             # else:
             ## Check if the main_line closes to create a polygon
 
 
-        ## if the own polygon is closed, modify it
+        # # if the own polygon is closed, modify it
         if self.is_polygon_identified:
             # modify the polygon
             # FIXME only area at left
@@ -135,17 +137,16 @@ class AnomalyManager(object):
             if self.polygon_time is None:
                 self.polygon_time = rospy.get_rostime()
         else:
-            ## near to other polygon?
+            # # near to other polygon?
             for id_robot, pol_data in self.data_polygons.items():
                 # same robot or anomaly is full.
                 if self._id_robot == id_robot or pol_data[1]:
                     continue
 
-                last_location = self.robot_location
-                distance = polygon.distance_point_to_polygon(last_location, pol_data[0])
+                distance = polygon.distance_point_to_polygon(sensed_location, pol_data[0])
 
                 if distance < MIN_DISTANCE_POLYGON:
-                    self.polyline = polygon.fuse_point_to_polygon(last_location, pol_data[0])
+                    self.polyline = polygon.fuse_point_to_polygon(sensed_location, pol_data[0])
                     self.is_polygon_identified = True
                     self.polygon_time = rospy.get_rostime()
                     break
@@ -155,9 +156,6 @@ class AnomalyManager(object):
             if not self.is_polygon_identified:
                 ## Check if other lines are near to fuse
                 for robot_i, line in self._anomaly_lines.iteritems():
-                    # own polyline
-                    if self._id_robot == robot_i:
-                        continue
 
                     ### try to fuse the line segment
                     fused_line = polygon.lines_fusion(self.polyline, line)
@@ -168,13 +166,11 @@ class AnomalyManager(object):
                         self.polyline = fused_line
 
 
-    def _in_wrong_polygon(self):
+    def _in_wrong_polygon(self, sensed_location):
         """
         Evaluate if the robot is in a wrong polygon.
 
         """
-        robot_location = self.robot_location
-
         for id_robot, pol_data in self.data_polygons.items():
             if id_robot == self._id_robot:
                 continue
@@ -182,12 +178,12 @@ class AnomalyManager(object):
             # 1 for closed, [polygon, closed, time]
             if pol_data[1]:
                 # Evaluate if the robot is near to a wrong polygon
-                in_polygon = polygon.point_in_polygon(robot_location, pol_data[0])
+                in_polygon = polygon.point_in_polygon(sensed_location, pol_data[0])
 
                 if in_polygon:
                     return True
 
-                near_polygon = polygon.distance_point_to_polygon(robot_location, pol_data[0]) < MIN_DISTANCE_POLYGON
+                near_polygon = polygon.distance_point_to_polygon(sensed_location, pol_data[0]) < MIN_DISTANCE_POLYGON
                 if near_polygon:
                     return True
 
@@ -216,7 +212,6 @@ class AnomalyManager(object):
             except:
                 print "Error in compute intersection, to evaluete if anomaly is full"
 
-
         perimeter = polygon.polygon_perimeter(self.polyline)
 
         # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
@@ -235,3 +230,5 @@ class AnomalyManager(object):
 
     def get_simplyfied_polygon(self):
         return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+
+

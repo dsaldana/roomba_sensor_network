@@ -111,6 +111,7 @@ def fuse_point_to_polygon(point, polygon):
     aa = identify_first_point_in_polygon(fused_polygon)
     # print "FUSING", aa
 
+    print point, polygon, fused_polygon
     return fused_polygon
     # min_index + 2 works, the first point is deleted
     # return polygon[min_index + 1:] + [point]

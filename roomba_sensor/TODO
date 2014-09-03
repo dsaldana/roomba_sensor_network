@@ -1,13 +1,14 @@
 
 
-* Robot2 not sensing
-*
+
+* first point of the anomaly is far away
 
 
 
 
 
 [FIXED]
+* Robot2 not sensing
 * robots están entrando en la anomalía muy rápido
 * calcular el perímetro del polígono.
 * Crear un particle_drawer para meter en el robot y modificar facilmente.
