@@ -27,7 +27,7 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # P = pi / 4
 # D = pi / 1
 P_TRACKING = 0.70
-D_TRACKING = 0.5
+D_TRACKING = 0.8
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
@@ -91,7 +91,7 @@ def run():
         # TODO implement tracking in another module.
         if tracking:
             # if new_tracking_msg:
-            #     new_tracking_msg = False
+            # new_tracking_msg = False
 
             # ##### Tracking ######
             sensedValue = camera.sensed_value * 2 - 1
@@ -149,11 +149,11 @@ def run():
             # Euclidean distance
             d = sqrt(x * x + y * y)
 
-            print  "distance=", d, " teta: ", degrees(controlT)
+            # print "distance=", d, " teta: ", degrees(controlT)
 
             vel = Twist()
             # for rial robot: vel.linear.x = 0.5 * d
-            ### P Control ###
+            # ## P Control ###
 
             vel.linear.x = p_linear * d
             vel.angular.z = p_angular * controlT
@@ -162,8 +162,8 @@ def run():
             if not simulated_robots:
                 vel.angular.z *= -1
 
-            # velocity range
-            linear_r = [0.02, 0.2]
+            # velocity range [min, max]
+            linear_r = [0.02, 0.4]
             angular_r = [-pi, pi]
 
             if vel.linear.x > linear_r[1]:

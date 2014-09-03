@@ -1,8 +1,9 @@
 import rospy
 
 from roomba_sensor.geometric import polygon
+from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 10000.1
+PERIMETER_PER_ROBOT = 1.1
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -58,7 +59,7 @@ class AnomalyManager(object):
                 # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
                 return
 
-            #if not sensed an anomaly
+            # if not sensed an anomaly
             if not sensed_point[3] > 0:
                 continue
 
@@ -79,7 +80,7 @@ class AnomalyManager(object):
 
         :param sensed [x, y, th, value]
         """
-        ## Extract robot location
+        # # Extract robot location
         self.robot_location = (sensed[0], sensed[1])
 
         #### Evaluate Sensed value
@@ -111,16 +112,16 @@ class AnomalyManager(object):
         2. else, find a polygon near by other robot, own it, and modify with (1).
         :return True if the data gives a polygon.
         """
-        ## Check if main_line closes
+        # # Check if main_line closes
         first_point = polygon.identify_first_point_in_polygon(self.polyline, ddd=MIN_DISTANCE_POLYGON)
         polyline_closes = first_point >= 0
 
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
             self.is_polygon_identified = polyline_closes
-        #     if len(self.polyline[first_point:]) < 3:
-        #         self.is_polygon_identified = False
-        # else:
+            #     if len(self.polyline[first_point:]) < 3:
+            #         self.is_polygon_identified = False
+            # else:
             ## Check if the main_line closes to create a polygon
 
 
@@ -149,20 +150,23 @@ class AnomalyManager(object):
                     self.polygon_time = rospy.get_rostime()
                     break
 
-            # todo if there is not a near polygon, try with segment
-            # if not self.closed_polygon:
-            #     # Other robots
-            #     robots_anomaly = []
-            #     ## Check if other lines are near to fuse
-            #     for robot_i, line in self._anomaly_lines.iteritems():
-            #         ### try to fuse
-            #         fused_line = polygon.lines_fusion(self.polyline, line)
-            #         # if it was fused
-            #         if self.polyline != fused_line:
-            #             robots_anomaly.append(robot_i)
-            #             self.polyline = fused_line
-            #             self._anomaly_lines[robot_i] = fused_line
-            #             break
+            print "not near polygon"
+            # if there is not a near polygon, try with near segments
+            if not self.is_polygon_identified:
+                ## Check if other lines are near to fuse
+                for robot_i, line in self._anomaly_lines.iteritems():
+                    # own polyline
+                    if self._id_robot == robot_i:
+                        continue
+
+                    ### try to fuse the line segment
+                    fused_line = polygon.lines_fusion(self.polyline, line)
+
+                    print "fused line: ", polyline_length(fused_line) > polyline_length(self.polyline)
+                    # if it was fused
+                    if polyline_length(fused_line) > polyline_length(self.polyline):
+                        self.polyline = fused_line
+
 
     def _in_wrong_polygon(self):
         """
@@ -204,17 +208,21 @@ class AnomalyManager(object):
             if id_robot == self._id_robot:
                 continue
             # pol_data = [polygon, closed, time]
-            intersect = polygon.polygons_intersect(self.polyline, pol_data[0])
+            try:
+                intersect = polygon.polygons_intersect(self.polyline, pol_data[0])
 
-            if intersect:
-                n_in_anomaly += 1
+                if intersect:
+                    n_in_anomaly += 1
+            except:
+                print "Error in compute intersection, to evaluete if anomaly is full"
+
 
         perimeter = polygon.polygon_perimeter(self.polyline)
 
         # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
         self.anomaly_full = perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
 
-        ## should I go out of the full anomaly?
+        # # should I go out of the full anomaly?
 
     def fix_polygon(self):
         """

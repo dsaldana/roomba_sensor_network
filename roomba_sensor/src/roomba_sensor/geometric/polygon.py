@@ -66,7 +66,7 @@ def identify_first_point_in_polygon(points, ddd=0.5):
     # Distance between last point and a line segment
     distance_point_line = 2 * ddd
 
-    while not (distance_point_line < ddd and line_perimeter(points[first_point:]) > 2):
+    while not (distance_point_line < ddd and polyline_length(points[first_point:]) > 2):
         # next segment
         first_point -= 1
 
@@ -116,7 +116,7 @@ def fuse_point_to_polygon(point, polygon):
     # return polygon[min_index + 1:] + [point]
 
 
-def line_perimeter(points):
+def polyline_length(points):
     """
     Perimeter delimited by a polygon defined by a set of points.
     :param points: points are tuples of floats.

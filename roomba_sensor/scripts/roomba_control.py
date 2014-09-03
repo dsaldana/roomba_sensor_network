@@ -99,7 +99,6 @@ def run():
             am.evaluate_anomaly_full()
 
             # am.fix_polygon()
-            print am.is_polygon_identified
             # Compute Proportional control for steering.
             # Convert a value from [0, 1] to a value in the interval [-1, 1].
             control_p = camera.sensed_value * 2 - 1

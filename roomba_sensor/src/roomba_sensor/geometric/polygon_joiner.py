@@ -4,7 +4,7 @@ from roomba_sensor.geometric import polygon
 
 
 class PolygonJoiner(object):
-    def __init__(self,robot_name, data_polygons):
+    def __init__(self, robot_name, data_polygons):
         self.robot_name = robot_name
         self.open_area = Polygon()
         self.full_area = Polygon()

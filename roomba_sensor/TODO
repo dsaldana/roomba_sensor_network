@@ -1,13 +1,17 @@
 
-* Crear un particle_drawer para meter en el robot y modificar facilmente.
-* La anomalia se esta perdiendo despues de indentificada.
+
+* Robot2 not sensing
+*
 
 
-* meter los calculos en el controlador del robot.
-* borrar puntos innecesarios
 
-* mensaje polygon, con estado de cerrado o abierto.
+
 
 [FIXED]
 * robots están entrando en la anomalía muy rápido
 * calcular el perímetro del polígono.
+* Crear un particle_drawer para meter en el robot y modificar facilmente.
+* mensaje polygon, con estado de cerrado o abierto.
+* borrar puntos innecesarios
+* meter los calculos en el controlador del robot.
+* La anomalia se esta perdiendo despues de indentificada.
