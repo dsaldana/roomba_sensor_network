@@ -38,7 +38,7 @@ def run():
     # Path line in anomaly detection for each robot.
     am = AnomalyManager(robot_name)
     # Initialize Particles
-    pf = ParticleFilter()
+    pf = ParticleFilter(robot_name)
 
     if GRAPHIC_DEBUG:
         from roomba_sensor.viewer.robotdrawer import RobotDrawer
@@ -127,14 +127,11 @@ def run():
 
         if GRAPHIC_DEBUG:
             display.clear()
-            display.draw_robot(robot_position[:2], robot_position[2])
 
-            # Draw polygon
+             # Draw polygon
             if am.is_polygon_identified:
                 display.draw_polygon(am.polyline, stroke=0, color=(0, 0, 180, 50))
 
-            # Draw polyline
-            display.draw_path(am.polyline)
             # Particles
             for p in pf.particles:
                 display.draw_circle((p.x, p.y), radio=0.04, color=(0,150,0))
@@ -142,6 +139,10 @@ def run():
             for r, p in anomaly_polygons.items():
                 display.draw_polygon(p[0], stroke=2, color=(0, 180, 180, 50))
 
+
+            display.draw_robot(robot_position[:2], robot_position[2])
+            # Draw polyline
+            display.draw_path(am.polyline)
 
             display.draw()
 

@@ -4,7 +4,7 @@ import rospy
 import gazebo_msgs.srv
 from tf.transformations import euler_from_quaternion
 #from tf2_msgs.msg import TFMessage
-from ar_track_alvar.msg import AlvarMarkers
+
 
 from math import *
 from roomba_sensor.util.angle import cut_angle
@@ -87,13 +87,14 @@ class RoombaGazebo:
         return [camX, camY, robotT]
 
 
-from ar_track_alvar.msg import AlvarMarkers
+
 
 
 class ArLocator:
     poses = {}
 
     def __init__(self):
+        from ar_track_alvar.msg import AlvarMarkers
         self.load()
 
     def load(self):

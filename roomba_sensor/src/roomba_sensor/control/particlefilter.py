@@ -28,7 +28,10 @@ class ParticleFilter:
     _WEIGHT_OUT_OF_MAP = 0.01
     _WEIGHT_SENSED_ZERO = 0.1
 
-    def __init__(self):
+    def __init__(self, robot_name):
+
+        self.robot_name = robot_name
+
         # real robots has a different behaviour (it can be fixed).
         if not self.simulated_robots:
             self._WEIGHT_TRACKING_LEFT = 0.01
@@ -91,7 +94,7 @@ class ParticleFilter:
         :param data_polygons:
         """
         # joint the polygons
-        anomaly_area = PolygonJoiner(data_polygons)
+        anomaly_area = PolygonJoiner(self.robot_name, data_polygons)
 
         for [senX, senY, senT, sen_val] in sensed_values:
 
@@ -103,7 +106,6 @@ class ParticleFilter:
                 # open anomaly
                 elif anomaly_area.point_in_open_anomaly((p.x, p.y)):
                     p.z *= self._WEIGHT_TRACKING_LEFT
-
                 # If the particles in the robot area.
                 elif sqrt((senX - p.x) ** 2 + (senY - p.y) ** 2) < self.r:
                     if sen_val == 0:

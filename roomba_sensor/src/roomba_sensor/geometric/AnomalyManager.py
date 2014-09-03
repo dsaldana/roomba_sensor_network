@@ -192,10 +192,10 @@ class AnomalyManager(object):
         Evaluate if the anomaly is full of robots. Report full if necessary.
         :return True if there is no space for mor robots
         """
-        return True
         # No anomaly
         if not self.is_polygon_identified:
-            return False
+            self.anomaly_full = False
+            return
 
         # how many robots are in this anomaly?
         n_in_anomaly = 1
@@ -224,3 +224,6 @@ class AnomalyManager(object):
             return
 
         self.polyline = polygon.fix_polygon(self.polyline)
+
+    def get_simplyfied_polygon(self):
+        return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
