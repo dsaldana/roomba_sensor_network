@@ -21,18 +21,18 @@ class Communicator(object):
         # Subscriber for robot communication
         rospy.Subscriber("/robotCom", SensedValue, self.robot_comm)
         # Sensor's publisher
-        self.sensor_pub = rospy.Publisher("/robotCom", SensedValue)
+        self.sensor_pub = rospy.Publisher("/robotCom", SensedValue, queue_size=1)
         # Create a publisher for the particles
-        self.particle_pub = rospy.Publisher("/" + robot_name + "/particles", Particle)
+        self.particle_pub = rospy.Publisher("/" + robot_name + "/particles", Particle, queue_size=1)
 
         # Create the Publisher to control the robot.
         # topic_name = "/" + robot_name + "/commands/velocity"
         # vel_pub = rospy.Publisher(topic_name, Twist)
 
         # Goal Navigator
-        self.nav_pub = rospy.Publisher("/" + robot_name + "/goal", Point32)
+        self.nav_pub = rospy.Publisher("/" + robot_name + "/goal", Point32, queue_size=1)
         # Tracker navigator
-        self.track_pub = rospy.Publisher("/" + robot_name + "/tracking", Point32)
+        self.track_pub = rospy.Publisher("/" + robot_name + "/tracking", Point32, queue_size=1)
 
     def robot_comm(self, msg):
         """
@@ -96,7 +96,7 @@ class Communicator(object):
             smsg.anomaly = [Point(i[0], i[1]) for i in polygon]
             smsg.closed_anomaly = closed_anomaly
             # smsg.time_of_detection = time_of_detection
-        #Publish
+        # Publish
         self.sensor_pub.publish(smsg)
 
     def publish_particles(self, particles, robot_position, orobots, polyline):
@@ -136,5 +136,5 @@ class Communicator(object):
         p = Point32()
         p.x = control_p
         p.y = crf
-        #print "f=", crf
+        # print "f=", crf
         self.track_pub.publish(p)

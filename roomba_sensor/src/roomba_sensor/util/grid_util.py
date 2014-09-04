@@ -1,5 +1,5 @@
 # ######################################
-### Utilities for woking with Grids. ##
+# ## Utilities for woking with Grids. ##
 #######################################
 from math import *
 
@@ -8,9 +8,9 @@ from roomba_sensor.params.map import *
 
 # Validate if one position in grid is valid.
 def validate_index(ni, nj, grid):
-    if (ni < 0 or ni >= len(grid)):
+    if ni < 0 or ni >= len(grid):
         return False
-    if (nj < 0 or nj >= len(grid[0])):
+    if nj < 0 or nj >= len(grid[0]):
         return False
     return True
 
@@ -54,7 +54,7 @@ def bread_first_search(spi, spj, grid):
         for [ni, nj] in mvs:
             if validate_index(ni, nj, grid):
                 # Not visited node
-                if (D[ni][nj] < 0):
+                if D[ni][nj] < 0:
                     D[ni][nj] = D[i][j] + 1
                     l.append([ni, nj])
 
@@ -63,7 +63,7 @@ def bread_first_search(spi, spj, grid):
         for [ni, nj] in mvs:
             if validate_index(ni, nj, grid):
                 # Not visited node
-                if (D[ni][nj] < 0):
+                if D[ni][nj] < 0:
                     D[ni][nj] = D[i][j] + sqrt(2)
                     l.append([ni, nj])
 
@@ -77,13 +77,13 @@ def coords_to_grid(x, y):
     spi = int((y - mapY1) / gdy)
     spj = int((x - mapX1) / gdx)
 
-    if (spi > gm - 1):
+    if spi > gm - 1:
         spi = gm - 1
-    if (spj > gn - 1):
+    if spj > gn - 1:
         spj = gn - 1
-    if (spi < 0):
+    if spi < 0:
         spi = 0
-    if (spj < 0):
+    if spj < 0:
         spj = 0
     return spi, spj
 

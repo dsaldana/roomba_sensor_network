@@ -14,9 +14,6 @@ class PolygonJoiner(object):
             # pol_data = [polygon, closed, time]
 
             try:
-                #fixme
-                pol_data = polygon.fix_polygon(pol_data)
-
                 available = not pol_data[1]
                 pol = Polygon(pol_data[0])
 

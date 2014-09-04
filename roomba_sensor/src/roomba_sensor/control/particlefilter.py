@@ -100,8 +100,14 @@ class ParticleFilter:
 
             # Update particles
             for p in self.particles:
+                # if the particles are outside the map.
+                if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
+                    p.z *= self._WEIGHT_OUT_OF_MAP
                 # Particle in open area
-                if anomaly_area.point_in_full_anomaly((p.x, p.y)):
+                elif anomaly_area.point_in_full_anomaly((p.x, p.y)):
+                    # Position
+                    # p.x = random.random() * mapLX + mapX1
+                    # p.y = random.random() * mapLY + mapY1
                     p.z = 0
                 # open anomaly
                 elif anomaly_area.point_in_open_anomaly((p.x, p.y)):
@@ -125,10 +131,7 @@ class ParticleFilter:
                 else:
                     p.z *= self._WEIGHT_NO_SENSED
 
-                # if the particles are outside the map.
-                # FIXME elif
-                if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
-                    p.z *= self._WEIGHT_OUT_OF_MAP
+
 
     def particles_in_grid(self):
         """

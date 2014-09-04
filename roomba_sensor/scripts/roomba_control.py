@@ -15,7 +15,7 @@ from roomba_sensor.geometric.vector import points_to_vector
 from roomba_sensor.sensor.sensor_camera import Camera
 
 
-GRAPHIC_DEBUG = True
+GRAPHIC_DEBUG = rospy.get_param('~graphic_debug', True)
 
 
 def run():
@@ -46,7 +46,6 @@ def run():
         display = RobotDrawer()
         display.set_title(robot_name)
 
-    # #
     # ####### Control Loop ###################
     while not rospy.is_shutdown():
         # Get robot position from gazebo
@@ -69,7 +68,7 @@ def run():
             # Includes time of detection and closed anomaly
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
                                            polygon=am.get_simplyfied_polygon(), closed_anomaly=am.anomaly_full,
-                                           time_of_detection=0)
+                                           time_of_detection=am.polygon_time)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
@@ -80,6 +79,7 @@ def run():
         pf.update_particles(sensed_points.values(), anomaly_polygons)
         # Re-sampling.
         pf.resample()
+
         # Publish particles
         communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
@@ -140,13 +140,19 @@ def run():
             for r, p in anomaly_polygons.items():
                 display.draw_polygon(p[0], stroke=2, color=(0, 180, 180, 50))
 
+            # Draw other robots
+            for r in communicator.robot_msgs.values():
+                if r.robot_id == robot_name:
+                    continue
+                display.draw_robot([r.rx, r.ry], r.rtheta, color=(150, 150, 150))
+
             display.draw_robot(robot_position[:2], robot_position[2])
             # Draw polyline
             display.draw_path(am.polyline)
 
             display.draw()
 
-        rospy.sleep(0.3)
+        rospy.sleep(0.2)
 
 
 if __name__ == '__main__':
