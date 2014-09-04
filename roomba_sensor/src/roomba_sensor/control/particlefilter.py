@@ -103,13 +103,13 @@ class ParticleFilter:
                 # if the particles are outside the map.
                 if p.x > mapX2 or p.x < mapX1 or p.y > mapY2 or p.y < mapY1:
                     p.z *= self._WEIGHT_OUT_OF_MAP
-                # Particle in open area
+                # Particle in full polygon
                 elif anomaly_area.point_in_full_anomaly((p.x, p.y)):
                     # Position
-                    # p.x = random.random() * mapLX + mapX1
-                    # p.y = random.random() * mapLY + mapY1
-                    p.z = 0
-                # open anomaly
+                    p.x = random.random() * mapLX + mapX1
+                    p.y = random.random() * mapLY + mapY1
+                    # p.z = 0
+                # avaible polygon
                 elif anomaly_area.point_in_open_anomaly((p.x, p.y)):
                     p.z *= self._WEIGHT_TRACKING_LEFT
                 # If the particles in the robot area.
