@@ -206,6 +206,7 @@ def polygons_intersect(poly1, poly2):
     pol2 = Polygon(poly2)
     # print "p1,p2=", poly1, ",", poly2
     return pol1.intersection(pol2).area > 0
+    # FIXME puede ser realizado con la distancia.
 
 
 def fix_polygon(poly):

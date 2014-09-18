@@ -86,16 +86,7 @@ def run():
     while not rospy.is_shutdown():
         rospy.sleep(0.1)
 
-        # if (traking is None):
-        # continue
-        # TODO implement tracking in another module.
         if tracking:
-        # if True:
-        #     crf = 0
-
-            # if new_tracking_msg:
-            # new_tracking_msg = False
-
             # ##### Tracking ######
             sensedValue = camera.sensed_value * 2 - 1
             # Max speed for tracking.
@@ -171,7 +162,7 @@ def run():
                 vel.angular.z *= -1
 
             # velocity range [min, max]
-            linear_r = [0.02, 0.4]
+            linear_r = [0.02, 0.8]
             angular_r = [-pi, pi]
 
             if vel.linear.x > linear_r[1]:

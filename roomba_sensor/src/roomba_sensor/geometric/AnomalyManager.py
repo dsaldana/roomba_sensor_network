@@ -1,9 +1,9 @@
 import rospy
-
+import numpy as np
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 3.1
+PERIMETER_PER_ROBOT = 300000.1
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -50,8 +50,8 @@ class AnomalyManager(object):
         if sensed_value > 0:
             self.polyline.append((sensed_position[0], sensed_position[1]))
 
-        # ## Simplify polyline.
-        # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+            # ## Simplify polyline.
+            # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
 
     def add_sensed_points(self, sensed_points):
         """
@@ -103,10 +103,7 @@ class AnomalyManager(object):
         else:
             # TIMEOUT: tracking is lost, restart variables.
             if rospy.get_rostime().secs - self._last_time_anomaly > _MAX_TRACKING_TIME:
-                self.sensed_anomaly = False
-                self.polyline = []
-                self.polygon_time = None
-                self.is_polygon_identified = False
+                self._clear_detections()
                 # print "Timeout, polygon lost."
 
     def modify_polygon(self, sensed_location):
@@ -114,6 +111,7 @@ class AnomalyManager(object):
         Modify the polygon of the anomaly.
         1. if it has its own polygon, modify it adding the new point.
         2. else, find a polygon near by other robot, own it, and modify with (1).
+        :param sensed_location: new sensed location
         :return True if the data gives a polygon.
         """
         # # Check if main_line closes
@@ -153,14 +151,14 @@ class AnomalyManager(object):
                     self.polygon_time = rospy.get_rostime()
                     break
 
-            print "not near polygon"
+            # print "not near polygon"
             # if there is not a near polygon, try with near segments
             if not self.is_polygon_identified:
                 # # Check if other lines are near to fuse
                 for robot_i, line in self._anomaly_lines.iteritems():
 
                     try:
-                        ### try to fuse the line segment
+                        # ## try to fuse the line segment
                         fused_line = polygon.lines_fusion(self.polyline, line)
 
                         # print "fused line: ", polyline_length(fused_line) > polyline_length(self.polyline)
@@ -196,6 +194,7 @@ class AnomalyManager(object):
     def evaluate_anomaly_full(self):
         """
         Evaluate if the anomaly is full of robots. Report full if necessary.
+        It modifies data_polygons
         :return True if there is no space for mor robots
         """
         # No anomaly
@@ -203,27 +202,49 @@ class AnomalyManager(object):
             self.anomaly_full = False
             return
 
-        # how many robots are in this anomaly?
-        n_in_anomaly = 1
-        # take each reported anomaly
+        intersected_anomaly_time = []
+        intersected_ids = []
+        # take each reported polygon
         for id_robot, pol_data in self.data_polygons.items():
             if id_robot == self._id_robot:
                 continue
             # pol_data = [polygon, closed, time]
             try:
                 intersect = polygon.polygons_intersect(self.polyline, pol_data[0])
-
+                # Intersected polygon
                 if intersect:
-                    n_in_anomaly += 1
+                    intersected_anomaly_time.append(pol_data[2])
+                    intersected_ids.append(id_robot)
             except:
                 print "Error in compute intersection, to evaluete if anomaly is full"
 
+        # how many robots are in this anomaly?
+        n_in_anomaly = len(intersected_anomaly_time)
         perimeter = polygon.polygon_perimeter(self.polyline)
 
-        # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
-        self.anomaly_full = perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
+        # required robots for anomaly
+        required_n = perimeter * PERIMETER_PER_ROBOT
+        print "required_n", required_n, perimeter, PERIMETER_PER_ROBOT
+        # ## should this robot go out of the full anomaly?
+        # robots with priority in the anomaly
+        prior_robots = sum(np.array(intersected_anomaly_time) < self.polygon_time)
+        # If robots with priority are more than required.
+        go_out = prior_robots >= required_n
 
-        # # should I go out of the full anomaly?
+        print go_out, prior_robots, n_in_anomaly, required_n
+        if go_out:
+            # Cancel detected polygon and associated variables
+            self._clear_detections()
+        else:
+            # open all the intersected polygons
+            for id in intersected_ids:
+                # Not full polygon
+                self.data_polygons[id][1] = False
+
+
+        # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
+        self.anomaly_full = required_n < n_in_anomaly
+
 
     def fix_polygon(self):
         """
@@ -235,6 +256,20 @@ class AnomalyManager(object):
         self.polyline = polygon.fix_polygon(self.polyline)
 
     def get_simplyfied_polygon(self):
+        """
+        Simplify the path polyline.
+        :return:
+        """
         return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+
+    def _clear_detections(self):
+        """
+        Delete detected polyline and polygon.
+        """
+        self.sensed_anomaly = False
+        self.polyline = []
+        self.polygon_time = None
+        self.is_polygon_identified = False
+
 
 

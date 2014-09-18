@@ -14,10 +14,12 @@ from roomba_sensor.util.angle import cut_angle
 # Distance from robot to camera.
 d = rospy.get_param('/sensor_distance', 0.5)
 
-#######################################################
-##### Localization for virtual or physical robot.
-#######################################################
-class RoombaLocalization:
+
+class RoombaLocalization(object):
+    """
+    Localization for virtual or physical robot.
+    :param robot_name:
+    """
     def __init__(self, robot_name):
         simulated_robots = rospy.get_param('/simulated_robots', False)
         # Object to get information from Gazebo
@@ -40,9 +42,12 @@ class RoombaLocalization:
 
 
 ######################################
-### Localization from Gazebo.
-######################################
-class RoombaGazebo:
+class RoombaGazebo(object):
+    """
+    Localization from Gazebo.
+    :param robotName:
+    """
+
     def __init__(self, robotName):
         print "RoombaGazebo"
         self.robotName = robotName
@@ -86,19 +91,20 @@ class RoombaGazebo:
 
         return [camX, camY, robotT]
 
-
-
-
-
-class ArLocator:
+########################################################
+class ArLocator(object):
+    """
+    Localization for physical robots, using ARTrack Alvar.
+    """
     poses = {}
 
     def __init__(self):
         from ar_track_alvar.msg import AlvarMarkers
+
         self.load()
 
     def load(self):
-        #rospy.Subscriber("/tf", TFMessage, self.callback_maker)
+        # rospy.Subscriber("/tf", TFMessage, self.callback_maker)
         rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self.callback_maker)
 
     def callback_maker(self, msg_positions):

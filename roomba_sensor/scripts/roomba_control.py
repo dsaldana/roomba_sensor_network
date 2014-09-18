@@ -62,7 +62,6 @@ def run():
         am.add_sensed_points(sensed_points)
         am.data_polygons = anomaly_polygons
 
-
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
@@ -83,7 +82,7 @@ def run():
         # Publish particles
         communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
-        print "sensed anomaly: ", am.sensed_anomaly, camera.sensed_value > 0
+        # print "sensed anomaly: ", am.sensed_anomaly, camera.sensed_value > 0
         # ####### Exploring #################
         if not am.sensed_anomaly:
             # Total force
@@ -98,7 +97,8 @@ def run():
             # modify the polygon with sensed data and other robot's data
             am.modify_polygon(sensed_xy)
 
-            # close the polygon if necessary
+            # Validate if full anomaly is really full for this robot
+            #TODO move to before update particles
             am.evaluate_anomaly_full()
 
             # Compute Proportional control for steering.
