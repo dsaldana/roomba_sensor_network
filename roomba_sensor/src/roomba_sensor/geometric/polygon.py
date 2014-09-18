@@ -1,6 +1,6 @@
 # ## Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 
-from shapely.geometry import LineString, Point, LinearRing, Polygon
+from shapely.geometry import LineString, Point, LinearRing, Polygon, MultiPoint
 
 
 def _vec2d_dist(p1, p2):
@@ -198,15 +198,22 @@ def point_in_polygon(point, poly):
 def polygons_intersect(poly1, poly2):
     """
     Identify if two polygons intersect.
-    :param poly1:
-    :param poly2:
+    If the polygons are invalid, convex hull for the set of points is used.
+    :param poly1: set of points that form apolygon,
+    :param poly2: set of points that form apolygon.
     :return: true if intersection
     """
     pol1 = Polygon(poly1)
+    if not pol1.is_valid:
+        pol1 = MultiPoint(poly1).convex_hull
+
     pol2 = Polygon(poly2)
-    # print "p1,p2=", poly1, ",", poly2
-    return pol1.intersection(pol2).area > 0
-    # FIXME puede ser realizado con la distancia.
+    if not pol2.is_valid:
+        pol2 = MultiPoint(poly2).convex_hull
+
+    return pol1.intersects(pol2)
+
+
 
 
 def fix_polygon(poly):
@@ -234,3 +241,12 @@ def fix_polygon(poly):
             return fix_polygon(poly1)
 
     return poly
+
+
+def convex_hull(poly):
+    """
+    Convert a polygon to points and get the convex hull.
+    :param poly:
+    """
+    mp = MultiPoint(poly)
+    mp.convex_hull

@@ -1,4 +1,5 @@
 from shapely.geometry import Polygon, Point
+from shapely.geometry.multipoint import MultiPoint
 
 from roomba_sensor.geometric import polygon
 
@@ -17,7 +18,12 @@ class PolygonJoiner(object):
                 available = not pol_data[1]
                 pol = Polygon(pol_data[0])
 
+                # Invalid polygons cannot be join.
+                if not pol.is_valid:
+                    pol = MultiPoint(pol_data[0]).convex_hull
+
                 if available or robot_name == id_robot:
+
                     self.open_area = self.open_area.union(pol)
                 else:
                     self.full_area = self.full_area.union(pol)

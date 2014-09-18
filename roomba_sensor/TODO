@@ -1,14 +1,17 @@
 
 
 
-* first point of the anomaly is far away
+
 * particles in wrong polygon go away
 * Crear fuerzas en los bordes del mapa
-* Error fusing polylines
-* Error joining polygons.
 
+* actualizando mal las particulas
+* en navigation, timeout
 
 [FIXED]
+* first point of the anomaly is far away
+* Error fusing polylines
+* Error joining polygons.
 * Robot2 not sensing
 * robots están entrando en la anomalía muy rápido
 * calcular el perímetro del polígono.

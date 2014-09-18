@@ -3,7 +3,7 @@ import numpy as np
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 0.10
+PERIMETER_PER_ROBOT = 0.0010
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -232,28 +232,29 @@ class AnomalyManager(object):
         go_out = prior_robots >= required_n
 
         print "required_n", required_n, prior_robots, go_out
+
+
+        # open all the intersected polygons
+        for id in intersected_ids:
+            # Not full polygon
+            self.data_polygons[id][1] = go_out
+
         if go_out:
             # Cancel detected polygon and associated variables
             self._clear_detections()
-        else:
-            # open all the intersected polygons
-            for id in intersected_ids:
-                # Not full polygon
-                self.data_polygons[id][1] = False
-
 
         # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
         self.anomaly_full = required_n < n_in_anomaly
 
 
-    def fix_polygon(self):
-        """
-        Fix if the polygon is bad formed.
-        """
-        if len(self.polyline) < 5:
-            return
-
-        self.polyline = polygon.fix_polygon(self.polyline)
+    # def fix_polygon(self):
+    #     """
+    #     Fix if the polygon is bad formed.
+    #     """
+    #     if len(self.polyline) < 5:
+    #         return
+    #
+    #     self.polyline = polygon.fix_polygon(self.polyline)
 
     def get_simplyfied_polygon(self):
         """
