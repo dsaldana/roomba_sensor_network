@@ -71,6 +71,11 @@ def run():
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
+        # Validate if full anomaly is really full for this robot
+        if am.sensed_anomaly:
+            am.evaluate_anomaly_full()
+
+
         # ################ Particle Filter ###############
         # Move the particles for simulating the anomaly's dynamics
         pf.move_particles()
@@ -96,10 +101,6 @@ def run():
             # ######## Tracking ############
             # modify the polygon with sensed data and other robot's data
             am.modify_polygon(sensed_xy)
-
-            # Validate if full anomaly is really full for this robot
-            #TODO move to before update particles
-            am.evaluate_anomaly_full()
 
             # Compute Proportional control for steering.
             # Convert a value from [0, 1] to a value in the interval [-1, 1].

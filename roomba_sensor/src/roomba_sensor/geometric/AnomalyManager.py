@@ -3,7 +3,7 @@ import numpy as np
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 300000.1
+PERIMETER_PER_ROBOT = 0.10
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -224,14 +224,14 @@ class AnomalyManager(object):
 
         # required robots for anomaly
         required_n = perimeter * PERIMETER_PER_ROBOT
-        print "required_n", required_n, perimeter, PERIMETER_PER_ROBOT
+
         # ## should this robot go out of the full anomaly?
         # robots with priority in the anomaly
         prior_robots = sum(np.array(intersected_anomaly_time) < self.polygon_time)
         # If robots with priority are more than required.
         go_out = prior_robots >= required_n
 
-        print go_out, prior_robots, n_in_anomaly, required_n
+        print "required_n", required_n, prior_robots, go_out
         if go_out:
             # Cancel detected polygon and associated variables
             self._clear_detections()
