@@ -91,11 +91,12 @@ class Communicator(object):
         smsg.robot_id = self.robot_name
         smsg.value = sensed_val
 
+
         # for anomaly in polygon
         if polygon is not None:
             smsg.anomaly = [Point(i[0], i[1]) for i in polygon]
             smsg.closed_anomaly = closed_anomaly
-            # smsg.time_of_detection = time_of_detection
+            smsg.time_of_detection = time_of_detection
         # Publish
         self.sensor_pub.publish(smsg)
 

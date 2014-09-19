@@ -3,7 +3,7 @@ import numpy as np
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 0.0010
+PERIMETER_PER_ROBOT = 0.10
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -219,7 +219,7 @@ class AnomalyManager(object):
                 print "Error in compute intersection, to evaluete if anomaly is full"
 
         # how many robots are in this anomaly?
-        n_in_anomaly = len(intersected_anomaly_time)
+        n_in_anomaly = len(intersected_anomaly_time) + 1
         perimeter = polygon.polygon_perimeter(self.polyline)
 
         # required robots for anomaly
@@ -231,8 +231,7 @@ class AnomalyManager(object):
         # If robots with priority are more than required.
         go_out = prior_robots >= required_n
 
-        print "required_n", required_n, prior_robots, go_out
-
+        print "required_n", required_n, " prior:", prior_robots, "go_out", go_out
 
         # open all the intersected polygons
         for id in intersected_ids:
@@ -242,13 +241,17 @@ class AnomalyManager(object):
         if go_out:
             # Cancel detected polygon and associated variables
             self._clear_detections()
+            # delete current polygon
+            if self._id_robot in self.data_polygons:
+                del self.data_polygons[self._id_robot]
 
         # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
         self.anomaly_full = required_n < n_in_anomaly
 
+        # print "Anomaly full:", self.anomaly_full, required_n, n_in_anomaly
 
     # def fix_polygon(self):
-    #     """
+    # """
     #     Fix if the polygon is bad formed.
     #     """
     #     if len(self.polyline) < 5:
@@ -271,6 +274,8 @@ class AnomalyManager(object):
         self.polyline = []
         self.polygon_time = None
         self.is_polygon_identified = False
+
+
 
 
 

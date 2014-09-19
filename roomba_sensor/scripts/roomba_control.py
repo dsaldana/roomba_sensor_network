@@ -62,6 +62,11 @@ def run():
         am.add_sensed_points(sensed_points)
         am.data_polygons = anomaly_polygons
 
+        # Validate if full anomaly is really full for this robot
+        if am.sensed_anomaly:
+            am.evaluate_anomaly_full()
+
+
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
@@ -70,10 +75,6 @@ def run():
                                            time_of_detection=am.polygon_time)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
-
-        # Validate if full anomaly is really full for this robot
-        if am.sensed_anomaly:
-            am.evaluate_anomaly_full()
 
 
         # ################ Particle Filter ###############
