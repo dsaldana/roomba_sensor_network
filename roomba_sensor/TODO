@@ -2,13 +2,15 @@
 
 
 
-* particles in wrong polygon go away
 * Crear fuerzas en los bordes del mapa
 
-* actualizando mal las particulas
-* en navigation, timeout
+
+
 
 [FIXED]
+* particles in wrong polygon go away
+* en navigation, timeout
+* actualizando mal las particulas
 * first point of the anomaly is far away
 * Error fusing polylines
 * Error joining polygons.

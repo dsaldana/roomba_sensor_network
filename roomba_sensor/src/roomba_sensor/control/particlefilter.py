@@ -108,7 +108,7 @@ class ParticleFilter:
                     # Position
                     p.x = random.random() * mapLX + mapX1
                     p.y = random.random() * mapLY + mapY1
-                    p.z = 1 / self.N
+                    p.z *= self._WEIGHT_NO_SENSED
                 # available polygon
                 elif anomaly_area.point_in_open_anomaly((p.x, p.y)):
                     p.z *= self._WEIGHT_TRACKING_LEFT

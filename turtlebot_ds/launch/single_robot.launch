@@ -1,7 +1,8 @@
 <launch>
   <arg name="robot_id"       default="Robot1"/> 
   <arg name="robot_pose"/> 
-  <arg name="algorithm" default="roomba"/> 
+  <arg name="algorithm" default="roomba"/>
+  <arg name="graphic_debug" default="false"/>
 
 
   <!--<arg name="base"  value="$(optenv TURTLEBOT_BASE kobuki_ds)"/> -->
@@ -16,6 +17,7 @@
 
 	 	<node pkg="roomba_sensor" type="$(arg algorithm)_control.py" name="rcontrol">
 			<param name="robot_name" value="$(arg robot_id)"/>
+            <arg name="graphic_debug" value="$(arg graphic_debug)"/>
 	  	</node>
 
 		<node pkg="roomba_sensor" type="$(arg algorithm)_navigation.py" name="rnavigation">

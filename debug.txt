@@ -8,6 +8,11 @@ roslaunch turtlebot_ds roomba_simulation.launch
 rosnode kill /Robot1/rcontrol
 rosrun roomba_sensor roomba_control.py
 
+rosnode kill /Robot2/rcontrol
+rosrun roomba_sensor roomba_control.py _robot_name:=Robot2
+
+
+
 
 ## Test navigation
 rosnode kill /Robot1/rnavigation
