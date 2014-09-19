@@ -89,7 +89,7 @@ def run():
             if new_tracking_msg:
                 new_tracking_msg = False
 
-                ###### Tracking ######
+                # ##### Tracking ######
                 # Max speed for tracking.
                 lin_vel = 0.4
                 # if there is a robot to crash.
@@ -109,7 +109,7 @@ def run():
 
                 # max_angle = pi / 3
                 # if vel.angular.z > max_angle:
-                #     vel.angular.z = max_angle
+                # vel.angular.z = max_angle
                 # elif vel.angular.z < - max_angle:
                 #     vel.angular.z = - max_angle
 
@@ -120,15 +120,15 @@ def run():
 
         else:
             old_val = 0
-            ###### Navigation #####
+            # ##### Navigation #####
             [sX, sY, sT] = robot.get_position()
-            print "Navigating", [sX, sY, sT]
+            # print "Navigating", [sX, sY, sT]
 
             # Orientation
             x = goal.x - sX
             y = goal.y - sY
 
-            if (x == 0):
+            if x == 0:
                 rospy.sleep(0.20)
                 continue
 
@@ -144,13 +144,14 @@ def run():
             # Euclidean distance
             d = sqrt(x * x + y * y)
 
-            print  "distance=", d, " teta: ", degrees(controlT)
-
             vel = Twist()
             # for rial robot: vel.linear.x = 0.5 * d
-            ### P Control ###
+            # ## P Control ###
+            #Magic!
+            vel.linear.x = 1.5 / (0.5*d + 2.0)
+            print "distance=", d, " teta: ", degrees(controlT), d, vel.linear.x
 
-            vel.linear.x = p_linear * d
+            # vel.linear.x = 0.4
             vel.angular.z = p_angular * controlT
 
             # For real robots: the relative position affect the axes.
