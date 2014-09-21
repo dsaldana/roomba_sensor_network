@@ -15,7 +15,7 @@ class GradientDescent(object):
 
         # Constant in Coulombs law. Force by centroid.
         self._F_CENTROID = rospy.get_param('/f_centroid', 1.0)
-        self._F_ROBOTS = rospy.get_param('/f_robots', 2.0)
+        self._F_ROBOTS = rospy.get_param('/f_robots', 1.0)
 
 
     def compute_forces(self, pf, robot_x, robot_y, robots):

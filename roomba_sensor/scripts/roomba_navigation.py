@@ -148,7 +148,8 @@ def run():
             # for rial robot: vel.linear.x = 0.5 * d
             # ## P Control ###
             #Magic!
-            vel.linear.x = 1.5 / (0.5*d + 2.0)
+            # vel.linear.x = 1.5 / (0.5*d + 2.0)
+            vel.linear.x = 0.4
             print "distance=", d, " teta: ", degrees(controlT), d, vel.linear.x
 
             # vel.linear.x = 0.4

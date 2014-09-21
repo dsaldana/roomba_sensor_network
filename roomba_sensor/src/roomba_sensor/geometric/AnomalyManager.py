@@ -8,7 +8,7 @@ PERIMETER_PER_ROBOT = 0.10
 MIN_DISTANCE_POLYGON = 0.2
 
 # Distance to simplify polygons.
-_SIMPLIFY_TH = 0.1
+_SIMPLIFY_TH = 0.3
 
 # Time for tracking without sensing anomaly.
 _MAX_TRACKING_TIME = 5
@@ -76,9 +76,13 @@ class AnomalyManager(object):
             # Add line to other robots
             self._anomaly_lines[robot_id].append(point)
 
-            # Simplify
-            # if len(self._anomaly_lines) > 3:
-            # self._anomaly_lines[robot_id] = polygon.simplify_polyline(self._anomaly_lines[robot_id],_SIMPLIFY_TH)
+            # #Limit the size
+            if len(self._anomaly_lines[robot_id]) > 20:
+                self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-20:]
+
+                # Simplify
+                # if len(self._anomaly_lines) > 3:
+                # self._anomaly_lines[robot_id] = polygon.simplify_polyline(self._anomaly_lines[robot_id],_SIMPLIFY_TH)
 
     def _process_sensed_value(self, sensed_val, sensed_position):
         """
@@ -130,7 +134,6 @@ class AnomalyManager(object):
         # # if the own polygon is closed, modify it
         if self.is_polygon_identified:
             # modify the polygon
-            # FIXME only area at left
             if polyline_closes:
                 self.polyline = self.polyline[first_point:]
 
@@ -234,16 +237,13 @@ class AnomalyManager(object):
         print "required_n", required_n, " prior:", prior_robots, "go_out", go_out
 
         # open all the intersected polygons
-        for id in intersected_ids:
+        for id1 in intersected_ids:
             # Not full polygon
-            self.data_polygons[id][1] = go_out
+            self.data_polygons[id1][1] = go_out
 
         if go_out:
             # Cancel detected polygon and associated variables
             self._clear_detections()
-            # delete current polygon
-            if self._id_robot in self.data_polygons:
-                del self.data_polygons[self._id_robot]
 
         # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
         self.anomaly_full = required_n < n_in_anomaly
@@ -252,8 +252,8 @@ class AnomalyManager(object):
 
     # def fix_polygon(self):
     # """
-    #     Fix if the polygon is bad formed.
-    #     """
+    # Fix if the polygon is bad formed.
+    # """
     #     if len(self.polyline) < 5:
     #         return
     #
@@ -265,6 +265,7 @@ class AnomalyManager(object):
         :return:
         """
         return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+        # return polygon.convex_hull(self.polyline)
 
     def _clear_detections(self):
         """
@@ -274,7 +275,11 @@ class AnomalyManager(object):
         self.polyline = []
         self.polygon_time = None
         self.is_polygon_identified = False
+        self._anomaly_lines = {}
 
+        # delete current polygon, if exists.
+        if self._id_robot in self.data_polygons:
+            del self.data_polygons[self._id_robot]
 
 
 

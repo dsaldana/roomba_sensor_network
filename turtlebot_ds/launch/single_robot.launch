@@ -17,7 +17,7 @@
 
 	 	<node pkg="roomba_sensor" type="$(arg algorithm)_control.py" name="rcontrol">
 			<param name="robot_name" value="$(arg robot_id)"/>
-            <arg name="graphic_debug" value="$(arg graphic_debug)"/>
+            <param name="graphic_debug" value="$(arg graphic_debug)"/>
 	  	</node>
 
 		<node pkg="roomba_sensor" type="$(arg algorithm)_navigation.py" name="rnavigation">

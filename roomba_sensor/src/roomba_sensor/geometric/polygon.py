@@ -96,7 +96,7 @@ def fuse_point_to_polygon(point, polygon):
     for i in range(len(polygon)):
         seg = polygon[i:i + 2]
         if len(seg) < 2:
-            #close the polygon
+            # close the polygon
             seg = [polygon[-1]] + [polygon[0]]
 
         line_segment = LineString(seg)
@@ -214,8 +214,6 @@ def polygons_intersect(poly1, poly2):
     return pol1.intersects(pol2)
 
 
-
-
 def fix_polygon(poly):
     """
     Fix the polygon if it is bad formed.
@@ -249,4 +247,6 @@ def convex_hull(poly):
     :param poly:
     """
     mp = MultiPoint(poly)
-    mp.convex_hull
+    ch = mp.convex_hull.boundary
+    points = [(u, v) for u, v in zip(*ch.xy)]
+    return points

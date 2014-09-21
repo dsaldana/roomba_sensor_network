@@ -15,7 +15,7 @@
 	<param name="sensor_distance" value="0.55" />
 
 	<!-- Particle filter parameters -->
-	<param name="particles_number" value="1500" />
+	<param name="particles_number" value="500" />
 	<param name="particle_movement" value="0.1" />
 	<!-- Particle drawer -->
 	<param name="draw_clusters" value="false" />
@@ -50,7 +50,7 @@
   	<!--Robots -->
    	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
    		<arg name="robot_id" value="Robot1"/>
-        <arg name="graphic_debug" value="true"/>
+        <arg name="graphic_debug" value="True"/>
    		<arg name="robot_pose" value="-x 2.5 -y 2.5 -z 0"/>
   	</include>
 
@@ -60,13 +60,18 @@
   	</include>
 
 
-	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-   		<!--<arg name="robot_id" value="Robot3"/>-->
-   		<!--<arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>-->
-  	<!--</include>-->
+	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
+   		<arg name="robot_id" value="Robot3"/>
+   		<arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>
+  	</include>
 
-	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-   		<!--<arg name="robot_id" value="Robot4"/>-->
-   		<!--<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>-->
-  	<!--</include>-->
+	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
+   		<arg name="robot_id" value="Robot4"/>
+   		<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>
+  	</include>
+
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+   		<arg name="robot_id" value="Robot5"/>
+   		<arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>
+  	</include>
 </launch>
