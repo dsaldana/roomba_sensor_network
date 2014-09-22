@@ -11,7 +11,7 @@ import rospy
 
 #
 SDF_FILE = '/home/dav/.gazebo/models/1fogo/model.sdf'
-SPAWN_COMMAND = 'rosrun gazebo_ros spawn_model -file {0} -sdf -model {1} -y {x} -x {y}'
+SPAWN_COMMAND = 'rosrun gazebo_ros spawn_model -file {0} -sdf -model {1} -x {x} -y {y}'
 
 
 def spawn_fire(id, x, y):
@@ -24,8 +24,11 @@ def simulate_anomaly():
     Spawn and move the fire
     """
     # {id: [ initial_pos, speed]}
-    anomalies = {'fogo4': [[1, 1], [0.01, 0.02]],
-                 'fogo2': [[-1, 1], [-0.01, 0.02]],
+    anomalies = {'fogo4': [[0, 0], [0.01, 0.0]],
+                 'fogo5': [[-0.5, 0], [0.01, 0.0]],
+                # 'fogo6': [[-1, 0], [0.01, 0.0]],
+                 'fogo7': [[0.5, 0], [0.01, 0.0]],
+                 'fogo8': [[0, 0.5], [0.01, 0.0]]
     }
 
     # ## SPAWN
@@ -39,9 +42,9 @@ def simulate_anomaly():
 
     client_ms = rospy.ServiceProxy(service_name, SetModelState)
 
-    rospy.sleep(1.1)
+    rospy.sleep(0.1)
 
-    # r = rospy.Rate(10)  # 10hz
+    r = rospy.Rate(10)  # 10hz
     #
     # # moving_x = 0
     while not rospy.is_shutdown():
@@ -63,7 +66,7 @@ def simulate_anomaly():
             set_ms = SetModelState()
             set_ms.model_state = ms
             client_ms.call(ms)
-            rospy.sleep(0.1)
+            rospy.sleep(0.05)
 
         r.sleep()
 
