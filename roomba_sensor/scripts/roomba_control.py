@@ -15,7 +15,7 @@ from roomba_sensor.geometric.vector import points_to_vector
 from roomba_sensor.sensor.sensor_camera import Camera
 
 
-
+GRAPHIC_DEBUG = rospy.get_param('~graphic_debug', True)
 
 def run():
     # ######## Initialization ##################
@@ -25,9 +25,6 @@ def run():
     # Robot's name is an argument
     robot_name = rospy.get_param('~robot_name', 'Robot1')
     rospy.loginfo("Loading robot control for " + robot_name)
-
-    GRAPHIC_DEBUG = rospy.get_param('~graphic_debug', False)
-
 
     # Communication
     communicator = Communicator(robot_name)

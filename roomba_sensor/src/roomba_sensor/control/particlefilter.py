@@ -23,7 +23,7 @@ class ParticleFilter:
 
     # PF weights
     _WEIGHT_NO_SENSED = 1.0
-    _WEIGHT_TRACKING_LEFT = 1.3
+    _WEIGHT_TRACKING_LEFT = 1.5
     _WEIGHT_TRACKING_RIGHT = 0.01
     _WEIGHT_OUT_OF_MAP = 0.01
     _WEIGHT_SENSED_ZERO = 0.1

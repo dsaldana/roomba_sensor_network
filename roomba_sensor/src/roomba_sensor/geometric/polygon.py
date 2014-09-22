@@ -134,6 +134,17 @@ def polygon_perimeter(poly):
     pol = Polygon(poly)
     return pol.length
 
+def polygon_perimeter_or_convexhull(poly):
+    """
+    Perimeter delimited by a polygon defined by a set of points.
+    IF POLYGON IS BAD FORMED, THEN TAKE THE CONVEX HULL
+    :param poly: polygon defined by a set of points (tuples of floats).
+    """
+    pol = Polygon(poly)
+    if not pol.is_valid:
+        pol = MultiPoint(poly).convex_hull
+    return pol.length
+
 
 def lines_fusion(line1, line2):
     """
@@ -179,7 +190,9 @@ def distance_point_to_polygon(point, poly):
     :return: the distance
     """
     p = Point(point)
-    pol = LinearRing(poly)
+    pol = Polygon(poly)
+    if not pol.is_valid:
+        pol = MultiPoint(poly).convex_hull
 
     return p.distance(pol)
 

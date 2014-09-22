@@ -1,9 +1,10 @@
+import math
 import rospy
 import numpy as np
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
-PERIMETER_PER_ROBOT = 0.10
+PERIMETER_PER_ROBOT = 0.20
 
 MIN_DISTANCE_POLYGON = 0.2
 
@@ -77,8 +78,8 @@ class AnomalyManager(object):
             self._anomaly_lines[robot_id].append(point)
 
             # #Limit the size
-            if len(self._anomaly_lines[robot_id]) > 20:
-                self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-20:]
+            if len(self._anomaly_lines[robot_id]) > 30:
+                self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-30:]
 
                 # Simplify
                 # if len(self._anomaly_lines) > 3:
@@ -207,34 +208,56 @@ class AnomalyManager(object):
 
         intersected_anomaly_time = []
         intersected_ids = []
+        prior_robots = 0
         # take each reported polygon
         for id_robot, pol_data in self.data_polygons.items():
             if id_robot == self._id_robot:
                 continue
-            # pol_data = [polygon, closed, time]
+            # pol_data = [polygon, full, time]
             try:
                 intersect = polygon.polygons_intersect(self.polyline, pol_data[0])
-                # Intersected polygon
+                prior_time = pol_data[2] < self.polygon_time
+                full = pol_data[1]
+                print intersect, prior_time, full
+                # Intersected polygon and closed
                 if intersect:
                     intersected_anomaly_time.append(pol_data[2])
                     intersected_ids.append(id_robot)
-            except:
-                print "Error in compute intersection, to evaluete if anomaly is full"
 
-        # how many robots are in this anomaly?
+                    if prior_time and full:
+                        prior_robots += 1
+            except:
+                print "Error in compute intersection, to evaluate if anomaly is full"
+
+        # how many robots are in this anomaly? (+1) is for current robot
         n_in_anomaly = len(intersected_anomaly_time) + 1
+
+
+        #
+        # Perimeter of the captain
+        # if prior_robots:
+        #     id_captain = np.where(intersected_anomaly_time=min(intersected_anomaly_time))[0]
+        #     perimeter = prior_time(self.data_polygons[id_captain][0])
+        # else:
         perimeter = polygon.polygon_perimeter(self.polyline)
 
-        # required robots for anomaly
-        required_n = perimeter * PERIMETER_PER_ROBOT
 
+
+        # required robots for anomaly
+        required_n = math.ceil(perimeter * PERIMETER_PER_ROBOT)
+        # required_n = 1
         # ## should this robot go out of the full anomaly?
         # robots with priority in the anomaly
-        prior_robots = sum(np.array(intersected_anomaly_time) < self.polygon_time)
+        # prior_robots = sum(np.array(intersected_anomaly_time) < self.polygon_time)
         # If robots with priority are more than required.
-        go_out = prior_robots >= required_n
 
-        print "required_n", required_n, " prior:", prior_robots, "go_out", go_out
+        # Anomaly is full if robots in anomaly, no aditional robot (+1) can enter
+        self.anomaly_full = required_n <= n_in_anomaly
+
+        # Go out if the the robots with priority plus our robot (+1) are in the anomaly.
+        go_out = required_n <= prior_robots
+
+        print "required_n", (perimeter * PERIMETER_PER_ROBOT), " prior:", prior_robots, "go_out", go_out
 
         # open all the intersected polygons
         for id1 in intersected_ids:
@@ -245,27 +268,27 @@ class AnomalyManager(object):
             # Cancel detected polygon and associated variables
             self._clear_detections()
 
-        # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
-        self.anomaly_full = required_n < n_in_anomaly
+            # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
 
-        # print "Anomaly full:", self.anomaly_full, required_n, n_in_anomaly
+
+            # print "Anomaly full:", self.anomaly_full, required_n, n_in_anomaly
 
     # def fix_polygon(self):
     # """
     # Fix if the polygon is bad formed.
     # """
-    #     if len(self.polyline) < 5:
-    #         return
+    # if len(self.polyline) < 5:
+    # return
     #
-    #     self.polyline = polygon.fix_polygon(self.polyline)
+    # self.polyline = polygon.fix_polygon(self.polyline)
 
     def get_simplyfied_polygon(self):
         """
         Simplify the path polyline.
         :return:
         """
-        return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
-        # return polygon.convex_hull(self.polyline)
+        # return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+        return polygon.convex_hull(self.polyline)
 
     def _clear_detections(self):
         """
