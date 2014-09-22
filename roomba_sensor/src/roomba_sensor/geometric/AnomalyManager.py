@@ -12,7 +12,7 @@ MIN_DISTANCE_POLYGON = 0.2
 _SIMPLIFY_TH = 0.3
 
 # Time for tracking without sensing anomaly.
-_MAX_TRACKING_TIME = 5
+_MAX_TRACKING_TIME = 8
 
 
 class AnomalyManager(object):
@@ -74,16 +74,15 @@ class AnomalyManager(object):
             if robot_id not in self._anomaly_lines:
                 self._anomaly_lines[robot_id] = []
 
-            # Add line to other robots
-            self._anomaly_lines[robot_id].append(point)
-
             # #Limit the size
-            if len(self._anomaly_lines[robot_id]) > 30:
-                self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-30:]
+            if not self.is_polygon_identified:
+                # Add line to other robots
+                self._anomaly_lines[robot_id].append(point)
+                if len(self._anomaly_lines[robot_id]) > 50:
+                    self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-50:]
+            else:
+                self._anomaly_lines[robot_id] = []
 
-                # Simplify
-                # if len(self._anomaly_lines) > 3:
-                # self._anomaly_lines[robot_id] = polygon.simplify_polyline(self._anomaly_lines[robot_id],_SIMPLIFY_TH)
 
     def _process_sensed_value(self, sensed_val, sensed_position):
         """
@@ -236,8 +235,8 @@ class AnomalyManager(object):
         #
         # Perimeter of the captain
         # if prior_robots:
-        #     id_captain = np.where(intersected_anomaly_time=min(intersected_anomaly_time))[0]
-        #     perimeter = prior_time(self.data_polygons[id_captain][0])
+        # id_captain = np.where(intersected_anomaly_time=min(intersected_anomaly_time))[0]
+        # perimeter = prior_time(self.data_polygons[id_captain][0])
         # else:
         perimeter = polygon.polygon_perimeter(self.polyline)
 

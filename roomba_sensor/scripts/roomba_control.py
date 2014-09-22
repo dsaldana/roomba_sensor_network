@@ -121,7 +121,7 @@ def run():
                 rf = 1 / (d ** 2)
                 # is this robot considerable?
                 # if the other robot is in front of it (angle view is 120 degrees)
-                if abs(theta - robot_t) < (math.pi / 3):
+                if abs(theta - robot_t) < (math.pi / 4):
                     if rf > crf:
                         crf = rf
             # Send control command
