@@ -24,11 +24,14 @@ def simulate_anomaly():
     Spawn and move the fire
     """
     # {id: [ initial_pos, speed]}
-    anomalies = {'fogo4': [[0, 0], [0.01, 0.0]],
-                 'fogo5': [[-0.5, 0], [0.01, 0.0]],
-                # 'fogo6': [[-1, 0], [0.01, 0.0]],
-                 'fogo7': [[0.5, 0], [0.01, 0.0]],
-                 'fogo8': [[0, 0.5], [0.01, 0.0]]
+    anomalies = {'fogo4': [[-0.50, 0.30], [0.01, 0.0]],
+                 'fogo5': [[-0.4, -0.30], [0.01, 0.0]],
+                'fogo6': [[-65, 0.2], [0.01, 0.0]],
+                'fogo7': [[0.5, 0], [0.01, 0.0]],
+                'fogo8': [[0, 0.4], [0.01, 0.0]],
+                'fogo9': [[0, -0.4], [0.01, 0.0]],
+                'fogo1': [[0.40, 0.40], [0.01, 0.0]],
+                'fogo2': [[-1, 0.0], [0.01, 0.0]],
     }
 
     # ## SPAWN
@@ -58,7 +61,6 @@ def simulate_anomaly():
             ms = ModelState()
             ms.model_name = anom
             ms.pose.position.x = data[0][0]
-            # ms.twist.linear.x
             ms.pose.position.y = data[0][1]
             ms.reference_frame = 'world'
 
