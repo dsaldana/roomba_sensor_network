@@ -66,6 +66,7 @@ def identify_first_point_in_polygon(points, ddd=0.5):
     # Distance between last point and a line segment
     distance_point_line = 2 * ddd
 
+    # Distance is not less than ddd or less than 3 points.
     while not (distance_point_line < ddd and polyline_length(points[first_point:]) > 2):
         # next segment
         first_point -= 1
@@ -83,6 +84,22 @@ def identify_first_point_in_polygon(points, ddd=0.5):
     return first_point
 
 
+def counter_clockwise_polygon(polygon):
+    """
+    DOES NOT WORK
+    Determines if a polygon is counter-clockwise.
+    :param polygon:
+    """
+    sum = 0
+    for i in range(1, len(polygon)):
+        e0 = polygon[i - 1]
+        e1 = polygon[i]
+
+        sum += (e1[0] - e0[0]) * (e1[1] + e0[1])
+
+    return sum < 0
+
+
 def fuse_point_to_polygon(point, polygon):
     """
 
@@ -92,6 +109,7 @@ def fuse_point_to_polygon(point, polygon):
     p = Point(point)
     min_distance = float("inf")
     min_index = -1
+    polygon = polygon[::-1] ##FIXME the received polygon is wrong. This is POG
     # Identify the nearest line segment.
     for i in range(len(polygon)):
         seg = polygon[i:i + 2]
@@ -108,10 +126,11 @@ def fuse_point_to_polygon(point, polygon):
 
     # print min_distance, min_index
     fused_polygon = polygon[min_index + 1:] + polygon[:min_index + 1] + [point]
-    aa = identify_first_point_in_polygon(fused_polygon)
+    # fused_polygon = polygon[min_index + 1:] +  [point]
+    # aa = identify_first_point_in_polygon(fused_polygon)
     # print "FUSING", aa
 
-    print point, polygon, fused_polygon
+    # print point, polygon, fused_polygon
     return fused_polygon
     # min_index + 2 works, the first point is deleted
     # return polygon[min_index + 1:] + [point]
@@ -133,6 +152,7 @@ def polygon_perimeter(poly):
     """
     pol = Polygon(poly)
     return pol.length
+
 
 def polygon_perimeter_or_convexhull(poly):
     """
@@ -180,6 +200,25 @@ def lines_fusion(line1, line2):
 
     # no fusion
     return line1
+
+
+[(0.02237921580672264, -0.9705353379249573), (-0.09601247310638428, -0.9552090764045715),
+ (-0.11929110437631607, -0.9417833089828491), (-0.723719596862793, -0.5667174458503723),
+ (-0.7884417772293091, -0.5221251249313354), (-0.8376850485801697, -0.4763202965259552),
+ (-0.8886716365814209, -0.4212799370288849), (-0.9336608648300171, -0.36220115423202515),
+ (-0.9920441508293152, -0.1253458559513092), (-0.9867501258850098, -0.06921036541461945),
+ (-0.9696007370948792, -0.02662450261414051), (-0.5925200581550598, 0.7175773978233337),
+ (-0.5545847415924072, 0.7872364521026611), (-0.5065802335739136, 0.8573220372200012),
+ (-0.4535008668899536, 0.9189891219139099), (-0.3962934613227844, 0.9538582563400269),
+ (-0.28307849168777466, 1.01012122631073), (-0.21978643536567688, 1.0362907648086548),
+ (-0.08472807705402374, 1.0444468259811401), (-0.030713802203536034, 1.038546085357666),
+ (0.01573004759848118, 1.0267153978347778), (0.6464980244636536, 0.6031489372253418),
+ (0.8071625232696533, 0.47116169333457947), (0.8663126826286316, 0.42143258452415466),
+ (0.9404926300048828, 0.3044620454311371), (0.9809964895248413, 0.235567107796669),
+ (0.9956198930740356, 0.0015363572165369987), (0.9797407984733582, -0.04292335361242294),
+ (0.9375841021537781, -0.12980377674102783), (0.5033408403396606, -0.8738877177238464),
+ (0.4337262511253357, -0.9531958103179932), (0.38527005910873413, -0.9639164805412292),
+ (0.19224901497364044, -0.9678642749786377), (0.02237921580672264, -0.9705353379249573)]
 
 
 def distance_point_to_polygon(point, poly):
