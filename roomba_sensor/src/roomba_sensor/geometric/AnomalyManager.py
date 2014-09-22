@@ -5,12 +5,12 @@ from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
 # Bigger numbers for many robots in an anomaly
-PERIMETER_PER_ROBOT = 0.20
+PERIMETER_PER_ROBOT = 0.30
 
 MIN_DISTANCE_POLYGON = 0.2
 
 # Distance to simplify polygons.
-_SIMPLIFY_TH = 0.3
+_SIMPLIFY_TH = 0.1
 
 # Time for tracking without sensing anomaly.
 _MAX_TRACKING_TIME = 8
@@ -39,6 +39,10 @@ class AnomalyManager(object):
         # polygons: detected anomalies {id_robot:[polygon, closed, time]}
         self.data_polygons = {}
 
+        #for debug
+        self.d_prior = None
+        self.d_required = None
+        self.d_ratio = None
 
     def add_local_sensed_point(self, sensed_value, sensed_position):
         """
@@ -255,6 +259,9 @@ class AnomalyManager(object):
         go_out = required_n <= prior_robots
 
         print "required_n", (perimeter * PERIMETER_PER_ROBOT), " prior:", prior_robots, "go_out", go_out
+        self.d_prior = prior_robots
+        self.d_ratio = perimeter * PERIMETER_PER_ROBOT
+        self.d_required = go_out
 
         # open all the intersected polygons
         for id1 in intersected_ids:

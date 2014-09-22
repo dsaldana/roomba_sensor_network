@@ -26,7 +26,7 @@
 	<!-- Robot navigation -->
 	<!-- forces for gradient descent -->
 	<param name="f_centroid" value="6" />
-	<param name="f_robots" value="7" />
+	<param name="f_robots" value="5" />
 	<!-- PID for velocities -->
 	<param name="p_control_linear" value="0.4" /> 
 	<param name="p_control_angular" value="1.5" /> 
@@ -38,7 +38,7 @@
 	    <arg name="debug" value="false"/>
 
 		<!-- $(find turtlebot_ds)/worlds/simple.world -->
-	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly4.world"/>
+	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomalyA.world"/>
   	</include>
   
 	<!-- Particle drawer -->  	
@@ -65,13 +65,13 @@
    		<arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>
   	</include>
 
-	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot4"/>
-   		<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>
-  	</include>
+	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+   		<!--<arg name="robot_id" value="Robot4"/>-->
+   		<!--<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>-->
+  	<!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot5"/>
-   		<arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>
-  	</include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+   		<!--<arg name="robot_id" value="Robot5"/>-->
+   		<!--<arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>-->
+  	<!--</include>-->
 </launch>

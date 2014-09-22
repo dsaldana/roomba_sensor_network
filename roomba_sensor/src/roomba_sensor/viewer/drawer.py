@@ -126,6 +126,11 @@ class Drawer(object):
         p1, p2 = self._convert_axis_p(p1), self._convert_axis_p(p2)
         pygame.draw.line(self.window, color, p1, p2, stroke)
 
+    def draw_text(self, point, text, color=(0, 0, 0)):
+        point = self._convert_axis_p(point)
+        font = pygame.font.Font(None, 30)
+        label = font.render(str(text), 1, color)
+        self.window.blit(label, point)
 
     def draw_polygon(self, points, color=(255, 0, 0), stroke=2):
         """

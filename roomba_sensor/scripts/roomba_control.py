@@ -17,6 +17,7 @@ from roomba_sensor.sensor.sensor_camera import Camera
 
 GRAPHIC_DEBUG = rospy.get_param('~graphic_debug', True)
 
+
 def run():
     # ######## Initialization ##################
     # Node roomba_control
@@ -151,6 +152,7 @@ def run():
             # Draw polyline
             display.draw_path(am.polyline)
 
+            display.draw_text((0, -5.1), "req_n=" + str(am.d_ratio) + " priors=" + str(am.d_prior))
             display.draw()
 
         rospy.sleep(0.2)
