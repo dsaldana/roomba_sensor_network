@@ -72,7 +72,7 @@ def run():
             # Includes time of detection and closed anomaly
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position,
                                            polygon=am.get_simplyfied_polygon(), closed_anomaly=am.anomaly_full,
-                                           time_of_detection=am.polygon_time)
+                                           time_of_detection=am.polygon_time, required_robots=am.required_n)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
 
@@ -152,11 +152,12 @@ def run():
             # Draw polyline
             display.draw_path(am.polyline)
 
-            display.draw_text((0, -5.1), "req_n=" + str(am.d_ratio) + " priors=" + str(am.d_prior))
+            display.draw_text((0, -5.2),
+                              "req={0} priors={1} full={2}".format(am.required_n,
+                                                                   am.d_prior, am.anomaly_full))
             display.draw()
 
         rospy.sleep(0.2)
-
 
 if __name__ == '__main__':
     try:

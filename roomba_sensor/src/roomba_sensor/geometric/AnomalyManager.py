@@ -38,10 +38,11 @@ class AnomalyManager(object):
         self._last_time_anomaly = 0
         # polygons: detected anomalies {id_robot:[polygon, closed, time]}
         self.data_polygons = {}
+        # Number of required robots for the anomaly
+        self.required_n = None
 
-        #for debug
+        # for debug
         self.d_prior = None
-        self.d_required = None
         self.d_ratio = None
 
     def add_local_sensed_point(self, sensed_value, sensed_position):
@@ -213,6 +214,11 @@ class AnomalyManager(object):
         intersected_anomaly_time = []
         intersected_ids = []
         prior_robots = 0
+
+        # Captain is the first robot in the anomaly
+        captain_id = None
+        captain_time = None
+
         # take each reported polygon
         for id_robot, pol_data in self.data_polygons.items():
             if id_robot == self._id_robot:
@@ -221,47 +227,52 @@ class AnomalyManager(object):
             try:
                 intersect = polygon.polygons_intersect(self.polyline, pol_data[0])
                 prior_time = pol_data[2] < self.polygon_time
-                full = pol_data[1]
-                print intersect, prior_time, full
+
                 # Intersected polygon and closed
                 if intersect:
                     intersected_anomaly_time.append(pol_data[2])
                     intersected_ids.append(id_robot)
 
-                    if prior_time and full:
+                    # if prior_time and full:
+                    if prior_time:
                         prior_robots += 1
+
+                        if captain_time is None or captain_time < pol_data[2]:
+                            captain_time = pol_data[2]
+                            captain_id = id_robot
+
             except:
                 print "Error in compute intersection, to evaluate if anomaly is full"
 
         # how many robots are in this anomaly? (+1) is for current robot
         n_in_anomaly = len(intersected_anomaly_time) + 1
 
-        #
-        # Perimeter of the captain
-        # if prior_robots:
-        # id_captain = np.where(intersected_anomaly_time=min(intersected_anomaly_time))[0]
-        # perimeter = prior_time(self.data_polygons[id_captain][0])
-        # else:
-        perimeter = polygon.polygon_perimeter(self.polyline)
 
-        # required robots for anomaly
-        required_n = math.ceil(perimeter * PERIMETER_PER_ROBOT)
-        # required_n = 3
-        # ## should this robot go out of the full anomaly?
-        # robots with priority in the anomaly
-        # prior_robots = sum(np.array(intersected_anomaly_time) < self.polygon_time)
-        # If robots with priority are more than required.
+        # If this robot is captain
+        if captain_id is None:
+            # required robots for anomaly
+            perimeter = polygon.polygon_perimeter(self.polyline)
+            self.required_n = math.ceil(perimeter * PERIMETER_PER_ROBOT)
+
+        else:
+            #[polygon, full, time]
+            self.anomaly_full = self.data_polygons[captain_id][1]
+            # # Required robots
+            # pol_data = [polygon, full, time, required_n]
+            self.required_n = self.data_polygons[captain_id][3]
+            # Many prior robots and captain say go out.
+            # go_out = required_n <= prior_robots and self.anomaly_full
+
+        # Required robots
 
         # Anomaly is full if robots in anomaly, no aditional robot (+1) can enter
-        self.anomaly_full = required_n <= n_in_anomaly
-
+        self.anomaly_full = self.required_n <= n_in_anomaly
         # Go out if the the robots with priority plus our robot (+1) are in the anomaly.
-        go_out = required_n <= prior_robots
+        go_out = self.required_n <= prior_robots
 
-        print "required_n", (perimeter * PERIMETER_PER_ROBOT), " prior:", prior_robots, "go_out", go_out
         self.d_prior = prior_robots
-        self.d_ratio = perimeter * PERIMETER_PER_ROBOT
-        self.d_required = go_out
+        # self.d_ratio = perimeter * PERIMETER_PER_ROBOT
+        # self.required_n = go_out
 
         # open all the intersected polygons
         for id1 in intersected_ids:

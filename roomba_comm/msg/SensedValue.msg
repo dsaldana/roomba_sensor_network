@@ -21,3 +21,5 @@ Point[] anomaly
 bool closed_anomaly
 # When robot detected the anomaly
 time time_of_detection
+# Number of required robots
+int32  required_robots

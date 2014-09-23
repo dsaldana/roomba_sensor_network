@@ -70,14 +70,17 @@ class Communicator(object):
             # Polygon
             if msg.anomaly:
                 polygon = [(p.x, p.y) for p in msg.anomaly]
-                polygons[msg.robot_id] = [polygon, msg.closed_anomaly, msg.time_of_detection]
+                polygons[msg.robot_id] = [polygon, msg.closed_anomaly,
+                                          msg.time_of_detection, msg.required_robots]
 
         return robot_positions, sensed_points, polygons
 
     def send_sensed_value(self, sensed_val, camera_position, robot_position,
-                          polygon=None, closed_anomaly=False, time_of_detection=0):
+                          polygon=None, closed_anomaly=False, time_of_detection=0, required_robots=0):
         """
 
+
+        :param required_robots: number of robots to track an anomaly.
         :param sensed_val:
         :param camera_position:
         :param robot_position:
@@ -97,6 +100,7 @@ class Communicator(object):
             smsg.anomaly = [Point(i[0], i[1]) for i in polygon]
             smsg.closed_anomaly = closed_anomaly
             smsg.time_of_detection = time_of_detection
+            smsg.required_robots = required_robots
         # Publish
         self.sensor_pub.publish(smsg)
 
