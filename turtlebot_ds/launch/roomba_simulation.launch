@@ -7,8 +7,8 @@
     <param name="map_y1" value="-4.0"/>
     <param name="map_y2" value="4.0"/>
     <!-- Grid n=y-->
-    <param name="grid_n" value="8"/>
-    <param name="grid_m" value="4"/>
+    <param name="grid_n" value="10"/>
+    <param name="grid_m" value="10"/>
 
     <!-- Sensor config -->
     <param name="sensor_radio" value="0.45"/>
@@ -25,8 +25,10 @@
 
     <!-- Robot navigation -->
     <!-- forces for gradient descent -->
-    <param name="f_centroid" value="6"/>
+    <param name="f_centroid" value="4"/>
     <param name="f_robots" value="5"/>
+    <param name="f_map_border" value="4"/>
+
     <!-- PID for velocities -->
     <param name="p_control_linear" value="0.4"/>
     <param name="p_control_angular" value="1.5"/>
@@ -70,23 +72,23 @@
         <arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>
     </include>
 
-    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-    <!--<arg name="robot_id" value="Robot5"/>-->
-    <!--<arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>-->
-    <!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+    <arg name="robot_id" value="Robot5"/>
+    <arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>
+    </include>
 
-    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-    <!--<arg name="robot_id" value="Robot6"/>-->
-    <!--<arg name="robot_pose" value="-x 3.5 -y 1.5 -z 0"/>-->
-    <!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+    <arg name="robot_id" value="Robot6"/>
+    <arg name="robot_pose" value="-x 3.5 -y 1.5 -z 0"/>
+    </include>
 
-    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-    <!--<arg name="robot_id" value="Robot7"/>-->
-    <!--<arg name="robot_pose" value="-x -3.5 -y 1.5 -z 0"/>-->
-    <!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+    <arg name="robot_id" value="Robot7"/>
+    <arg name="robot_pose" value="-x -3.5 -y 1.5 -z 0"/>
+    </include>
 
-    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-    <!--<arg name="robot_id" value="Robot8"/>-->
-    <!--<arg name="robot_pose" value="-x 1.5 -y 3.5 -z 0"/>-->
-    <!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+    <arg name="robot_id" value="Robot8"/>
+    <arg name="robot_pose" value="-x 1.5 -y 3.5 -z 0"/>
+    </include>
 </launch>

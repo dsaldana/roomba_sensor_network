@@ -4,22 +4,23 @@ from pygame.locals import *
 
 # Window size
 import math
+from roomba_sensor.params.map import mapX1, mapY1, mapLX, mapLY, gn, gm
 
 width, height = 750, 600
 
 # The map is represented by a rectangle from (x1,y1) to (x2,y2)
-mapX1 = -5
-mapX2 = 5
-mapY1 = -5
-mapY2 = 5
+# mapX1 = -5
+# mapX2 = 5
+# mapY1 = -5
+# mapY2 = 5
 # Map size
-mapLX = mapX2 - mapX1
-mapLY = mapY2 - mapY1
+# mapLX = mapX2 - mapX1
+# mapLY = mapY2 - mapY1
 # Grid size
-gn = 10  # Number of rows
-gdx = mapLX / gn  # delta x
-gm = 10  # Number of columns
-gdy = mapLY / gm  # delta y
+# gn = 10  # Number of rows
+# gdx = mapLX / gn  # delta x
+# gm = 10  # Number of columns
+# gdy = mapLY / gm  # delta y
 
 
 class Drawer(object):

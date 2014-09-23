@@ -1,6 +1,7 @@
 import rospy
 
 from roomba_sensor.geometric.vector import points_to_vector, vector_components
+from roomba_sensor.params.map import mapX2, mapX1, mapY2, mapY1
 
 
 class GradientDescent(object):
@@ -16,6 +17,7 @@ class GradientDescent(object):
         # Constant in Coulombs law. Force by centroid.
         self._F_CENTROID = rospy.get_param('/f_centroid', 1.0)
         self._F_ROBOTS = rospy.get_param('/f_robots', 1.0)
+        self._F_MAP_BORDER = rospy.get_param('/f_map_border', 1.0)
 
 
     def compute_forces(self, pf, robot_x, robot_y, robots):
@@ -30,13 +32,14 @@ class GradientDescent(object):
         :return:
         """
         # Vector from robot to particles. distance and angle
+        f_particle = self._F_CENTROID * len(robots) / 2
         fx, fy = 0, 0
         for p in pf.particles:
             # Force from robot to particles
             d, theta = points_to_vector([robot_x, robot_y], [p.x, p.y])
 
             # Force. Coulomb law. Charge c=n_pts
-            fm = self._F_CENTROID / (d ** 2)
+            fm = f_particle / (d ** 2)
 
             # New vector of force
             x, y = vector_components(fm, theta)
@@ -60,7 +63,24 @@ class GradientDescent(object):
             fx += x
             fy += y
 
+        # Force by border
+        f_bx = 0
+        if robot_x > mapX2:
+            f_bx -= self._F_MAP_BORDER
+        elif robot_x < mapX1:
+            f_bx += self._F_MAP_BORDER
+        # border in y axis
+        f_by = 0
+        if robot_y > mapY2:
+            f_by -= self._F_MAP_BORDER
+        elif robot_y < mapY1:
+            f_by += self._F_MAP_BORDER
+
+        fx += len(robots) * f_bx
+        fy += len(robots) * f_by
+
         # TODO forces by obstacles
+
 
         # Reducing force
         cte = 10.0 / len(pf.particles)
