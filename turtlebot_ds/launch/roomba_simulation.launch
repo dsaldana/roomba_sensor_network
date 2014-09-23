@@ -1,77 +1,92 @@
 <launch>
-	<param name="simulated_robots" value="true"/> 
+    <param name="simulated_robots" value="true"/>
 
-	<!-- Map parameters -->
-	<param name="map_x1" value="-5.0" /> 
-	<param name="map_x2" value="5.0" /> 
-	<param name="map_y1" value="-4.0" /> 
-	<param name="map_y2" value="4.0" /> 
-	<!-- Grid n=y-->
-	<param name="grid_n" value="8" /> 
-	<param name="grid_m" value="4" />
+    <!-- Map parameters -->
+    <param name="map_x1" value="-5.0"/>
+    <param name="map_x2" value="5.0"/>
+    <param name="map_y1" value="-4.0"/>
+    <param name="map_y2" value="4.0"/>
+    <!-- Grid n=y-->
+    <param name="grid_n" value="8"/>
+    <param name="grid_m" value="4"/>
 
-	<!-- Sensor config -->
-	<param name="sensor_radio" value="0.45" />
-	<param name="sensor_distance" value="0.55" />
+    <!-- Sensor config -->
+    <param name="sensor_radio" value="0.45"/>
+    <param name="sensor_distance" value="0.55"/>
 
-	<!-- Particle filter parameters -->
-	<param name="particles_number" value="500" />
-	<param name="particle_movement" value="0.1" />
-	<!-- Particle drawer -->
-	<param name="draw_clusters" value="false" />
-	<param name="draw_particles" value="false" />
-	<param name="draw_path" value="false" />
-	<param name="draw_anomaly" value="true" />
+    <!-- Particle filter parameters -->
+    <param name="particles_number" value="500"/>
+    <param name="particle_movement" value="0.1"/>
+    <!-- Particle drawer -->
+    <param name="draw_clusters" value="false"/>
+    <param name="draw_particles" value="false"/>
+    <param name="draw_path" value="false"/>
+    <param name="draw_anomaly" value="true"/>
 
-	<!-- Robot navigation -->
-	<!-- forces for gradient descent -->
-	<param name="f_centroid" value="6" />
-	<param name="f_robots" value="5" />
-	<!-- PID for velocities -->
-	<param name="p_control_linear" value="0.4" /> 
-	<param name="p_control_angular" value="1.5" /> 
+    <!-- Robot navigation -->
+    <!-- forces for gradient descent -->
+    <param name="f_centroid" value="6"/>
+    <param name="f_robots" value="5"/>
+    <!-- PID for velocities -->
+    <param name="p_control_linear" value="0.4"/>
+    <param name="p_control_angular" value="1.5"/>
 
-	<param name="sensor_enabled" value="true" />
+    <param name="sensor_enabled" value="true"/>
 
-	<include file="$(find gazebo_ros)/launch/empty_world.launch">
-	    <arg name="use_sim_time" value="true"/>
-	    <arg name="debug" value="false"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="use_sim_time" value="true"/>
+        <arg name="debug" value="false"/>
 
-		<!-- $(find turtlebot_ds)/worlds/simple.world -->
-	    <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomalyA.world"/>
-  	</include>
-  
-	<!-- Particle drawer -->  	
-  	<!--<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">-->
-		<!--<param name="robot_name" value="Robot1"/>-->
-  	<!--</node>-->
+        <!-- $(find turtlebot_ds)/worlds/simple.world -->
+        <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
+    </include>
+
+    <!-- Particle drawer -->
+    <!--<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">-->
+    <!--<param name="robot_name" value="Robot1"/>-->
+    <!--</node>-->
 
 
-  	<!--Robots -->
-   	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot1"/>
+    <!--Robots -->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+        <arg name="robot_id" value="Robot1"/>
         <arg name="graphic_debug" value="True"/>
-   		<arg name="robot_pose" value="-x 2.5 -y 2.5 -z 0"/>
-  	</include>
+        <arg name="robot_pose" value="-x 2.5 -y 2.5 -z 0"/>
+    </include>
 
- 	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot2"/>
-   		<arg name="robot_pose" value="-x -2.5 -y -2.5 -z 0"/>
-  	</include>
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+        <arg name="robot_id" value="Robot2"/>
+        <arg name="robot_pose" value="-x -2.5 -y -2.5 -z 0"/>
+    </include>
 
 
-	<include file="$(find turtlebot_ds)/launch/single_robot.launch">
-   		<arg name="robot_id" value="Robot3"/>
-   		<arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>
-  	</include>
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+        <arg name="robot_id" value="Robot3"/>
+        <arg name="robot_pose" value="-x -2.5 -y 2.5 -z 0"/>
+    </include>
 
-	<!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-   		<!--<arg name="robot_id" value="Robot4"/>-->
-   		<!--<arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>-->
-  	<!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+        <arg name="robot_id" value="Robot4"/>
+        <arg name="robot_pose" value="-x 2.5 -y -2.5 -z 0"/>
+    </include>
 
     <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-   		<!--<arg name="robot_id" value="Robot5"/>-->
-   		<!--<arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>-->
-  	<!--</include>-->
+    <!--<arg name="robot_id" value="Robot5"/>-->
+    <!--<arg name="robot_pose" value="-x 1.5 -y 1.5 -z 0"/>-->
+    <!--</include>-->
+
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot6"/>-->
+    <!--<arg name="robot_pose" value="-x 3.5 -y 1.5 -z 0"/>-->
+    <!--</include>-->
+
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot7"/>-->
+    <!--<arg name="robot_pose" value="-x -3.5 -y 1.5 -z 0"/>-->
+    <!--</include>-->
+
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot8"/>-->
+    <!--<arg name="robot_pose" value="-x 1.5 -y 3.5 -z 0"/>-->
+    <!--</include>-->
 </launch>

@@ -160,7 +160,7 @@ def run():
                 vel.angular.z *= -1
 
             # velocity range [min, max]
-            linear_r = [0.08, 0.8]
+            linear_r = [0.08, 0.99]
             angular_r = [-pi, pi]
 
             if vel.linear.x > linear_r[1]:

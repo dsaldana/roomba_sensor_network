@@ -15,9 +15,6 @@ from roomba_sensor.geometric.vector import points_to_vector
 from roomba_sensor.sensor.sensor_camera import Camera
 
 
-GRAPHIC_DEBUG = rospy.get_param('~graphic_debug', True)
-
-
 def run():
     # ######## Initialization ##################
     # Node roomba_control
@@ -26,6 +23,7 @@ def run():
     # Robot's name is an argument
     robot_name = rospy.get_param('~robot_name', 'Robot1')
     rospy.loginfo("Loading robot control for " + robot_name)
+    GRAPHIC_DEBUG = rospy.get_param('~graphic_debug', False)
 
     # Communication
     communicator = Communicator(robot_name)
@@ -66,7 +64,6 @@ def run():
         if am.sensed_anomaly:
             am.evaluate_anomaly_full()
 
-
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
@@ -75,7 +72,6 @@ def run():
                                            time_of_detection=am.polygon_time, required_robots=am.required_n)
         else:
             communicator.send_sensed_value(camera.sensed_value, robot.get_sensor_position(), robot_position)
-
 
         # ################ Particle Filter ###############
         # Move the particles for simulating the anomaly's dynamics
@@ -122,7 +118,8 @@ def run():
                 rf = 1 / (d ** 2)
                 # is this robot considerable?
                 # if the other robot is in front of it (angle view is 120 degrees)
-                if abs(theta - robot_t) < (math.pi / 4):
+                MIN_DISTANCE = 1
+                if abs(theta - robot_t) < (math.pi / 4) and d < MIN_DISTANCE:
                     if rf > crf:
                         crf = rf
             # Send control command
@@ -158,6 +155,7 @@ def run():
             display.draw()
 
         rospy.sleep(0.2)
+
 
 if __name__ == '__main__':
     try:
