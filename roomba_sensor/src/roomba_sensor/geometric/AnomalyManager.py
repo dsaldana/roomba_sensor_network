@@ -7,7 +7,8 @@ from roomba_sensor.geometric.polygon import polyline_length
 # Bigger numbers for many robots in an anomaly
 PERIMETER_PER_ROBOT = 0.30
 
-MIN_DISTANCE_POLYGON = 0.2
+#MIN_DISTANCE_POLYGON = 0.2
+MIN_DISTANCE_POLYGON = 0.5
 
 # Distance to simplify polygons.
 _SIMPLIFY_TH = 0.1

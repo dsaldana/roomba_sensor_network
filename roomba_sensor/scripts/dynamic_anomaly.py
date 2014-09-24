@@ -12,11 +12,9 @@ import math
 # orientation: {x: 0, y: 0.491983115673, z: 0, w: 0.870604813099 } },
 # twist: { linear: { x: 0, y: 0, z: 0 }, angular: { x: 0, y: 0, z: 0}  }, reference_frame: world }'
 
-#
-from roomba_sensor.anomaly.perimeter import compute_perimeter
 from roomba_sensor.comm.communicator import Communicator
 
-
+LOG_FILE = '/home/dav/testings_anom/log_anomalies.pkl'
 SDF_FILE1 = '/home/dav/.gazebo/models/1fogo/model.sdf'
 SDF_FILE2 = '/home/dav/.gazebo/models/4fogo/model.sdf'
 SPAWN_COMMAND = 'rosrun gazebo_ros spawn_model -file {0} -sdf -model {1} -x {x} -y {y}'
@@ -62,6 +60,12 @@ def simulate_anomaly():
                  'fogo1': [[0.80, -1.60], [.00, 0.0]],
                  'fogo2': [[-0.8, 0.0], [.00, 0.0]],
     }
+
+
+    expand=True
+    if expand:
+        for k,a in anomalies.items():
+            anomalies[k] = a[::-1]
 
     communicator = Communicator('Robot1')
 
@@ -109,16 +113,10 @@ def simulate_anomaly():
             rospy.sleep(0.05)
 
         time = rospy.get_rostime().secs + rospy.get_rostime().nsecs / 1000000000.0
-        # print (), ",", compute_perimeter(
-        #    anomalies), ","
-        # Read all messages from other robots.
         orobots, sensed_points, anomaly_polygons = communicator.read_inbox()
 
-
-        # for id_robot, pol_data in anomaly_polygons.items():
-        # 1 for closed, [polygon, closed, time, required_n]
-        log.append((time, anomaly_polygons, copy.deepcopy(anomalies)))
-        with open('log_anomalies.pkl', 'wb') as output:
+        log.append((time, anomaly_polygons, copy.deepcopy(anomalies),sensed_points))
+        with open(LOG_FILE, 'wb') as output:
             pickle.dump(log, output, pickle.HIGHEST_PROTOCOL)
         r.sleep()
 
