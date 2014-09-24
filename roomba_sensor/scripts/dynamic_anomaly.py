@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+import copy
 import os
+import pickle
 from gazebo_msgs.msg import ModelState
 from gazebo_msgs.srv import SetModelState
 import rospy
@@ -11,6 +13,8 @@ import math
 # twist: { linear: { x: 0, y: 0, z: 0 }, angular: { x: 0, y: 0, z: 0}  }, reference_frame: world }'
 
 #
+from roomba_sensor.anomaly.perimeter import compute_perimeter
+from roomba_sensor.comm.communicator import Communicator
 
 
 SDF_FILE1 = '/home/dav/.gazebo/models/1fogo/model.sdf'
@@ -38,19 +42,33 @@ def simulate_anomaly():
                  'fogo2': [[-2.30, 0.20], [0.0051, 0.0]],
     }
 
-    anomalies = {'fogo4': [[-0.50, 0.30], [0.00, 0.0]],
-                  'fogo5': [[-0.4, -1.60], [0.00, 0.0]],
-                  'fogo6': [[-1.0, -2.02], [0.00, 0.0]],
-                  'fogo7': [[1.0, -0.30], [0.00, 0.0]],
-                  'fogo8': [[0.0, 0.4], [0.00, 0.0]],
-                  'fogo9': [[-1.30, -0.90], [0.00, 0.0]],
-                  'fogo1': [[0.80, -1.60], [0.00, 0.0]],
-                  'fogo2': [[-0.8, 0.0], [0.00, 0.0]],
+    # {id: initial_position, target}
+    anomalies = {'fogo4': [[-0.50, 0.30], [5.00, 0.0]],
+                 'fogo5': [[-0.4, -1.60], [5.00, 0.0]],
+                 'fogo6': [[-1.0, -2.02], [5.00, 0.0]],
+                 'fogo7': [[1.0, -0.30], [5.00, 0.0]],
+                 'fogo8': [[0.0, 0.4], [5.00, 0.0]],
+                 'fogo9': [[-1.30, -0.90], [5.00, 0.0]],
+                 'fogo1': [[0.80, -1.60], [5.00, 0.0]],
+                 'fogo2': [[-0.8, 0.0], [5.00, 0.0]],
     }
+
+    anomalies = {'fogo4': [[-0.50, 0.30], [.00, 0.0]],
+                 'fogo5': [[-0.4, -1.60], [.00, 0.0]],
+                 'fogo6': [[-1.0, -2.02], [.00, 0.0]],
+                 'fogo7': [[1.0, -0.30], [.00, 0.0]],
+                 'fogo8': [[0.0, 0.4], [.00, 0.0]],
+                 'fogo9': [[-1.30, -0.90], [.00, 0.0]],
+                 'fogo1': [[0.80, -1.60], [.00, 0.0]],
+                 'fogo2': [[-0.8, 0.0], [.00, 0.0]],
+    }
+
+    communicator = Communicator('Robot1')
 
     # ## SPAWN
     for anom, data in anomalies.items():
         spawn_fire(anom, data[0][0], data[0][1])
+        pass
 
     # ### MOVE
     service_name = '/gazebo/set_model_state'
@@ -61,28 +79,21 @@ def simulate_anomaly():
 
     rospy.sleep(0.1)
 
-    r = rospy.Rate(10)  # 10hz
+    r = rospy.Rate(2)  # 10hz
     #
     # # moving_x = 0
+    log = []
+
     while not rospy.is_shutdown():
 
         for anom, data in anomalies.items():
-            # Position + V
-            # data[0][0] += data[1][0]
-            # data[0][1] += data[1][1]
-            #
-
-
-
             x, y = data[0]
+            target_x, target_y = data[1]
+            angle = math.atan2(target_y - y, target_x - x)
+            v = 0.002
 
-            angle = math.atan2(y,x)
-            v = -0.01
-
-            print data[0], math.degrees(angle), v * math.cos(angle)
             data[0][0] += v * math.cos(angle)
             data[0][1] += v * math.sin(angle)
-
 
             # Model state
             ms = ModelState()
@@ -97,6 +108,18 @@ def simulate_anomaly():
 
             rospy.sleep(0.05)
 
+        time = rospy.get_rostime().secs + rospy.get_rostime().nsecs / 1000000000.0
+        # print (), ",", compute_perimeter(
+        #    anomalies), ","
+        # Read all messages from other robots.
+        orobots, sensed_points, anomaly_polygons = communicator.read_inbox()
+
+
+        # for id_robot, pol_data in anomaly_polygons.items():
+        # 1 for closed, [polygon, closed, time, required_n]
+        log.append((time, anomaly_polygons, copy.deepcopy(anomalies)))
+        with open('log_anomalies.pkl', 'wb') as output:
+            pickle.dump(log, output, pickle.HIGHEST_PROTOCOL)
         r.sleep()
 
 
@@ -105,4 +128,5 @@ if __name__ == '__main__':
         simulate_anomaly()
     except rospy.ROSInterruptException:
         pass
+
 

@@ -302,8 +302,8 @@ class AnomalyManager(object):
         Simplify the path polyline.
         :return:
         """
-        # return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
-        return polygon.convex_hull(self.polyline)
+        return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+        # return polygon.convex_hull(self.polyline)
 
     def _clear_detections(self):
         """

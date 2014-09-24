@@ -149,7 +149,7 @@ def run():
             # Draw polyline
             display.draw_path(am.polyline)
 
-            display.draw_text((0, -5.2),
+            display.draw_text((0, -3.2),
                               "req={0} priors={1} full={2}".format(am.required_n,
                                                                    am.d_prior, am.anomaly_full))
             display.draw()
