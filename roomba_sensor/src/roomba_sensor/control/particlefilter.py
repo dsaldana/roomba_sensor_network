@@ -23,10 +23,11 @@ class ParticleFilter:
 
     # PF weights
     _WEIGHT_NO_SENSED = 1.0
-    _WEIGHT_TRACKING_LEFT = 1.5
+    _WEIGHT_TRACKING_LEFT = 1.3
     _WEIGHT_TRACKING_RIGHT = 0.01
     _WEIGHT_OUT_OF_MAP = 0.01
     _WEIGHT_SENSED_ZERO = 0.1
+    _WEIGHT_OPEN_POLYGON = 0.8
 
     def __init__(self, robot_name):
 
@@ -111,7 +112,7 @@ class ParticleFilter:
                     p.z *= self._WEIGHT_NO_SENSED
                 # available polygon
                 elif anomaly_area.point_in_open_anomaly((p.x, p.y)):
-                    p.z *= self._WEIGHT_TRACKING_LEFT
+                    p.z *= self._WEIGHT_OPEN_POLYGON
                 # If the particles in the robot area.
                 elif sqrt((senX - p.x) ** 2 + (senY - p.y) ** 2) < self.r:
                     if sen_val == 0:

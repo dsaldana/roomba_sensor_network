@@ -1,6 +1,6 @@
 # ## Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 
-from shapely.geometry import LineString, Point, LinearRing, Polygon, MultiPoint
+from shapely.geometry import LineString, Point, Polygon, MultiPoint
 
 
 def _vec2d_dist(p1, p2):
@@ -109,7 +109,7 @@ def fuse_point_to_polygon(point, polygon):
     p = Point(point)
     min_distance = float("inf")
     min_index = -1
-    polygon = polygon[::-1] ##FIXME the received polygon is wrong. This is POG
+    polygon = polygon[::-1]  ##FIXME the received polygon is wrong. This is POG
     # Identify the nearest line segment.
     for i in range(len(polygon)):
         seg = polygon[i:i + 2]
@@ -224,6 +224,10 @@ def point_in_polygon(point, poly):
     :param poly: polygon list of tuples (x,y)
     """
     p = Point(point)
+
+    if len(poly) < 3:
+        return False
+
     pol = Polygon(poly)
     return p.within(pol)
 
