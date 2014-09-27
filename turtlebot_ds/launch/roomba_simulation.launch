@@ -26,8 +26,8 @@
     <!-- Robot navigation -->
     <!-- forces for gradient descent -->
     <param name="f_centroid" value="4"/>
-    <param name="f_robots" value="5"/>
-    <param name="f_map_border" value="4"/>
+    <param name="f_robots" value="6"/>
+    <param name="f_map_border" value="10"/>
 
     <!-- PID for velocities -->
     <param name="p_control_linear" value="0.4"/>
@@ -50,7 +50,7 @@
 
      <!--Log-->
     <node pkg="roomba_sensor" type="dynamic_anomaly.py" name="log_anomaly">
-			<!--<param name="robot_name" value="$(arg robot_id)"/>-->
+			<param name="expand" value="false"/>
             <!--<param name="graphic_debug" value="$(arg graphic_debug)"/>-->
 	  	</node>
 

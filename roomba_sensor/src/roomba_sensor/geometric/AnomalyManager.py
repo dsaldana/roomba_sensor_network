@@ -5,7 +5,8 @@ from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length
 
 # Bigger numbers for many robots in an anomaly
-PERIMETER_PER_ROBOT = 0.30
+#PERIMETER_PER_ROBOT = 0.30
+PERIMETER_PER_ROBOT = 0.20
 
 #MIN_DISTANCE_POLYGON = 0.2
 MIN_DISTANCE_POLYGON = 0.5
@@ -61,9 +62,10 @@ class AnomalyManager(object):
             # ## Simplify polyline.
             # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
 
-    def add_sensed_points(self, sensed_points):
+    def add_sensed_points(self, sensed_points,anomaly_polygons):
         """
         Feed polyline for all the other robots.
+        :param anomaly_polygons: to know if robot i is in a polygon.
         :param sensed_points: position and value for each sensed point {id_robot :[x, y, th, value]}
         """
         # read each sensed point
@@ -81,12 +83,14 @@ class AnomalyManager(object):
             if robot_id not in self._anomaly_lines:
                 self._anomaly_lines[robot_id] = []
 
-            # #Limit the size
-            if not self.is_polygon_identified:
+            # Add point to polyline if robot i did not detect a polygon.
+            if not self.is_polygon_identified and robot_id in anomaly_polygons:
                 # Add line to other robots
                 self._anomaly_lines[robot_id].append(point)
-                if len(self._anomaly_lines[robot_id]) > 50:
-                    self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-50:]
+                pass
+                # #Limit the size
+                # if len(self._anomaly_lines[robot_id]) > 50:
+                #     self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-50:]
             else:
                 self._anomaly_lines[robot_id] = []
 

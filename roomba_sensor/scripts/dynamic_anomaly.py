@@ -11,6 +11,7 @@ import math
 # '{model_name: coke_can, pose: { position: { x: 1, y: 0, z: 2 },
 # orientation: {x: 0, y: 0.491983115673, z: 0, w: 0.870604813099 } },
 # twist: { linear: { x: 0, y: 0, z: 0 }, angular: { x: 0, y: 0, z: 0}  }, reference_frame: world }'
+from sets import Set
 
 from roomba_sensor.comm.communicator import Communicator
 
@@ -40,7 +41,7 @@ def simulate_anomaly():
                  'fogo2': [[-2.30, 0.20], [0.0051, 0.0]],
     }
 
-    # {id: initial_position, target}
+    # {id: initial_position, target, initial time}
     anomalies = {'fogo4': [[-0.50, 0.30], [5.00, 0.0]],
                  'fogo5': [[-0.4, -1.60], [5.00, 0.0]],
                  'fogo6': [[-1.0, -2.02], [5.00, 0.0]],
@@ -51,28 +52,35 @@ def simulate_anomaly():
                  'fogo2': [[-0.8, 0.0], [5.00, 0.0]],
     }
 
-    anomalies = {'fogo4': [[-0.50, 0.30], [.00, 0.0]],
-                 'fogo5': [[-0.4, -1.60], [.00, 0.0]],
-                 'fogo6': [[-1.0, -2.02], [.00, 0.0]],
-                 'fogo7': [[1.0, -0.30], [.00, 0.0]],
-                 'fogo8': [[0.0, 0.4], [.00, 0.0]],
-                 'fogo9': [[-1.30, -0.90], [.00, 0.0]],
-                 'fogo1': [[0.80, -1.60], [.00, 0.0]],
-                 'fogo2': [[-0.8, 0.0], [.00, 0.0]],
+    anomalies = {'fogo4': [[-0.50, 0.30], [.00, 0.0], 0],
+                 'fogo5': [[-0.4, -1.60], [.00, 0.0], 0],
+                 'fogo6': [[-1.0, -2.02], [.00, 0.0], 0],
+                 'fogo7': [[1.0, -0.30], [.00, 0.0], 0],
+                 'fogo8': [[0.0, 0.4], [.00, 0.0], 0],
+                 'fogo9': [[-1.30, -0.90], [.00, 0.0], 0],
+                 'fogo1': [[0.80, -1.60], [.00, 0.0], 0],
+                 'fogo2': [[-0.8, 0.0], [.00, 0.0], 0],
     }
 
+    anomalies = {'fogo4': [[-4.0, 3.0], [-4.0, 3.0], 40],
+                 'fogo5': [[1.4, 1.80], [1.4, 1.80], 100],
+                 'fogo6': [[-2.60, -1.2], [-2.60, -1.2], 150],
+                # 'fogo7': [[3.30, -2.40], [3.30, -2.40], 200]
+    }
 
-    expand=True
+    existent_anomalies = Set()
+
+    expand = rospy.get_param('~expand', False)
     if expand:
-        for k,a in anomalies.items():
-            anomalies[k] = a[::-1]
+        for k, a in anomalies.items():
+            anomalies[k][0], anomalies[k][1] = anomalies[k][1], anomalies[k][0]
 
     communicator = Communicator('Robot1')
 
     # ## SPAWN
-    for anom, data in anomalies.items():
-        spawn_fire(anom, data[0][0], data[0][1])
-        pass
+    # for anom, data in anomalies.items():
+    #     spawn_fire(anom, data[0][0], data[0][1])
+    #     pass
 
     # ### MOVE
     service_name = '/gazebo/set_model_state'
@@ -91,6 +99,14 @@ def simulate_anomaly():
     while not rospy.is_shutdown():
 
         for anom, data in anomalies.items():
+            if data[2] > rospy.get_rostime().secs:
+                continue
+            else:
+                if not anom in existent_anomalies:
+                    print "spawn fire ", anom
+                    spawn_fire(anom, data[0][0], data[0][1])
+                    existent_anomalies.add(anom)
+
             x, y = data[0]
             target_x, target_y = data[1]
             angle = math.atan2(target_y - y, target_x - x)
@@ -115,7 +131,7 @@ def simulate_anomaly():
         time = rospy.get_rostime().secs + rospy.get_rostime().nsecs / 1000000000.0
         orobots, sensed_points, anomaly_polygons = communicator.read_inbox()
 
-        log.append((time, anomaly_polygons, copy.deepcopy(anomalies),sensed_points))
+        log.append((time, anomaly_polygons, copy.deepcopy(anomalies), sensed_points))
         with open(LOG_FILE, 'wb') as output:
             pickle.dump(log, output, pickle.HIGHEST_PROTOCOL)
         r.sleep()

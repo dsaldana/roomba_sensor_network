@@ -57,7 +57,7 @@ def run():
 
         # Anomaly manager process sensed point
         am.add_local_sensed_point(camera.sensed_value, sensed_xy)
-        am.add_sensed_points(sensed_points)
+        am.add_sensed_points(sensed_points, anomaly_polygons)
         am.data_polygons = anomaly_polygons
 
         # Validate if full anomaly is really full for this robot
