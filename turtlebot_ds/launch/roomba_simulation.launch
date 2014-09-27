@@ -12,7 +12,7 @@
 
     <!-- Sensor config -->
     <param name="sensor_radio" value="0.45"/>
-    <param name="sensor_distance" value="0.55"/>
+    <param name="sensor_distance" value="0.20"/>
 
     <!-- Particle filter parameters -->
     <param name="particles_number" value="500"/>
@@ -61,39 +61,39 @@
         <arg name="robot_pose" value="-x 4.5 -y 3.5 -z 0"/>
     </include>
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-        <arg name="robot_id" value="Robot2"/>
-        <arg name="robot_pose" value="-x -4.5 -y -3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+        <!--<arg name="robot_id" value="Robot2"/>-->
+        <!--<arg name="robot_pose" value="-x -4.5 -y -3.5 -z 0"/>-->
+    <!--</include>-->
 
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-        <arg name="robot_id" value="Robot3"/>
-        <arg name="robot_pose" value="-x -4.5 -y 3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+        <!--<arg name="robot_id" value="Robot3"/>-->
+        <!--<arg name="robot_pose" value="-x -4.5 -y 3.5 -z 0"/>-->
+    <!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-        <arg name="robot_id" value="Robot4"/>
-        <arg name="robot_pose" value="-x 4.5 -y -3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+        <!--<arg name="robot_id" value="Robot4"/>-->
+        <!--<arg name="robot_pose" value="-x 4.5 -y -3.5 -z 0"/>-->
+    <!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-    <arg name="robot_id" value="Robot5"/>
-    <arg name="robot_pose" value="-x 4.5 -y 0.0 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot5"/>-->
+    <!--<arg name="robot_pose" value="-x 4.5 -y 0.0 -z 0"/>-->
+    <!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-    <arg name="robot_id" value="Robot6"/>
-    <arg name="robot_pose" value="-x -4.5 -y 0.0 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot6"/>-->
+    <!--<arg name="robot_pose" value="-x -4.5 -y 0.0 -z 0"/>-->
+    <!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-    <arg name="robot_id" value="Robot7"/>
-    <arg name="robot_pose" value="-x 0.0 -y 3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot7"/>-->
+    <!--<arg name="robot_pose" value="-x 0.0 -y 3.5 -z 0"/>-->
+    <!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-    <arg name="robot_id" value="Robot8"/>
-    <arg name="robot_pose" value="-x 0.0 -y -3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+    <!--<arg name="robot_id" value="Robot8"/>-->
+    <!--<arg name="robot_pose" value="-x 0.0 -y -3.5 -z 0"/>-->
+    <!--</include>-->
 </launch>

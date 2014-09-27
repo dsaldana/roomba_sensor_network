@@ -68,6 +68,9 @@ def simulate_anomaly():
                 # 'fogo7': [[3.30, -2.40], [3.30, -2.40], 200]
     }
 
+    anomalies = {'fogo4': [[-.0, .0], [-.0, .0], 0],
+    }
+
     existent_anomalies = Set()
 
     expand = rospy.get_param('~expand', False)

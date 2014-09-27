@@ -308,6 +308,7 @@ class AnomalyManager(object):
         :return:
         """
         return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
+        #return self.polyline
         # return polygon.convex_hull(self.polyline)
 
     def _clear_detections(self):
