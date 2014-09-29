@@ -1,0 +1,91 @@
+<launch>
+
+	<!-- USB Cam driver-->
+	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam_node0">
+		<param name="video_device" type="string" value="/dev/video0"/>
+
+		<param name="pixel_format" type="string" value="mjpeg" />
+		<param name="io_method" type="string" value="mmap" />
+
+		<param name="image_width" type="int" value="1280" />
+		<param name="image_height" type="int" value="800" />
+
+		<param name="camera_frame_id" type="string" value="usb_cam_frame0" />
+		<param name="camera_info_url" type="string" value="file://$(find camera_controller)/config/usb_cam_1280x800.yaml" />
+	</node>
+
+	<node pkg="usb_cam" type="usb_cam_node" name="usb_cam_node1">
+		<param name="video_device" type="string" value="/dev/video1"/>
+
+		<param name="pixel_format" type="string" value="mjpeg" />
+		<param name="io_method" type="string" value="mmap" />
+
+		<param name="image_width" type="int" value="1280" />
+		<param name="image_height" type="int" value="800" />
+
+		<param name="camera_frame_id" type="string" value="usb_cam_frame1" />
+		<param name="camera_info_url" type="string" value="file://$(find camera_controller)/config/usb_cam_1280x800.yaml" />
+	</node>
+
+	<!-- Image viewer-->
+	<node pkg="image_view" type="image_view" name="image_view0">
+		<remap from="/image" to="/usb_cam_node0/image_raw"/>
+	</node>
+
+	<node pkg="image_view" type="image_view" name="image_view1">
+		<remap from="/image" to="/usb_cam_node1/image_raw"/>
+	</node>
+
+	<!-- Frame broadcaster-->
+	<node pkg="camera_controller" type="frame_broadcaster.py" name="fixed_broadcaster0">
+		<param name="target_frame" type="string" value="usb_cam_frame0" />
+		<param name="x" type="double" value="0.80" />
+		<param name="y" type="double" value="1.25" />
+		<param name="z" type="double" value="2.687" />
+		<param name="qm" type="double" value="0.707" />
+		<param name="qx" type="double" value="0.707" />
+		<param name="qy" type="double" value="0.0" />
+		<param name="qz" type="double" value="0.0" />
+	</node>
+
+	<node pkg="camera_controller" type="frame_broadcaster.py" name="fixed_broadcaster1">
+		<param name="target_frame" type="string" value="usb_cam_frame1" />
+		<param name="x" type="double" value="2.02" />
+		<param name="y" type="double" value="1.13" />
+		<param name="z" type="double" value="2.683" />
+		<param name="qm" type="double" value="0.707" />
+		<param name="qx" type="double" value="0.707" />
+		<param name="qy" type="double" value="0.0" />
+		<param name="qz" type="double" value="0.0" />
+	</node>
+
+	<!-- AR track alvar-->
+	<group ns="track_1">
+		<arg name="marker_size" default="14.7" />
+		<arg name="max_new_marker_error" default="0.08" />
+		<arg name="max_track_error" default="0.2" />
+		<arg name="cam_image_topic" default="/usb_cam_node0/image_raw" />
+		<arg name="cam_info_topic" default="/usb_cam_node0/camera_info" />
+		<arg name="output_frame" default="/usb_cam_frame0" />
+
+		<node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)">
+
+			<remap from="/track_1/ar_pose_marker" to="/ar_pose_marker1"/>
+		</node>
+	</group>
+
+	<group ns="track_2">
+		<arg name="marker_size" default="14.7" />
+		<arg name="max_new_marker_error" default="0.08" />
+		<arg name="max_track_error" default="0.2" />
+		<arg name="cam_image_topic" default="/usb_cam_node1/image_raw" />
+		<arg name="cam_info_topic" default="/usb_cam_node1/camera_info" />
+		<arg name="output_frame" default="/usb_cam_frame1" />
+
+		<node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)">
+
+			<remap from="/track_2/ar_pose_marker" to="/ar_pose_marker2"/>
+		</node>
+	</group>
+
+</launch>
