@@ -2,7 +2,33 @@
 Anomaly to be projected by a video-beam.
 For physical robots.
 """
+# ########### Anomaly definition##################
+begin_anomalies = {
+    # 'fogo1': {"loc": [-2.0, -2.0], 'target': [-2.0, -2.0], 'start_t': 0},
+    # 'fogo11': {"loc": [-2.0, -2.0], 'target': [-2.0, -1.5], 'start_t': 0},
+    # 'fogo12': {"loc": [-2.0, -2.0], 'target': [-2.5, -1.0], 'start_t': 0},
+    # 'fogo13': {"loc": [-2.0, -2.0], 'target': [-2.5, -0.5], 'start_t': 0},
+    # 'fogo14': {"loc": [-2.0, -2.0], 'target': [-1.5, -0.5], 'start_t': 0},
+    # 'fogo15': {"loc": [-2.0, -2.0], 'target': [-2.0, -0.0], 'start_t': 0},
+    # 'fogo16': {"loc": [-2.0, -2.0], 'target': [-2.5, -0.0], 'start_t': 0},
+    # 'fogo17': {"loc": [-2.0, -2.0], 'target': [-2.0, 0.3], 'start_t': 0},
+    'fogo2': {"loc": [2.0, 2.0], 'target': [2.0, 2.0], 'start_t': 0},
+    'fogo21': {"loc": [2.0, 2.0], 'target': [2.0, 1.5], 'start_t': 0},
+    'fogo22': {"loc": [2.0, 2.0], 'target': [2.5, 1.0], 'start_t': 0},
+    'fogo23': {"loc": [2.0, 2.0], 'target': [2.5, 0.5], 'start_t': 0},
+    'fogo24': {"loc": [2.0, 2.0], 'target': [2.5, 0.0], 'start_t': 0},
+    # 'fogo25': {"loc": [2.0, 2.0], 'target': [2.0, 0.0], 'start_t': 0},
+    # 'fogo26': {"loc": [2.0, 2.0], 'target': [2.5, 0.0], 'start_t': 0},
+    # 'fogo27': {"loc": [2.0, 2.0], 'target': [2.0, -0.3], 'start_t': 0},
+
+}
+vel = 4.2
+scale = 1.
+dt = 0.001
+# ######################################################
+
 # For plotting
+import copy
 import pygame
 from pygame.locals import *
 import numpy as np
@@ -180,30 +206,54 @@ if __name__ == '__main__':
          0.8410394, 1.005029, 1.093469, 1.086207])
 
 
-    # Anomaly definition
-    anomalies = {
-        'fogo1': {"loc": [-4.0, 3.0], 'target': [-.0, 0.0], 'start_t': 0},
-        'fogo2': {"loc": [1.4, 1.80], 'target': [.4, 0.0], 'start_t': 0},
 
-    }
+
+    # scale
+    pol_x *= scale
+    pol_y *= scale
+
+    t = 0
+    anomalies = copy.deepcopy(begin_anomalies)
+
     # Create polygons
-    for key, vals in anomalies.items():
-        x = pol_x[:] + vals['loc'][0]
-        y = pol_y[:] + vals['loc'][1]
-        anomalies[key]['pol_x'] = x
-        anomalies[key]['pol_y'] = y
+    def restart():
+        for key, vals in begin_anomalies.items():
+            anomalies[key]['pol_x'] = pol_x[:] + vals['loc'][0]
+            anomalies[key]['pol_y'] = pol_y[:] + vals['loc'][1]
+            anomalies[key]['loc'] = vals['loc'][:]
 
-    for i in range(1000):
+    restart()
+
+    _quit = False
+    while not _quit:
+        # Pygame chars
+        for e in pygame.event.get():
+            if e.type is KEYDOWN != 0:
+                print "restart"
+                restart()
+                t = 0
+            if e.type is QUIT:
+                _quit = True
+            if e.type is KEYDOWN and e.key == K_ESCAPE:
+                _quit = True
+
+
+        # Clear screen
         v.clear(background_color=(0, 0, 0), draw_grid=False)
+
+
 
         # Draw anomalies
         for key, vals in anomalies.items():
+            if vals['start_t'] > t:
+                continue
+
             lx, ly = vals['loc']
             tx, ty = vals['target']
 
             angle = math.atan2(ty - ly, tx - lx)
-            vel = 0.02
-            dx, dy = vel * math.cos(angle), vel * math.sin(angle)
+
+            dx, dy = vel * math.cos(angle) * dt, vel * math.sin(angle) * dt
             vals['loc'][0] += dx
             vals['loc'][1] += dy
 
@@ -213,5 +263,6 @@ if __name__ == '__main__':
 
             v.draw_polygon(zip(vals['pol_x'], vals['pol_y']), stroke=0)
 
+        t += 1
         v.draw()
-        time.sleep(.1)
+        time.sleep(dt)
