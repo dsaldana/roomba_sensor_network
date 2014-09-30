@@ -92,18 +92,17 @@ class RoombaGazebo(object):
         return [camX, camY, robotT]
 
 ########################################################
+
 class ArLocator(object):
     """
     Localization for physical robots, using ARTrack Alvar.
     """
     poses = {}
-
     def __init__(self):
-        from ar_track_alvar.msg import AlvarMarkers
-
         self.load()
 
     def load(self):
+        from ar_track_alvar_msgs.msg import AlvarMarkers
         # rospy.Subscriber("/tf", TFMessage, self.callback_maker)
         rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self.callback_maker)
 
