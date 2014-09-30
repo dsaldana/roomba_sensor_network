@@ -3,7 +3,7 @@ import rospy
 # Gazebo
 import gazebo_msgs.srv
 from tf.transformations import euler_from_quaternion
-#from tf2_msgs.msg import TFMessage
+# from tf2_msgs.msg import TFMessage
 
 
 from math import *
@@ -20,6 +20,7 @@ class RoombaLocalization(object):
     Localization for virtual or physical robot.
     :param robot_name:
     """
+
     def __init__(self, robot_name):
         simulated_robots = rospy.get_param('/simulated_robots', False)
         # Object to get information from Gazebo
@@ -91,6 +92,7 @@ class RoombaGazebo(object):
 
         return [camX, camY, robotT]
 
+
 ########################################################
 
 class ArLocator(object):
@@ -98,6 +100,7 @@ class ArLocator(object):
     Localization for physical robots, using ARTrack Alvar.
     """
     poses = {}
+
     def __init__(self):
         self.load()
 
@@ -113,9 +116,9 @@ class ArLocator(object):
             self.poses[detected_robot] = marker.pose.pose
 
 
-    def get_robot_position(self, robotname):
-        if robotname in self.poses:
-            return self.poses[robotname]
+    def get_robot_position(self, robot_name):
+        if robot_name in self.poses:
+            return self.poses[robot_name]
         else:
             return None
 
@@ -126,23 +129,23 @@ class ArLocator(object):
 class RealRoomba:
     locator = None
 
-    def __init__(self, robotName):
-        print "Real romba localization"
-        self.robotName = robotName
+    def __init__(self, robot_name):
+        print "Real roomba localization"
+        self.robot_name = robot_name
         self.positionServer = None
 
-        if self.locator == None:
+        if self.locator is None:
             self.locator = ArLocator()
-        #locator.add_robot(robotName)
+            #locator.add_robot(robotName)
 
     def get_position(self):
-        pose = self.locator.get_robot_position(self.robotName)
+        pose = self.locator.get_robot_position(self.robot_name)
 
         if pose is None:
             rospy.logerr("No robot position")
             return [0, 0, 0]
 
-        robotX, robotY = pose.position.x, pose.position.y
+        robot_x, robot_y = pose.position.x, pose.position.y
 
         # the reference for the angle is the y axes.
         quat = [pose.orientation.w,
@@ -153,14 +156,19 @@ class RealRoomba:
         euler = euler_from_quaternion(quat)
 
         ## FIXME It works, I dont know why.
-        robotT = cut_angle(-euler[0] + pi)
+        robot_t = cut_angle(-euler[0] + pi)
 
-        return [robotX, robotY, robotT]
+        return [robot_x, robot_y, robot_t]
 
     def get_sensor_position(self):
-        [robotX, robotY, robotT] = self.get_position()
+        """
+        Get position of the sensor.
 
-        cam_x = robotX + d * cos(robotT)
-        cam_y = robotY + d * sin(robotT)
+        :return: [x,y, theta]
+        """
+        [robot_x, robot_y, robot_t] = self.get_position()
 
-        return [cam_x, cam_y, robotT]
+        cam_x = robot_x + d * cos(robot_t)
+        cam_y = robot_y + d * sin(robot_t)
+
+        return [cam_x, cam_y, robot_t]
