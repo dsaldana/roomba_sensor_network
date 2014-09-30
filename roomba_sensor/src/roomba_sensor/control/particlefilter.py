@@ -11,7 +11,7 @@ from roomba_sensor.geometric.polygon_joiner import PolygonJoiner
 
 class ParticleFilter:
     # Number of particles
-    N = rospy.get_param('/particles_number', 5000)
+    N = rospy.get_param('/particles_number', 500)
 
     # Particle movement (standard deviation)
     sd_mov = rospy.get_param('/particle_movement', 0.1)
