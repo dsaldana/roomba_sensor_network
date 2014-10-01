@@ -29,8 +29,9 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # D_TRACKING = 0.8
 
 # For real
-P_TRACKING = 0.70
-D_TRACKING = 0.9
+P_TRACKING = 0.50
+D_TRACKING = 0.4
+
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
