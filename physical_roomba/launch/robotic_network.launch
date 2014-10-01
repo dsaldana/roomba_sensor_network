@@ -1,10 +1,10 @@
 <launch> 
 	<param name="simulated_robots" value="false"/> 
  	
-	<arg name="robot_id"       default="Robot1"/> 
+	<arg name="robot_id"       default="Robot4"/>
 
 	<!-- P Control for Navigation -->
-	<param name="p_control_linear" value="0.50" /> 
+	<param name="p_control_linear" value="0.10" />
 	<param name="p_control_angular" value="1.50" /> 
 
 	<!-- Map parameters -->
@@ -17,12 +17,12 @@
 	<param name="grid_m" value="16" />
 
 	<!-- Sensor config -->
-	<param name="sensor_radio" value="0.2" />
-	<param name="sensor_distance" value="0.1" />
+	<param name="sensor_radio" value="0.04" />
+	<param name="sensor_distance" value="0.01" />
 
 	<!-- Particle filter parameters -->
-	<param name="particles_number" value="500" />
-	<param name="particle_movement" value="0.04" />
+	<param name="particles_number" value="1000" />
+	<param name="particle_movement" value="0.01" />
      <param name="draw_particles" value="true"/>
 
     <!-- Robot navigation -->
@@ -33,7 +33,7 @@
 
     <!-- PID for velocities -->
     <param name="p_control_linear" value="0.4"/>
-    <param name="p_control_angular" value="1.5"/>
+    <param name="p_control_angular" value="1.0"/>
 
     <param name="sensor_enabled" value="true"/>
 

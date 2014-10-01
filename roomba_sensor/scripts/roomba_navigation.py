@@ -24,8 +24,13 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # PD Control for tracking
 # P = pi / 4
 # D = pi / 1
+# For simulations
+# P_TRACKING = 0.70
+# D_TRACKING = 0.8
+
+# For real
 P_TRACKING = 0.70
-D_TRACKING = 0.8
+D_TRACKING = 0.9
 
 # Sensed value is between 0 e 1
 def tracking_callback(sensedData):
@@ -149,7 +154,7 @@ def run():
             # ## P Control ###
             #Magic!
             # vel.linear.x = 1.5 / (0.5*d + 2.0)
-            vel.linear.x = 0.4
+            vel.linear.x = 0.2
             print "distance=", d, " teta: ", degrees(controlT), d, vel.linear.x
 
             # vel.linear.x = 0.4

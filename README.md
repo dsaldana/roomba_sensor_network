@@ -10,9 +10,7 @@ A robotic sensor network based on roomba robots.
     - ros-indigo-desktop-full*
 
 * Python packages:
-    - shapely
-    - pygame
-    - scipy
+    - sudo apt-get install python-shapely python-pygame python-scipy
 
 * Copy the folder 1fogo from doc/gazebomodels/ to ~/.gazebo/models/
 
@@ -28,6 +26,14 @@ A robotic sensor network based on roomba robots.
     # To see the robot cam
     $ rosrun image_view image_view image:=/Robot1/front_cam/camera/image
     ```
+
+
+sudo apt-get install ros-hydro-turtlebot ros-hydro-cmake-modules ros-hydro-create-driver ros-hydro-usb-cam             
+
+
+
+
+
 
 
 
