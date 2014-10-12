@@ -25,12 +25,12 @@ p_angular = rospy.get_param('/p_control_angular', 1.0)
 # P = pi / 4
 # D = pi / 1
 # For simulations
-# P_TRACKING = 0.70
-# D_TRACKING = 0.8
+P_TRACKING = 0.70
+D_TRACKING = 0.8
 
 # For real
-P_TRACKING = 0.50
-D_TRACKING = 0.4
+# P_TRACKING = 0.50
+# D_TRACKING = 0.4
 
 
 # Sensed value is between 0 e 1
@@ -69,7 +69,7 @@ def run():
 
 
     # Create the Publisher to control the robot.
-    topicName = "/" + robot_name + "/commands/velocity"
+    topicName = "/" + robot_name + "/mobile_base/commands/velocity"
     velPub = rospy.Publisher(topicName, Twist, queue_size=1)
 
     topicName = "/" + robot_name + "/goal"

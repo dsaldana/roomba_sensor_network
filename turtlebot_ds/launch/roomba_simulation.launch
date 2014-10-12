@@ -15,7 +15,7 @@
     <param name="sensor_distance" value="0.20"/>
 
     <!-- Particle filter parameters -->
-    <param name="particles_number" value="500"/>
+    <param name="particles_number" value="1000"/>
     <param name="particle_movement" value="0.1"/>
     <!-- Particle drawer -->
     <param name="draw_clusters" value="false"/>
@@ -44,9 +44,9 @@
     </include>
 
     <!-- Particle drawer -->
-    <!--<node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">-->
-    <!--<param name="robot_name" value="Robot1"/>-->
-    <!--</node>-->
+    <node pkg="roomba_sensor" type="particle_drawer2.py" name="particle_viewer">
+    <param name="robot_name" value="Robot1"/>
+    </node>
 
      <!--Log-->
     <node pkg="roomba_sensor" type="dynamic_anomaly.py" name="log_anomaly">
@@ -61,16 +61,16 @@
         <arg name="robot_pose" value="-x 4.5 -y 3.5 -z 0"/>
     </include>
 
-    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-        <!--<arg name="robot_id" value="Robot2"/>-->
-        <!--<arg name="robot_pose" value="-x -4.5 -y -3.5 -z 0"/>-->
-    <!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+        <arg name="robot_id" value="Robot2"/>
+        <arg name="robot_pose" value="-x -4.5 -y -3.5 -z 0"/>
+    </include>
 
 
-    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
-        <!--<arg name="robot_id" value="Robot3"/>-->
-        <!--<arg name="robot_pose" value="-x -4.5 -y 3.5 -z 0"/>-->
-    <!--</include>-->
+    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
+        <arg name="robot_id" value="Robot3"/>
+        <arg name="robot_pose" value="-x -4.5 -y 3.5 -z 0"/>
+    </include>
 
     <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
         <!--<arg name="robot_id" value="Robot4"/>-->

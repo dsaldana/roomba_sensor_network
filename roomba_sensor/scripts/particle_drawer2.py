@@ -7,8 +7,6 @@ from pygame.locals import *
 # Clustering
 from scipy.cluster.vq import kmeans2
 
-
-
 from geometry_msgs.msg import Point32
 
 from roomba_comm.msg import Particle
@@ -185,7 +183,6 @@ def draw_points(points, color=(255, 0, 0)):
     return
 
 
-
 def callback(particles_msg):
     global particles
     global new_msg
@@ -220,8 +217,8 @@ def draw_particles():
     # Grid constats
     ax = width - 2.0 * mx  # area for x
     ay = height - 2.0 * my  # area for y
-    dx = ax / gm  #Delta x
-    dy = ay / gn  #Delta y
+    dx = ax / gm  # Delta x
+    dy = ay / gn  # Delta y
 
     # Draw the canvas
     window.fill((255, 255, 255))
@@ -275,30 +272,30 @@ def draw_particles():
     # # Write particles in a CSV file
     u = []
     # for p in particles.particles:
-    # 	u.append([p.x, p.y])
+    #     u.append([p.x, p.y])
 
     # np.savetxt("foo.csv", u, delimiter=",")
 
-    # if "Robot1" in paths and not particles.anomaly:
-    # 	print "Writing"
-    # 	path_size = len(paths["Robot1"])
+    if "Robot1" in paths and not particles.anomaly:
+        print "Writing"
+        path_size = len(paths["Robot1"])
 
-    # 	for i in range(1, path_size):
-    # 		l = []
-    # 		for rname in paths.keys():
-    # 			if len(paths[rname]) > i:
-    # 				l.append(paths[rname][i].x)
-    # 				l.append(paths[rname][i].y)
-    # 				l.append(paths[rname][i].z)
-    # 		u.append(l)
+        for i in range(1, path_size):
+            l = []
+            for rname in paths.keys():
+                if len(paths[rname]) > i:
+                    l.append(paths[rname][i].x)
+                    l.append(paths[rname][i].y)
+                    l.append(paths[rname][i].z)
+            u.append(l)
 
 
-    # 	#Write path
-    # 	try:
-    # 		np.savetxt("path.csv", np.array(u) , delimiter=",")
-    # 	except Exception, e:
-    # 		print e
-    # 		print u
+        #Write path
+        try:
+            np.savetxt("path.csv", np.array(u), delimiter=",")
+        except Exception, e:
+            print e
+            print u
 
     # ## End Write
 
@@ -379,7 +376,7 @@ def run():
             elif event.type == VIDEORESIZE:
                 window = pygame.display.set_mode(event.dict['size'],
                                                  HWSURFACE | DOUBLEBUF | RESIZABLE)
-                #else:
+                # else:
                 #print event
         # Draw the particles
         if particles is not None:
@@ -388,7 +385,7 @@ def run():
 
 
 if __name__ == '__main__':
-    #global robot
+    # global robot
     try:
         run()
     except rospy.ROSInterruptException:

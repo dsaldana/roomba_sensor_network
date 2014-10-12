@@ -15,15 +15,16 @@
         args="$(arg init_pose) -unpause -urdf -param robot_description -model $(arg robot_name)"/>
   
   <!-- Velocity muxer -->
-  <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
+  <!--<node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>-->
 
-  <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
-        args="load cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
+  <!--<node pkg="nodelet" type="nodelet" name="cmd_vel_mux"-->
+        <!--args="load cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">-->
 
-    <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
-    <remap from="cmd_vel_mux/output" to="/$(arg robot_name)/commands/velocity"/>
-  </node>
+    <!--<param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />-->
+    <!--<remap from="cmd_vel_mux/output" to="/$(arg robot_name)/commands/velocity"/>-->
+      <!--&lt;!&ndash;<remap from="cmd_vel_mux/output" to="commands/velocity"/>&ndash;&gt;-->
+  <!--</node>-->
 
   <!-- Bumper/cliff to pointcloud -->
-  <include file="$(find turtlebot_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/>
+  <!--<include file="$(find turtlebot_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/>-->
 </launch>
