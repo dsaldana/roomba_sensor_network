@@ -1,17 +1,17 @@
 <launch> 
 	<param name="simulated_robots" value="false"/> 
  	
-	<arg name="robot_id"       default="Robot4"/>
+	<arg name="robot_id"       default="Robot1"/>
 
 	<!-- P Control for Navigation -->
 	<param name="p_control_linear" value="0.10" />
 	<param name="p_control_angular" value="1.50" /> 
 
 	<!-- Map parameters -->
-	<param name="map_x1" value="-0.35" />
-	<param name="map_x2" value="0.35" />
-	<param name="map_y1" value="-0.2" />
-	<param name="map_y2" value="0.2" />
+	<param name="map_x1" value="-0.3" />
+	<param name="map_x2" value="0.3" />
+	<param name="map_y1" value="-0.15" />
+	<param name="map_y2" value="0.15" />
 	<!-- Grid -->
 	<param name="grid_n" value="8" /> 
 	<param name="grid_m" value="16" />
@@ -29,7 +29,7 @@
     <!-- forces for gradient descent -->
     <param name="f_centroid" value="4"/>
     <param name="f_robots" value="6"/>
-    <param name="f_map_border" value="10"/>
+    <param name="f_map_border" value="100"/>
 
     <!-- PID for velocities -->
     <param name="p_control_linear" value="0.4"/>
