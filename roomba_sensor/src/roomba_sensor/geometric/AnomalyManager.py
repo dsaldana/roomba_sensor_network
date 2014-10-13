@@ -56,11 +56,10 @@ class AnomalyManager(object):
         # Wrong polygon? and update the timeout.
         self._process_sensed_value(sensed_value, sensed_position)
 
-        if sensed_value > 0:
-            self.polyline.append((sensed_position[0], sensed_position[1]))
+        ############# TEMPORAL #### not polylines
+        # if sensed_value > 0:
+        #     self.polyline.append((sensed_position[0], sensed_position[1]))
 
-            # ## Simplify polyline.
-            # self.polyline = polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
 
     def add_sensed_points(self, sensed_points,anomaly_polygons):
         """
