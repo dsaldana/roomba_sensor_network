@@ -2,13 +2,11 @@
     <param name="simulated_robots" value="true"/>
 
     <!-- Map parameters -->
-    <param name="map_x1" value="-5.0"/>
-    <param name="map_x2" value="5.0"/>
-    <param name="map_y1" value="-4.0"/>
-    <param name="map_y2" value="4.0"/>
-    <!-- Grid n=y-->
-    <param name="grid_n" value="10"/>
-    <param name="grid_m" value="10"/>
+    <param name="map_x1" value="-3.0"/>
+    <param name="map_x2" value="3.0"/>
+    <param name="map_y1" value="-3.0"/>
+    <param name="map_y2" value="3.0"/>
+
 
     <!-- Sensor config -->
     <param name="sensor_radio" value="0.45"/>
@@ -17,6 +15,7 @@
     <!-- Particle filter parameters -->
     <param name="particles_number" value="1000"/>
     <param name="particle_movement" value="0.1"/>
+
     <!-- Particle drawer -->
     <param name="draw_clusters" value="false"/>
     <param name="draw_particles" value="false"/>
@@ -30,7 +29,7 @@
     <param name="f_map_border" value="100"/>
 
     <!-- PID for velocities -->
-    <param name="p_control_linear" value="0.4"/>
+    <param name="p_control_linear" value="1.4"/>
     <param name="p_control_angular" value="1.5"/>
 
     <param name="sensor_enabled" value="true"/>
@@ -40,7 +39,7 @@
         <arg name="debug" value="false"/>
 
         <!-- $(find turtlebot_ds)/worlds/simple.world -->
-        <arg name="world_name" value="$(find turtlebot_ds)/worlds/anomaly5.world"/>
+        <arg name="world_name" value="$(find turtlebot_ds)/worlds/empty.world"/>
     </include>
 
     <!-- Particle drawer -->
@@ -49,10 +48,10 @@
     <!--</node>-->
 
      <!--Dynamic anomaly -->
-    <!--<node pkg="roomba_sensor" type="dynamic_anomaly.py" name="dynamic">-->
-			<!--<param name="expand" value="false"/>-->
-            <!--&lt;!&ndash;<param name="graphic_debug" value="$(arg graphic_debug)"/>&ndash;&gt;-->
-	  	<!--</node>-->
+    <node pkg="roomba_sensor" type="dynamic_anomaly.py" name="dynamic">
+			<param name="expand" value="false"/>
+            <!--<param name="graphic_debug" value="$(arg graphic_debug)"/>-->
+	  	</node>
 
     <node pkg="roomba_sensor" type="log_anomaly.py" name="log_anomaly">
         <param name="robot_name" value="Robot1"/>
@@ -61,25 +60,25 @@
     <!--Robots -->
     <include file="$(find turtlebot_ds)/launch/single_robot.launch">
         <arg name="robot_id" value="Robot1"/>
-        <arg name="graphic_debug" value="False"/>
-        <arg name="robot_pose" value="-x 4.5 -y 3.5 -z 0"/>
+        <arg name="graphic_debug" value="True"/>
+        <arg name="robot_pose" value="-x 2.8 -y 2.8 -z 0"/>
     </include>
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-        <arg name="robot_id" value="Robot2"/>
-        <arg name="robot_pose" value="-x -4.5 -y -3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+        <!--<arg name="robot_id" value="Robot2"/>-->
+        <!--<arg name="robot_pose" value="-x 2.2 -y 2.8 -z 0"/>-->
+    <!--</include>-->
 
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-        <arg name="robot_id" value="Robot3"/>
-        <arg name="robot_pose" value="-x -4.5 -y 3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+        <!--<arg name="robot_id" value="Robot3"/>-->
+        <!--<arg name="robot_pose" value="-x 1.6 -y 2.8 -z 0"/>-->
+    <!--</include>-->
 
-    <include file="$(find turtlebot_ds)/launch/single_robot.launch">
-        <arg name="robot_id" value="Robot4"/>
-        <arg name="robot_pose" value="-x 4.5 -y -3.5 -z 0"/>
-    </include>
+    <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
+        <!--<arg name="robot_id" value="Robot4"/>-->
+        <!--<arg name="robot_pose" value="-x 1.0 -y 2.8 -z 0"/>-->
+    <!--</include>-->
 
     <!--<include file="$(find turtlebot_ds)/launch/single_robot.launch">-->
     <!--<arg name="robot_id" value="Robot5"/>-->

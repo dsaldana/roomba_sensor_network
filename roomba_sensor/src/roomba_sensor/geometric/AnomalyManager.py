@@ -9,7 +9,7 @@ from roomba_sensor.geometric.polygon import polyline_length
 PERIMETER_PER_ROBOT = 0.20
 
 #MIN_DISTANCE_POLYGON = 0.2
-MIN_DISTANCE_POLYGON = 0.5
+MIN_DISTANCE_POLYGON = 1.5
 
 # Distance to simplify polygons.
 _SIMPLIFY_TH = 0.1
@@ -57,8 +57,8 @@ class AnomalyManager(object):
         self._process_sensed_value(sensed_value, sensed_position)
 
         ############# TEMPORAL #### not polylines
-        # if sensed_value > 0:
-        #     self.polyline.append((sensed_position[0], sensed_position[1]))
+        if sensed_value > 0:
+            self.polyline.append((sensed_position[0], sensed_position[1]))
 
 
     def add_sensed_points(self, sensed_points,anomaly_polygons):
@@ -86,7 +86,7 @@ class AnomalyManager(object):
             if not self.is_polygon_identified and robot_id in anomaly_polygons:
                 # Add line to other robots
                 self._anomaly_lines[robot_id].append(point)
-                pass
+
                 # #Limit the size
                 # if len(self._anomaly_lines[robot_id]) > 50:
                 #     self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-50:]
@@ -132,6 +132,7 @@ class AnomalyManager(object):
         first_point = polygon.identify_first_point_in_polygon(self.polyline, ddd=MIN_DISTANCE_POLYGON)
         polyline_closes = first_point >= 0
 
+        # print "polyline closes", polyline_closes, self.is_polygon_identified, len(self.polyline)
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
             self.is_polygon_identified = polyline_closes
@@ -314,6 +315,7 @@ class AnomalyManager(object):
         """
         Delete detected polyline and polygon.
         """
+        print "clear detections"
         self.sensed_anomaly = False
         self.polyline = []
         self.polygon_time = None

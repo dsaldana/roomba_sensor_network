@@ -4,10 +4,10 @@ roomba_sensor_network
 A robotic sensor network based on roomba robots.
 
 * Required ROS Packages
-    - ros-indigo-hector-sensors-description (https://github.com/tu-darmstadt-ros-pkg/hector_models/tree/indigo-devel)
+    - ros-indigo-hector-sensors-description
     - ros-indigo-turtlebot-simulator
     - ros-indigo-kobuki-gazebo
-    - ros-indigo-desktop-full*
+
 
 * Python packages:
     - sudo apt-get install python-shapely python-pygame python-scipy
@@ -28,7 +28,7 @@ A robotic sensor network based on roomba robots.
     ```
 
 
-sudo apt-get install ros-hydro-turtlebot ros-hydro-cmake-modules ros-hydro-create-driver ros-hydro-usb-cam             
+sudo apt-get install ros-indigo-turtlebot ros-indigo-cmake-modules ros-indigo-create-driver ros-indigo-usb-cam             
 
 
 

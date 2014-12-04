@@ -62,13 +62,15 @@ def simulate_anomaly():
                  'fogo2': [[-0.8, 0.0], [.00, 0.0], 0],
     }
 
-    anomalies = {'fogo4': [[-4.0, 3.0], [-4.0, 3.0], 40],
-                 'fogo5': [[1.4, 1.80], [1.4, 1.80], 100],
-                 'fogo6': [[-2.60, -1.2], [-2.60, -1.2], 150],
-                # 'fogo7': [[3.30, -2.40], [3.30, -2.40], 200]
-    }
+    # anomalies = {'fogo4': [[-4.0, 3.0], [-4.0, 3.0], 40],
+    # 'fogo5': [[1.4, 1.80], [1.4, 1.80], 100],
+    #              'fogo6': [[-2.60, -1.2], [-2.60, -1.2], 150],
+    #             # 'fogo7': [[3.30, -2.40], [3.30, -2.40], 200]
+    # }
 
-    anomalies = {'fogo4': [[-.0, .0], [-.0, .0], 0],
+
+    anomalies = {'fogo4': [[-0.50, 0.30], [-0.50, 0.30], 0],
+
     }
 
     existent_anomalies = Set()
@@ -81,9 +83,9 @@ def simulate_anomaly():
     communicator = Communicator('Robot1')
 
     # ## SPAWN
-    # for anom, data in anomalies.items():
-    #     spawn_fire(anom, data[0][0], data[0][1])
-    #     pass
+    for anom, data in anomalies.items():
+        spawn_fire(anom, data[0][0], data[0][1])
+        pass
 
     # ### MOVE
     service_name = '/gazebo/set_model_state'
@@ -113,7 +115,7 @@ def simulate_anomaly():
             x, y = data[0]
             target_x, target_y = data[1]
             angle = math.atan2(target_y - y, target_x - x)
-            v = 0.002
+            v = 0.001
 
             data[0][0] += v * math.cos(angle)
             data[0][1] += v * math.sin(angle)

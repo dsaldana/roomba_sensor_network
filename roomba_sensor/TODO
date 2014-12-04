@@ -2,7 +2,7 @@
 
 
 
-* Crear fuerzas en los bordes del mapa
+
 
 
 
@@ -22,3 +22,4 @@
 * borrar puntos innecesarios
 * meter los calculos en el controlador del robot.
 * La anomalia se esta perdiendo despues de indentificada.
+* Crear fuerzas en los bordes del mapa

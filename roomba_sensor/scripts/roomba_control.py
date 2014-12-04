@@ -64,6 +64,7 @@ def run():
         if am.sensed_anomaly:
             am.evaluate_anomaly_full()
 
+        print "polygon identified", am.is_polygon_identified
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
