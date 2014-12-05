@@ -64,7 +64,6 @@ def run():
         if am.sensed_anomaly:
             am.evaluate_anomaly_full()
 
-        print "polygon identified", am.is_polygon_identified
         # Send the info to other robots.
         if am.is_polygon_identified:
             # Includes time of detection and closed anomaly
@@ -85,7 +84,6 @@ def run():
         # Publish particles
         communicator.publish_particles(pf.particles, robot_position, orobots, am.polyline)
 
-        # print "sensed anomaly: ", am.sensed_anomaly, camera.sensed_value > 0
         # ####### Exploring #################
         if not am.sensed_anomaly:
             # Total force

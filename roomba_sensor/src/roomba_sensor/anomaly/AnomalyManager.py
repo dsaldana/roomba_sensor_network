@@ -19,7 +19,11 @@ _MAX_TRACKING_TIME = 8
 
 
 class AnomalyManager(object):
-    """
+    """d_robot:[polygon, closed, time]}
+        self.data_polygons = {}
+        # Number of required robots for the anomaly
+        self.required_n = None
+
     It manages the points where an anomaly is detected to create polygons
     based on local and other robot measures.
     """
@@ -38,11 +42,7 @@ class AnomalyManager(object):
 
         # last time that an anomaly was detected
         self._last_time_anomaly = 0
-        # polygons: detected anomalies {id_robot:[polygon, closed, time]}
-        self.data_polygons = {}
-        # Number of required robots for the anomaly
-        self.required_n = None
-
+        # polygons: detected anomalies {i
         # for debug
         self.d_prior = None
         self.d_ratio = None

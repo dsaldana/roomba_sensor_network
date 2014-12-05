@@ -69,9 +69,8 @@ def simulate_anomaly():
     # }
 
 
-    anomalies = {'fogo4': [[-0.50, 0.30], [-0.50, 0.30], 0],
-
-    }
+    # anomalies = {'fogo4': [[-0.50, 0.30], [-0.50, 0.30], 0],
+    # }
 
     existent_anomalies = Set()
 
@@ -115,7 +114,7 @@ def simulate_anomaly():
             x, y = data[0]
             target_x, target_y = data[1]
             angle = math.atan2(target_y - y, target_x - x)
-            v = 0.001
+            v = 0.002
 
             data[0][0] += v * math.cos(angle)
             data[0][1] += v * math.sin(angle)
