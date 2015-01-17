@@ -1,6 +1,8 @@
 # ## Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
+from math import atan2, pi, sin, cos
 
 from shapely.geometry import LineString, Point, Polygon, MultiPoint
+from roomba_sensor.util import geo
 
 
 def _vec2d_dist(p1, p2):
@@ -48,7 +50,58 @@ def simplify_polyline(points, gamma):
             simplify_polyline(points[pos + 1:], gamma)[1:])
 
 
-def identify_first_point_in_polygon(points, ddd=0.5):
+def polygon_closes_perpend(points, ddd=0.5):
+    """
+    Identify the cycle beginning for the last point
+    :param points: array of objects of PointX
+    :param ddd: distance to the fist point ddd>0.
+    :return -1 if do not close, or i if close in point i.
+    """
+    n = len(points)
+    if n < 3:
+        return None
+    # last point
+    lp = points[-1]
+
+    ############ FIXME #############
+    ## FIXME TEMPORAL: minetras que no se registre el angulo
+    perp_theta = atan2(lp[1], lp[0])  # perpendicular angle
+
+    ##########################
+
+    # perpendicular line
+    x1 = lp[0] - ddd * cos(perp_theta)
+    y1 = lp[1] - ddd * sin(perp_theta)
+    x2 = lp[0] + ddd * cos(perp_theta)
+    y2 = lp[1] + ddd * sin(perp_theta)
+
+    perp_line = LineString([(x1, y1), (x2, y2)])
+
+    ## the last before the last.
+    i = n - 2
+
+    # fixme responder porque de atras para adelante???
+    while i > 0:
+        # line segment
+        p1 = points[i - 1]  ### fixme si hay theta, esto no funciona.
+        p2 = points[i]
+        seg = LineString((p1, p2))
+
+        if seg.intersects(perp_line):
+            d1 = geo.euclidean_distance(lp, p1)
+            d2 = geo.euclidean_distance(lp, p2)
+
+            if d1 < d2:
+                return i - 1
+            else:
+                return i
+
+        i -= 1
+
+    return None
+
+
+def polygon_closes(points, ddd=0.5):
     """
     Identify the cycle beginning for the last point
     :param points: array of objects of PointX

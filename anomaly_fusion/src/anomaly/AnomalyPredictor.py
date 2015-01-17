@@ -57,7 +57,7 @@ class AnomalyPredictor(object):
         # Wrong polygon? and update the timeout.
         self._process_sensed_value(sensed_value, sensed_position, measure_time)
 
-        ############# TEMPORAL #### not polylines
+        ### Add new point with anomaly identified.
         if sensed_value > 0:
             self.polyline.append((sensed_position[0], sensed_position[1]))
 
@@ -122,7 +122,7 @@ class AnomalyPredictor(object):
                 self._clear_detections()
                 # print "Timeout, polygon lost."
 
-    def modify_polygon(self, sensed_location, measure_time, ddd=MIN_DISTANCE_POLYGON):
+    def modify_polygon(self, measure_time, ddd=MIN_DISTANCE_POLYGON):
         """
         Modify the polygon of the anomaly.
         1. if it has its own polygon, modify it adding the new point.
@@ -132,21 +132,19 @@ class AnomalyPredictor(object):
 
         :return True if the data gives a polygon.
         """
+        ### last sensed location
+        sensed_location = self.polyline[-1]
+
+
         # # Check if main_line closes
-        first_point = polygon.identify_first_point_in_polygon(self.polyline, ddd=ddd)
+        first_point = polygon.polygon_closes_perpend(self.polyline, ddd=ddd)
         polyline_closes = first_point >= 0
 
-        # print "polyline closes", polyline_closes, self.is_polygon_identified, len(self.polyline)
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
             self.is_polygon_identified = polyline_closes
-            # if len(self.polyline[first_point:]) < 3:
-            # self.is_polygon_identified = False
-            # else:
-            # # Check if the main_line closes to create a polygon
 
-
-        # # if the own polygon is closed, modify it
+        ## if the own polygon is closed, modify it
         if self.is_polygon_identified:
             # modify the polygon
             if polyline_closes:
