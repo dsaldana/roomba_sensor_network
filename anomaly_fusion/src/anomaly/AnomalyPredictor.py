@@ -8,7 +8,7 @@ from roomba_sensor.geometric.polygon import polyline_length
 # PERIMETER_PER_ROBOT = 0.30
 PERIMETER_PER_ROBOT = 0.20
 
-#MIN_DISTANCE_POLYGON = 0.2
+# MIN_DISTANCE_POLYGON = 0.2
 MIN_DISTANCE_POLYGON = 0.5
 
 # Distance to simplify polygons.
@@ -47,6 +47,10 @@ class AnomalyPredictor(object):
         # for debug
         self.d_prior = None
         self.d_ratio = None
+
+        # path for each vertex
+        self.vertex_path = {}
+
 
     def add_local_sensed_point(self, sensed_value, sensed_position, measure_time):
         """
@@ -90,7 +94,7 @@ class AnomalyPredictor(object):
 
                 # #Limit the size
                 # if len(self._anomaly_lines[robot_id]) > 50:
-                #     self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-50:]
+                # self._anomaly_lines[robot_id] = self._anomaly_lines[robot_id][-50:]
             else:
                 self._anomaly_lines[robot_id] = []
 
@@ -148,10 +152,25 @@ class AnomalyPredictor(object):
         if self.is_polygon_identified:
             # modify the polygon
             if polyline_closes:
-                # todo guarda el punto para hacerle tracking
+                # Save the path to predict the movement
+                near_point = self.polyline[nearest_last_vertex]
 
-                # Borra los vertices de la polilinea hasta aqui
-                self.polyline = self.polyline[nearest_last_vertex+1:]
+                # nearest point does not have a path
+                if not near_point in self.vertex_path:
+                    # the path of the new point is only the nearest
+                    self.vertex_path[sensed_location] = [near_point]
+                else:
+                    last_path = self.vertex_path[near_point]
+                    self.vertex_path[sensed_location] = last_path + [near_point]
+
+                # The polyline continues only after the nearest point
+                # self.polyline = self.polyline[nearest_last_vertex + 1:]
+
+                # remove the tail in the dictionary. then new dictionary is the following
+                # fixme not very efficient.
+                self.vertex_path = {v: self.vertex_path[v] for v in self.polyline if v in self.vertex_path}
+
+
 
             # Set the first detected time
             if self.polygon_time is None:
@@ -266,7 +285,7 @@ class AnomalyPredictor(object):
             self.required_n = math.ceil(perimeter * PERIMETER_PER_ROBOT)
 
         else:
-            #[polygon, full, time]
+            # [polygon, full, time]
             self.anomaly_full = self.data_polygons[captain_id][1]
             # # Required robots
             # pol_data = [polygon, full, time, required_n]
@@ -314,7 +333,7 @@ class AnomalyPredictor(object):
         :return:
         """
         return polygon.simplify_polyline(self.polyline, _SIMPLIFY_TH)
-        #return self.polyline
+        # return self.polyline
         # return polygon.convex_hull(self.polyline)
 
     def _clear_detections(self):
