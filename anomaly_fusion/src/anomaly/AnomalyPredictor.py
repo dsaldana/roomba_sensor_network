@@ -137,8 +137,8 @@ class AnomalyPredictor(object):
 
 
         # # Check if main_line closes
-        first_point = polygon.polygon_closes_perpend(self.polyline, ddd=ddd)
-        polyline_closes = first_point >= 0
+        nearest_last_vertex = polygon.polygon_closes_perpend(self.polyline, ddd=ddd)
+        polyline_closes = nearest_last_vertex is not None
 
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
@@ -148,8 +148,12 @@ class AnomalyPredictor(object):
         if self.is_polygon_identified:
             # modify the polygon
             if polyline_closes:
-                self.polyline = self.polyline[first_point:]
+                # todo guarda el punto para hacerle tracking
 
+                # Borra los vertices de la polilinea hasta aqui
+                self.polyline = self.polyline[nearest_last_vertex+1:]
+
+            # Set the first detected time
             if self.polygon_time is None:
                 self.polygon_time = measure_time
         else:
