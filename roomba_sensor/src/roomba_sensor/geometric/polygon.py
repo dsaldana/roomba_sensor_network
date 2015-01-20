@@ -1,4 +1,5 @@
 # ## Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
+from copy import copy
 from math import atan2, pi, sin, cos
 import shapely
 
@@ -6,6 +7,7 @@ from shapely.geometry import LineString, Point, Polygon, MultiPoint
 import math
 from roomba_sensor.util import geo
 import numpy as np
+from roomba_sensor.util.geo import euclidean_distance
 
 
 def _vec2d_dist(p1, p2):
@@ -381,7 +383,7 @@ def perpendicular_line_intersection(point, perp_theta, polygon, l=10.5150):
             if d < min_dist:
                 min_dist = d
                 near_poi = poi
-        #FIXME it must be as Point
+        # FIXME it must be as Point
         return near_poi.xy
 
     elif inter.type == 'GeometryCollection':
@@ -390,3 +392,17 @@ def perpendicular_line_intersection(point, perp_theta, polygon, l=10.5150):
     else:
         print "different type", inter.type
         return None
+
+
+def nearest_vertex(point, polygon):
+    """
+    Get the nearest vertex to the point
+    :param point:
+    :param polygon: an array with form [v1, v2, v3], where each vertex v is a point (x,y)
+    """
+    pol = copy(polygon)
+    # distance function
+    dist_f = lambda p1, p2: euclidean_distance(point, p1) < euclidean_distance(point, p2)
+    sorted(pol, cmp=dist_f)
+
+    return pol[0]

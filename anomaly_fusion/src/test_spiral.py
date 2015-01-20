@@ -1,7 +1,6 @@
 import math
 from matplotlib import animation
 from anomaly.AnomalyPredictor import AnomalyPredictor
-from anomaly.log_extractor import extract_log, get_robot_path
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -73,11 +72,17 @@ def animate(t):
     px, py = polyline[:, 0], polyline[:, 1]
     polygon_line = ax.plot(px, py, lw=2)
 
+    ## paths
+    if (p[0], p[1]) in ap.vertex_path:
+        print ap.vertex_path[(p[0], p[1])]
+    else:
+        print 'not path'
+
     return path_line + polygon_line
 
 
 # ani = animation.FuncAnimation(fig, animate, frames=len(time), interval=40, blit=True)
-ani = animation.FuncAnimation(fig, animate, frames=20, interval=400, blit=True)
+ani = animation.FuncAnimation(fig, animate, frames=len(time)-1-START_TIME, interval=1, blit=True)
 
 plt.show()
 # plt.show()

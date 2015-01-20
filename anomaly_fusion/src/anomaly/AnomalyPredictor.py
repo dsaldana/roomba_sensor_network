@@ -2,7 +2,7 @@ import math
 import rospy
 import numpy as np
 from roomba_sensor.geometric import polygon
-from roomba_sensor.geometric.polygon import polyline_length, perpendicular_line_intersection
+from roomba_sensor.geometric.polygon import polyline_length, perpendicular_line_intersection, nearest_vertex
 
 # Bigger numbers for many robots in an anomaly
 # PERIMETER_PER_ROBOT = 0.30
@@ -171,7 +171,8 @@ class AnomalyPredictor(object):
                 # self.vertex_path = {v: self.vertex_path[v] for v in self.polyline if v in self.vertex_path}
             else:
                 ### save the path
-                nearest_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
+                intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
+                nearest_point  = nearest_vertex(intersection_point, self.old_polygon)
 
 
             ### update vertex path.
