@@ -1,8 +1,11 @@
 # ## Source: http://stackoverflow.com/questions/2573997/reduce-number-of-points-in-line
 from math import atan2, pi, sin, cos
+import shapely
 
 from shapely.geometry import LineString, Point, Polygon, MultiPoint
+import math
 from roomba_sensor.util import geo
+import numpy as np
 
 
 def _vec2d_dist(p1, p2):
@@ -50,9 +53,10 @@ def simplify_polyline(points, gamma):
             simplify_polyline(points[pos + 1:], gamma)[1:])
 
 
-def polygon_closes_perpend(points, ddd=0.5):
+def polygon_closes_perpend(perp_theta, points, ddd=0.5):
     """
     Identify the cycle beginning for the last point
+    :param perp_theta: perpendicular angle  to the last point.
     :param points: array of objects of PointX
     :param ddd: distance to the fist point ddd>0.
     :return -1 if do not close, or i if close in point i.
@@ -62,12 +66,6 @@ def polygon_closes_perpend(points, ddd=0.5):
         return None
     # last point
     lp = points[-1]
-
-    ############ FIXME #############
-    ## FIXME TEMPORAL: minetras que no se registre el angulo
-    perp_theta = atan2(lp[1], lp[0])  # perpendicular angle
-
-    ##########################
 
     # perpendicular line
     x1 = lp[0] - ddd * cos(perp_theta)
@@ -340,3 +338,55 @@ def convex_hull(poly):
     ch = mp.convex_hull.boundary
     points = [(u, v) for u, v in zip(*ch.xy)]
     return points
+
+
+def perpendicular_line_intersection(point, perp_theta, polygon, l=10.5150):
+    """
+    Trace a perpendicular line from the point_ang to identify an intersection with the polygon.
+    :param point: (x,y)
+    :param perp_theta: perpendicular angle to the point.
+    :param polygon: polygon to find the intersection with the perpendicular line.
+    :param l: length of the perpendicular line to find the intersection at any side.
+    :return x,y coordinates of the nearest intersecting point
+    """
+    x1, y1 = point
+
+    x2 = x1 + l * cos(perp_theta)
+    y2 = y1 + l * sin(perp_theta)
+    x3 = x1 - l * cos(perp_theta)
+    y3 = y1 - l * sin(perp_theta)
+
+    np_polygon = np.array(polygon)
+    p = shapely.geometry.Polygon(np_polygon[:, :2]).boundary
+    l = LineString([(x2, y2), (x3, y3)])
+
+    inter = p.intersection(l)
+
+    if inter is None:
+        return None
+    elif inter.type == 'MultiLineString':
+        for l in inter:
+            return l.xy
+    elif inter.type == 'LineString':
+        return inter.xy
+    elif inter.type == 'Point':
+        return tuple((inter.xy[0][0], inter.xy[1][0]))
+    elif inter.type == 'MultiPoint':
+        near_poi = None  # Nearest point
+        min_dist = l  # Minimum distance
+
+        for poi in inter:
+            x, y = poi.xy
+            d = math.sqrt((x - x1) ** 2 + (y - y1) ** 2)
+            if d < min_dist:
+                min_dist = d
+                near_poi = poi
+        #FIXME it must be as Point
+        return near_poi.xy
+
+    elif inter.type == 'GeometryCollection':
+        print "No intersection for perpendicular_line_intersection", inter.type
+        return None
+    else:
+        print "different type", inter.type
+        return None

@@ -28,7 +28,7 @@ path_tracking = path_tracking.T
 
 ######## SIMULATE ROBOT ########3
 
-START_TIME = 80
+START_TIME = 82
 
 # create a simple animation
 fig = plt.figure()
@@ -47,7 +47,6 @@ def animate(t):
             p = path_tracking[i]
             ap.add_local_sensed_point(p[3], p, i)
 
-
     # increase the time
     t += START_TIME
 
@@ -60,10 +59,7 @@ def animate(t):
     ### if the polygon is identified.
     print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.vertex_path)
 
-
-
-
-
+    ##################
     ### Plot #########
     ax.clear()
     ax.plot((-40, 40, 40, -40), (-40, -40, 40, 40))  # bounds
@@ -88,7 +84,7 @@ plt.show()
 #
 #
 # for i in range(20):
-#     # increase the time
+# # increase the time
 #     t = i + START_TIME
 #
 #

@@ -2,7 +2,7 @@ import math
 import rospy
 import numpy as np
 from roomba_sensor.geometric import polygon
-from roomba_sensor.geometric.polygon import polyline_length
+from roomba_sensor.geometric.polygon import polyline_length, perpendicular_line_intersection
 
 # Bigger numbers for many robots in an anomaly
 # PERIMETER_PER_ROBOT = 0.30
@@ -48,8 +48,10 @@ class AnomalyPredictor(object):
         self.d_prior = None
         self.d_ratio = None
 
+        ## For anomaly prediction
         # path for each vertex
         self.vertex_path = {}
+        self.old_polygon = []
 
 
     def add_local_sensed_point(self, sensed_value, sensed_position, measure_time):
@@ -139,10 +141,13 @@ class AnomalyPredictor(object):
         ### last sensed location
         sensed_location = self.polyline[-1]
 
+        #### FIXME perpendicular angle of the last point.
+        ## temporal
+        perp_theta = math.atan2(sensed_location[1], sensed_location[0])
 
         # # Check if main_line closes
-        nearest_last_vertex = polygon.polygon_closes_perpend(self.polyline, ddd=ddd)
-        polyline_closes = nearest_last_vertex is not None
+        nearest_vertex_idx = polygon.polygon_closes_perpend(perp_theta, self.polyline, ddd=ddd)
+        polyline_closes = nearest_vertex_idx is not None
 
         # Validate polygon size. less than 3 points is not a polygon.
         if not self.is_polygon_identified:
@@ -153,23 +158,34 @@ class AnomalyPredictor(object):
             # modify the polygon
             if polyline_closes:
                 # Save the path to predict the movement
-                near_point = self.polyline[nearest_last_vertex]
+                nearest_point = self.polyline[nearest_vertex_idx]
 
-                # nearest point does not have a path
-                if not near_point in self.vertex_path:
-                    # the path of the new point is only the nearest
-                    self.vertex_path[sensed_location] = [near_point]
-                else:
-                    last_path = self.vertex_path[near_point]
-                    self.vertex_path[sensed_location] = last_path + [near_point]
+                # save old polygon (it does not include the last point)
+                self.old_polygon = self.polyline[nearest_vertex_idx:-1]
+                self.polyline = [sensed_location]
 
-                # The polyline continues only after the nearest point
-                # self.polyline = self.polyline[nearest_last_vertex + 1:]
 
-                # remove the tail in the dictionary. then new dictionary is the following
-                # fixme not very efficient.
-                self.vertex_path = {v: self.vertex_path[v] for v in self.polyline if v in self.vertex_path}
+                # TODO remove from vertex_path the old_old_polygon, because it must be already added.
+                # remove the tail in the dictionary. then new dictionary is the following.
+                # note: not very efficient.
+                # self.vertex_path = {v: self.vertex_path[v] for v in self.polyline if v in self.vertex_path}
+            else:
+                ### save the path
+                nearest_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
 
+
+            ### update vertex path.
+            # nearest point does not have a path
+            if nearest_point not in self.vertex_path:
+                # the path of the new point is only the nearest
+                self.vertex_path[sensed_location] = [nearest_point]
+            else:
+                # takes the path of the old intersected point and increases with the new one.
+                old_path = self.vertex_path[nearest_point]
+                self.vertex_path[sensed_location] = old_path + [sensed_location]
+
+                # identify the nearest in old polygon
+                # update the vertex_path with the last path.
 
 
             # Set the first detected time
