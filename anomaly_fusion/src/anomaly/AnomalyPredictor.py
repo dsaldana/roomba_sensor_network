@@ -172,14 +172,14 @@ class AnomalyPredictor(object):
             else:
                 ### save the path
                 intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
-                nearest_point  = nearest_vertex(intersection_point, self.old_polygon)
+                nearest_point = nearest_vertex(intersection_point, self.old_polygon)
 
 
             ### update vertex path.
             # nearest point does not have a path
             if nearest_point not in self.vertex_path:
                 # the path of the new point is only the nearest
-                self.vertex_path[sensed_location] = [nearest_point]
+                self.vertex_path[sensed_location] = [ nearest_point, sensed_location]
             else:
                 # takes the path of the old intersected point and increases with the new one.
                 old_path = self.vertex_path[nearest_point]

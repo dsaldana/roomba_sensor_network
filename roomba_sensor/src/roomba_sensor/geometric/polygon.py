@@ -400,9 +400,10 @@ def nearest_vertex(point, polygon):
     :param point:
     :param polygon: an array with form [v1, v2, v3], where each vertex v is a point (x,y)
     """
-    pol = copy(polygon)
-    # distance function
-    dist_f = lambda p1, p2: euclidean_distance(point, p1) < euclidean_distance(point, p2)
-    sorted(pol, cmp=dist_f)
 
-    return pol[0]
+    # distance function
+    distances = [euclidean_distance(point, p) for p in polygon]
+    # index of the minimum distance.
+    min_idx = np.argmin(distances)
+
+    return polygon[min_idx]

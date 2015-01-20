@@ -56,7 +56,7 @@ def animate(t):
     ap.modify_polygon(time, ddd=20)
 
     ### if the polygon is identified.
-    print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.vertex_path)
+    # print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.vertex_path)
 
     ##################
     ### Plot #########
@@ -66,7 +66,7 @@ def animate(t):
     xx = path_tracking[:t + 1][:, 0]
     yy = path_tracking[:t + 1][:, 1]
     tt = path_tracking[t][2] - math.pi / 2
-    path_line = ax.plot(xx, yy, '.-')
+    path_line = ax.plot(xx, yy, 'y.-')
     # polygon
     polyline = np.array(ap.polyline)
     px, py = polyline[:, 0], polyline[:, 1]
@@ -74,15 +74,17 @@ def animate(t):
 
     ## paths
     if (p[0], p[1]) in ap.vertex_path:
-        print ap.vertex_path[(p[0], p[1])]
+        # print ap.vertex_path[(p[0], p[1])]
+        last_path = np.array(ap.vertex_path[(p[0], p[1])])
+        track_line = ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
+        return path_line + polygon_line + track_line
     else:
-        print 'not path'
-
-    return path_line + polygon_line
+        # print 'not path'
+        return path_line + polygon_line
 
 
 # ani = animation.FuncAnimation(fig, animate, frames=len(time), interval=40, blit=True)
-ani = animation.FuncAnimation(fig, animate, frames=len(time)-1-START_TIME, interval=1, blit=True)
+ani = animation.FuncAnimation(fig, animate, frames=len(time) - 1 - START_TIME, interval=100, blit=True)
 
 plt.show()
 # plt.show()
@@ -90,7 +92,7 @@ plt.show()
 #
 # for i in range(20):
 # # increase the time
-#     t = i + START_TIME
+# t = i + START_TIME
 #
 #
 #
