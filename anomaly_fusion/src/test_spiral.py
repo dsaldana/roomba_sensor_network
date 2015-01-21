@@ -56,7 +56,7 @@ def animate(t):
     ap.modify_polygon(time, ddd=20)
 
     ### if the polygon is identified.
-    # print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.vertex_path)
+    print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.vertex_path)
 
     ##################
     ### Plot #########

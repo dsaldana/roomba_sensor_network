@@ -1,3 +1,4 @@
+from copy import copy
 import math
 import rospy
 import numpy as np
@@ -160,10 +161,19 @@ class AnomalyPredictor(object):
                 # Save the path to predict the movement
                 nearest_point = self.polyline[nearest_vertex_idx]
 
-                # save old polygon (it does not include the last point)
+                # Save the old polygon before overwrite it.
+                old_old_polygon = copy(self.old_polygon)
+
+                # Save the old polygon (it does not include the last point).
                 self.old_polygon = self.polyline[nearest_vertex_idx:-1]
                 self.polyline = [sensed_location]
 
+                # Remove old points in vertex_path:
+                for p in old_old_polygon:
+                    try:
+                        del self.vertex_path[p]
+                    except KeyError:
+                        print "key error, deleting vertex in vertex_path"
 
                 # TODO remove from vertex_path the old_old_polygon, because it must be already added.
                 # remove the tail in the dictionary. then new dictionary is the following.
@@ -174,8 +184,8 @@ class AnomalyPredictor(object):
                 intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
                 nearest_point = nearest_vertex(intersection_point, self.old_polygon)
 
-
-            ### update vertex path.
+            ###############################
+            ####### Update vertex path.
             # nearest point does not have a path
             if nearest_point not in self.vertex_path:
                 # the path of the new point is only the nearest
@@ -187,12 +197,15 @@ class AnomalyPredictor(object):
 
                 # identify the nearest in old polygon
                 # update the vertex_path with the last path.
+            ################################
+
 
 
             # Set the first detected time
             if self.polygon_time is None:
                 self.polygon_time = measure_time
         else:
+            ##### multi robot ######
             # # near to other polygon?
             for id_robot, pol_data in self.data_polygons.items():
                 # same robot or anomaly is full.
@@ -208,7 +221,7 @@ class AnomalyPredictor(object):
                     break
 
             # print "not near polygon"
-            # if there is not a near polygon, try with near segments
+            # if there is not a near polygon, try with the near line segments
             if not self.is_polygon_identified:
                 # # Check if other lines are near to fuse
                 for robot_i, line in self._anomaly_lines.iteritems():
