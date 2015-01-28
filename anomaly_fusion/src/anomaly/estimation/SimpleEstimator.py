@@ -6,10 +6,22 @@ class SimpleEstimator:
     def __init__(self):
         ## For anomaly estimation
         # path for each vertex
+
+        # A path associated to each vertex
+        # {point: path}, where a point is (x,y) and path is a set of points.
         self.vertex_path = {}
+
+        # Speed for each vertex
+        self.vertex_speed = {}
+
+
+        # set of points of the las polygon.
         self.old_polygon = []
 
-    def update_closed_path(self, nearest_vertex_idx, polyline):
+
+
+
+    def replace_old_polygon(self, nearest_vertex_idx, polyline):
 
         # Save the old polygon before overwrite it.
         old_old_polygon = copy(self.old_polygon)
@@ -39,7 +51,12 @@ class SimpleEstimator:
             ################################
 
     def get_nearest_intersection(self, sensed_location, perp_theta):
-        ### save the path
+        """
+        Get the nearest point in the old polygon.
+        :param sensed_location:
+        :param perp_theta:
+        :return:
+        """
         intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
         nearest_point = nearest_vertex(intersection_point, self.old_polygon)
 

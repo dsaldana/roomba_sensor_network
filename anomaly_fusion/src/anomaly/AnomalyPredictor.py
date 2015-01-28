@@ -162,9 +162,9 @@ class AnomalyPredictor(object):
                 nearest_point = self.polyline[nearest_vertex_idx]
 
                 # Update the current vertices for the estimation.
-                self.estimator.update_closed_path(nearest_vertex_idx, self.polyline)
+                self.estimator.replace_old_polygon(nearest_vertex_idx, self.polyline)
 
-                # new polyline only has a point.
+                # Restart polyline: new polyline only has a point.
                 self.polyline = [sensed_location]
             else:
                 nearest_point = self.estimator.get_nearest_intersection(sensed_location, perp_theta)
