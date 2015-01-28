@@ -2,6 +2,7 @@ from copy import copy
 import math
 import rospy
 import numpy as np
+from anomaly.estimation.SimpleEstimator import SimpleEstimator
 from roomba_sensor.geometric import polygon
 from roomba_sensor.geometric.polygon import polyline_length, perpendicular_line_intersection, nearest_vertex
 
@@ -49,10 +50,9 @@ class AnomalyPredictor(object):
         self.d_prior = None
         self.d_ratio = None
 
-        ## For anomaly prediction
-        # path for each vertex
-        self.vertex_path = {}
-        self.old_polygon = []
+        self.estimator = SimpleEstimator()
+
+
 
 
     def add_local_sensed_point(self, sensed_value, sensed_position, measure_time):
@@ -147,7 +147,7 @@ class AnomalyPredictor(object):
         perp_theta = math.atan2(sensed_location[1], sensed_location[0])
 
         # # Check if main_line closes
-        nearest_vertex_idx = polygon.polygon_closes_perpend(perp_theta, self.polyline, ddd=ddd)
+        nearest_vertex_idx = polygon.polyline_closes_perpend(perp_theta, self.polyline, ddd=ddd)
         polyline_closes = nearest_vertex_idx is not None
 
         # Validate polygon size. less than 3 points is not a polygon.
@@ -161,45 +161,17 @@ class AnomalyPredictor(object):
                 # Save the path to predict the movement
                 nearest_point = self.polyline[nearest_vertex_idx]
 
-                # Save the old polygon before overwrite it.
-                old_old_polygon = copy(self.old_polygon)
+                # Update the current vertices for the estimation.
+                self.estimator.update_closed_path(nearest_vertex_idx, self.polyline)
 
-                # Save the old polygon (it does not include the last point).
-                self.old_polygon = self.polyline[nearest_vertex_idx:-1]
+                # new polyline only has a point.
                 self.polyline = [sensed_location]
-
-                # Remove old points in vertex_path:
-                for p in old_old_polygon:
-                    try:
-                        del self.vertex_path[p]
-                    except KeyError:
-                        print "key error, deleting vertex in vertex_path"
-
-                # TODO remove from vertex_path the old_old_polygon, because it must be already added.
-                # remove the tail in the dictionary. then new dictionary is the following.
-                # note: not very efficient.
-                # self.vertex_path = {v: self.vertex_path[v] for v in self.polyline if v in self.vertex_path}
             else:
-                ### save the path
-                intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
-                nearest_point = nearest_vertex(intersection_point, self.old_polygon)
+                nearest_point = self.estimator.get_nearest_intersection(sensed_location, perp_theta)
 
             ###############################
-            ####### Update vertex path.
-            # nearest point does not have a path
-            if nearest_point not in self.vertex_path:
-                # the path of the new point is only the nearest
-                self.vertex_path[sensed_location] = [ nearest_point, sensed_location]
-            else:
-                # takes the path of the old intersected point and increases with the new one.
-                old_path = self.vertex_path[nearest_point]
-                self.vertex_path[sensed_location] = old_path + [sensed_location]
-
-                # identify the nearest in old polygon
-                # update the vertex_path with the last path.
-            ################################
-
-
+            # Update vertex path.
+            self.estimator.update_vertex_path(nearest_point, sensed_location)
 
             # Set the first detected time
             if self.polygon_time is None:

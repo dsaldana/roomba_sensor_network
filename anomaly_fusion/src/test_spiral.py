@@ -56,10 +56,11 @@ def animate(t):
     ap.modify_polygon(time, ddd=20)
 
     ### if the polygon is identified.
-    print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.vertex_path)
+    print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.estimator.vertex_path)
 
-    ##################
-    ### Plot #########
+    ####################
+    ##### Plot #########
+    ####################
     ax.clear()
     ax.plot((-40, 40, 40, -40), (-40, -40, 40, 40))  # bounds
     # plot full path
@@ -73,9 +74,9 @@ def animate(t):
     polygon_line = ax.plot(px, py, lw=2)
 
     ## paths
-    if (p[0], p[1]) in ap.vertex_path:
+    if (p[0], p[1]) in ap.estimator.vertex_path:
         # print ap.vertex_path[(p[0], p[1])]
-        last_path = np.array(ap.vertex_path[(p[0], p[1])])
+        last_path = np.array(ap.estimator.vertex_path[(p[0], p[1])])
         track_line = ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
         return path_line + polygon_line + track_line
     else:
