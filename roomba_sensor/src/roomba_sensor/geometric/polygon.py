@@ -55,7 +55,7 @@ def simplify_polyline(points, gamma):
             simplify_polyline(points[pos + 1:], gamma)[1:])
 
 
-def polygon_closes_perpend(perp_theta, points, ddd=0.5):
+def polyline_closes_perpend(perp_theta, points, ddd=0.5):
     """
     Identify the cycle beginning for the last point
     :param perp_theta: perpendicular angle  to the last point.
@@ -351,7 +351,7 @@ def perpendicular_line_intersection(point, perp_theta, polygon, l=10.5150):
     :param l: length of the perpendicular line to find the intersection at any side.
     :return x,y coordinates of the nearest intersecting point
     """
-    x1, y1 = point
+    x1, y1, t = point
 
     x2 = x1 + l * cos(perp_theta)
     y2 = y1 + l * sin(perp_theta)

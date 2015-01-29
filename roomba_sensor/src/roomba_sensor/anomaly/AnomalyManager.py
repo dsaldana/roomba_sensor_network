@@ -129,7 +129,7 @@ class AnomalyManager(object):
         :return True if the data gives a polygon.
         """
         # # Check if main_line closes
-        first_point = polygon.identify_first_point_in_polygon(self.polyline, ddd=MIN_DISTANCE_POLYGON)
+        first_point = polygon.polygon_closes(self.polyline, ddd=MIN_DISTANCE_POLYGON)
         polyline_closes = first_point >= 0
 
         # print "polyline closes", polyline_closes, self.is_polygon_identified, len(self.polyline)

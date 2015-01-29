@@ -122,7 +122,7 @@ def draw_polygon(points, color=(255, 0, 0)):
 
     ## Pre-process the points
     # Identify the cycle beginning for the last point
-    first_point = polygon.identify_first_point_in_polygon(pts)
+    first_point = polygon.polygon_closes(pts)
 
     # Eliminate the unnecessary points
     pts = polygon.simplify_polyline(pts, 10)
