@@ -66,7 +66,7 @@ class AnomalyPredictor(object):
 
         ### Add new point with anomaly identified.
         if sensed_value > 0:
-            self.polyline.append((sensed_position[0], sensed_position[1]))
+            self.polyline.append((sensed_position[0], sensed_position[1], measure_time))
 
 
     def add_sensed_points(self, sensed_points, anomaly_polygons):
@@ -119,7 +119,7 @@ class AnomalyPredictor(object):
             if self._in_wrong_polygon(sensed_position):
                 # Treat this case as a non detection.
                 sensed_val = 0.0
-                return self._process_sensed_value(sensed_val, sensed_position)
+                return self._process_sensed_value(sensed_val, sensed_position, measure_time)
             else:
                 self.sensed_anomaly = True
                 self._last_time_anomaly = measure_time

@@ -74,9 +74,10 @@ def animate(t):
     polygon_line = ax.plot(px, py, lw=2)
 
     ## paths
-    if (p[0], p[1]) in ap.estimator.vertex_path:
+    measurement = (p[0], p[1], t)
+    if measurement in ap.estimator.vertex_path:
         # print ap.vertex_path[(p[0], p[1])]
-        last_path = np.array(ap.estimator.vertex_path[(p[0], p[1])])
+        last_path = np.array(ap.estimator.vertex_path[measurement])
         track_line = ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
         return path_line + polygon_line + track_line
     else:
@@ -97,8 +98,8 @@ plt.show()
 #
 #
 #
-#     ### add new measure
-#     p = path_tracking[t]  # new measure
+# ### add new measure
+# p = path_tracking[t]  # new measure
 #     ap.add_local_sensed_point(p[3], p, t)  # add
 #     # adapt polygon to the new information
 #     ap.modify_polygon(p, time, ddd=20)
