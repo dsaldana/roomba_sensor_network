@@ -32,6 +32,10 @@ START_TIME = 82
 # create a simple animation
 fig = plt.figure()
 ax = plt.axes(xlim=(-40, 40), ylim=(-40, 40))
+# anomaly circle
+patch = plt.Circle((0, 0), 20, color='#ffd5d5', )
+ax.add_patch(patch)
+
 
 ### Create predictor ###
 ap = AnomalyPredictor()
@@ -62,6 +66,7 @@ def animate(t):
     ##### Plot #########
     ####################
     ax.clear()
+    ax.cla()
     ax.plot((-40, 40, 40, -40), (-40, -40, 40, 40))  # bounds
     # plot full path
     xx = path_tracking[:t + 1][:, 0]
@@ -73,22 +78,32 @@ def animate(t):
     px, py = polyline[:, 0], polyline[:, 1]
     polygon_line = ax.plot(px, py, lw=2)
 
+    anomaly_radio = math.hypot(p[0], p[1])
+    # circle1 = plt.Circle((0, 0), anomaly_radio, color='#ffd5d5', fill=False)
+
+    # Draw circle anomaly Circle((0,0),50)
+    patch.radius = anomaly_radio
+
+    # circ = ax.add_patch(circle1)
+
     ## paths
     measurement = (p[0], p[1], t)
     if measurement in ap.estimator.vertex_path:
         # print ap.vertex_path[(p[0], p[1])]
         last_path = np.array(ap.estimator.vertex_path[measurement])
         track_line = ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
-        return path_line + polygon_line + track_line
+        return [patch] + path_line + polygon_line + track_line
+        # return patch,
     else:
         # print 'not path'
-        return path_line + polygon_line
+        return path_line + polygon_line #+ patch,
 
 
 # ani = animation.FuncAnimation(fig, animate, frames=len(time), interval=40, blit=True)
 ani = animation.FuncAnimation(fig, animate, frames=len(time) - 1 - START_TIME, interval=100, blit=True)
 
-plt.show()
+#plt.show()
+ani.save('anomaly_growing.mp4')
 # plt.show()
 #
 #
@@ -100,7 +115,7 @@ plt.show()
 #
 # ### add new measure
 # p = path_tracking[t]  # new measure
-#     ap.add_local_sensed_point(p[3], p, t)  # add
+# ap.add_local_sensed_point(p[3], p, t)  # add
 #     # adapt polygon to the new information
 #     ap.modify_polygon(p, time, ddd=20)
 #
