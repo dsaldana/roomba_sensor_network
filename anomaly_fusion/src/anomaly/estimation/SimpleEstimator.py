@@ -84,13 +84,15 @@ class SimpleEstimator:
 
             x, y, t = p
 
+            print "delta=", t - last_point[2]
             # Compute velocity.
-            vx = x - last_point[0]
-            vy = y - last_point[1]
+            vx = (x - last_point[0]) / (t - last_point[2])  # v = x/t
+            vy = (y - last_point[1]) / (t - last_point[2])  # v = x/t
 
             # estimate the new place.
-            new_x = x + vx * (time - t)*0.15
-            new_y = y + vy * (time - t)*0.15
+            new_x = x + vx * (time - t) # *0.15
+            new_y = y + vy * (time - t) #*0.15
+
             # new_x = x +10
             # new_y = y
 

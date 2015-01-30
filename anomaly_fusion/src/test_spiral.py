@@ -48,7 +48,8 @@ def animate(t):
         # add old points
         for i in range(START_TIME):
             p = path_tracking[i]
-            ap.add_local_sensed_point(p[3], p, i)
+            anomaly_time = math.hypot(p[0], p[1])  # time is proportional to the radio.
+            ap.add_local_sensed_point(p[3], p, anomaly_time)
 
     # increase the time
     t += START_TIME
@@ -69,7 +70,7 @@ def animate(t):
 
 
     ### if the polygon is identified.
-    print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.estimator.vertex_path)
+    print t, anomaly_time, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.estimator.vertex_path)
 
     ####################
     ##### Plot #########

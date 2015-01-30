@@ -53,9 +53,6 @@
             <!--<param name="graphic_debug" value="$(arg graphic_debug)"/>-->
 	  	</node>
 
-    <node pkg="roomba_sensor" type="log_anomaly.py" name="log_anomaly">
-        <param name="robot_name" value="Robot1"/>
-    </node>
 
     <!--Robots -->
     <include file="$(find turtlebot_ds)/launch/single_robot.launch">
