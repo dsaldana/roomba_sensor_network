@@ -33,8 +33,8 @@ START_TIME = 82
 fig = plt.figure()
 ax = plt.axes(xlim=(-40, 40), ylim=(-40, 40))
 # anomaly circle
-patch = plt.Circle((0, 0), 20, color='#ffd5d5', )
-ax.add_patch(patch)
+anomaly_circle = plt.Circle((0, 0), 20, color='#ffd5d5', )
+ax.add_patch(anomaly_circle)
 
 
 ### Create predictor ###
@@ -53,11 +53,20 @@ def animate(t):
     # increase the time
     t += START_TIME
 
+
+
     ### add new measure
     p = path_tracking[t]  # new measure
-    ap.add_local_sensed_point(p[3], p, t)  # add
+    anomaly_radio = math.hypot(p[0], p[1])
+    anomaly_time = anomaly_radio
+
+    ap.add_local_sensed_point(p[3], p, anomaly_time)  # add
     # adapt polygon to the new information
-    ap.modify_polygon(time, ddd=20)
+    ap.modify_polygon(anomaly_time, ddd=20)
+
+    # Estimated polygon
+    estimated_polygon = ap.estimator.estimate_polygon(anomaly_time)
+
 
     ### if the polygon is identified.
     print t, ap.is_polygon_identified, len(ap.polyline), len(ap.polyline), len(ap.estimator.vertex_path)
@@ -78,32 +87,37 @@ def animate(t):
     px, py = polyline[:, 0], polyline[:, 1]
     polygon_line = ax.plot(px, py, lw=2)
 
-    anomaly_radio = math.hypot(p[0], p[1])
-    # circle1 = plt.Circle((0, 0), anomaly_radio, color='#ffd5d5', fill=False)
+    # Anomaly size
+    anomaly_circle.radius = anomaly_radio
 
-    # Draw circle anomaly Circle((0,0),50)
-    patch.radius = anomaly_radio
-
-    # circ = ax.add_patch(circle1)
+     # Draw estimated polygon
+    estimated_pol = None
+    if estimated_polygon:
+        estimated_polygon = np.array(estimated_polygon)
+        estimated_pol = ax.plot(estimated_polygon[:, 0], estimated_polygon[:, 1], 'bo-')
 
     ## paths
-    measurement = (p[0], p[1], t)
+    measurement = (p[0], p[1], anomaly_time)
     if measurement in ap.estimator.vertex_path:
         # print ap.vertex_path[(p[0], p[1])]
         last_path = np.array(ap.estimator.vertex_path[measurement])
         track_line = ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
-        return [patch] + path_line + polygon_line + track_line
-        # return patch,
+
+        drawings = [anomaly_circle] + path_line + polygon_line + track_line
+
+        if estimated_pol is None:
+            return drawings
+        else:
+            return drawings + estimated_pol
+
     else:
-        # print 'not path'
-        return path_line + polygon_line #+ patch,
+        return path_line + polygon_line
 
+# Animation
+ani = animation.FuncAnimation(fig, animate, frames=len(time) - 1 - START_TIME, interval=10, blit=True)
 
-# ani = animation.FuncAnimation(fig, animate, frames=len(time), interval=40, blit=True)
-ani = animation.FuncAnimation(fig, animate, frames=len(time) - 1 - START_TIME, interval=100, blit=True)
-
-#plt.show()
-ani.save('anomaly_growing.mp4')
+plt.show()
+# ani.save('anomaly_growing.mp4')
 # plt.show()
 #
 #
@@ -116,7 +130,7 @@ ani.save('anomaly_growing.mp4')
 # ### add new measure
 # p = path_tracking[t]  # new measure
 # ap.add_local_sensed_point(p[3], p, t)  # add
-#     # adapt polygon to the new information
+# # adapt polygon to the new information
 #     ap.modify_polygon(p, time, ddd=20)
 #
 #     ### if the polygon is identified.

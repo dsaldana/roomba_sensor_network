@@ -63,4 +63,42 @@ class SimpleEstimator:
         return nearest_point
 
 
+    def estimate_polygon(self, time):
+        estimated_polygon = []
 
+        if len(self.vertex_path) < len(self.old_polygon):
+            print "not enough information"
+            return []
+
+
+
+        # for each point int the old polygon
+        for p in self.old_polygon:
+            if not p in self.vertex_path:
+                print "Point not found ", p
+                return []
+
+            # get the last related one.
+            path = self.vertex_path[p]
+            last_point = path[-2]
+
+            x, y, t = p
+
+            # Compute velocity.
+            vx = x - last_point[0]
+            vy = y - last_point[1]
+
+            # estimate the new place.
+            new_x = x + vx * (time - t)*0.15
+            new_y = y + vy * (time - t)*0.15
+            # new_x = x +10
+            # new_y = y
+
+            estimated_polygon.append((new_x, new_y, time))
+
+
+
+
+            # TODO priority taking into account the polyline.
+
+        return estimated_polygon
