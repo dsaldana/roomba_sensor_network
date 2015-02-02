@@ -97,10 +97,19 @@ class RobotSpiralSimultaor:
         else:
             return path_line + polygon_line
 
+
+    def _get_animation(self, interval=10):
+        anim = animation.FuncAnimation(self.fig, self.animate, frames=len(self.path_tracking) - 1 - self.start_time, interval=interval, blit=True)
+        return anim
+
     def show(self, interval=10):
         # Animation
-        ani = animation.FuncAnimation(self.fig, self.animate, frames=len(self.path_tracking) - 1 - self.start_time, interval=interval, blit=True)
+        self._get_animation()
 
         plt.show()
+
+    def save(self, file_name):
+        anim = self._get_animation()
+        anim.save(file_name)
 
 
