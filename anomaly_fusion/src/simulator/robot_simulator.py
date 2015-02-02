@@ -5,7 +5,16 @@ import matplotlib.pyplot as plt
 from simulator.spiral_generator import generate_spiral
 from matplotlib import animation
 
-class RobotSpiralSimultaor:
+
+class RobotSpiralSimulator(object):
+    """
+    Robot simulator for spiral movement.
+    :param duration:
+    :param start_time:
+    :param x_lim:
+    :param y_lim:
+    """
+
     def __init__(self, duration, start_time=40, x_lim=(-40, 40), y_lim=(-40, 40)):
         ## parameter
         self.start_time = start_time
@@ -24,11 +33,15 @@ class RobotSpiralSimultaor:
         self.anomaly_circle = plt.Circle((0, 0), 20, color='#ffd5d5', )
         self.ax.add_patch(self.anomaly_circle)
 
-
-    def animate(self, t):
-        # initialization
+    def _animate(self, t):
+        """
+        Method for animation, this is called by FuncAnimation of matplotlib.
+        :param t:
+        :return:
+        """
+        # First iteration only adds old points in order to start after start_time.
         if t == 0:
-            self.ap._clear_detections()
+            self.ap.clear_detections()
             # add old points
             for i in range(self.start_time):
                 p = self.path_tracking[i]
@@ -49,7 +62,6 @@ class RobotSpiralSimultaor:
 
         # Estimated polygon
         estimated_polygon = self.ap.estimator.estimate_polygon(anomaly_time)
-
 
         ### if the polygon is identified.
         print t, anomaly_time, self.ap.is_polygon_identified, len(self.ap.polyline), len(self.ap.polyline), len(
@@ -99,17 +111,25 @@ class RobotSpiralSimultaor:
 
 
     def _get_animation(self, interval=10):
-        anim = animation.FuncAnimation(self.fig, self.animate, frames=len(self.path_tracking) - 1 - self.start_time, interval=interval, blit=True)
+        anim = animation.FuncAnimation(self.fig, self._animate, frames=len(self.path_tracking) - 1 - self.start_time,
+                                       interval=interval, blit=True)
         return anim
 
     def show(self, interval=10):
-        # Animation
-        self._get_animation()
-
+        """
+        Show the simulation.
+        :param interval:
+        """
+        self._get_animation(interval=interval)
         plt.show()
 
-    def save(self, file_name):
-        anim = self._get_animation()
+    def save(self, file_name, interval=100):
+        """
+        Save simulation in a file.
+        :param file_name:
+        :param interval:
+        """
+        anim = self._get_animation(interval=interval)
         anim.save(file_name)
 
 

@@ -126,7 +126,7 @@ class AnomalyPredictor(object):
         else:
             # TIMEOUT: tracking is lost, restart variables.
             if rospy.get_rostime().secs - self._last_time_anomaly > _MAX_TRACKING_TIME:
-                self._clear_detections()
+                self.clear_detections()
                 # print "Timeout, polygon lost."
 
     def modify_polygon(self, measure_time, ddd=MIN_DISTANCE_POLYGON):
@@ -313,7 +313,7 @@ class AnomalyPredictor(object):
 
         if go_out:
             # Cancel detected polygon and associated variables
-            self._clear_detections()
+            self.clear_detections()
 
             # print perimeter, perimeter / PERIMETER_PER_ROBOT < n_in_anomaly
 
@@ -338,7 +338,7 @@ class AnomalyPredictor(object):
         # return self.polyline
         # return polygon.convex_hull(self.polyline)
 
-    def _clear_detections(self):
+    def clear_detections(self):
         """
         Delete detected polyline and polygon.
         """

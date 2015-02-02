@@ -1,8 +1,8 @@
 
-from simulator.robot_simulator import RobotSpiralSimultaor
+from simulator.robot_simulator import RobotSpiralSimulator
 
 
-simul = RobotSpiralSimultaor(40)
+simul = RobotSpiralSimulator(40)
 
 #simul.show()
 
