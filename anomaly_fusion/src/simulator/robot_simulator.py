@@ -109,7 +109,6 @@ class RobotSpiralSimulator(object):
         else:
             return path_line + polygon_line
 
-
     def _get_animation(self, interval=10):
         n_frames = len(self.path_tracking) - 1 - self.start_time
         anim = animation.FuncAnimation(self.fig, self._animate, frames= n_frames,
