@@ -121,9 +121,8 @@ class RobotSpiralSimulator(object):
         Show the simulation.
         :param interval:
         """
-        self._get_animation(interval=interval)
+        anim = self._get_animation(interval=interval)
         plt.show()
-        print "fasd"
 
     def save(self, file_name, interval=100):
         """
