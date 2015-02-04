@@ -2,9 +2,8 @@ import numpy as np
 import math
 
 def generate_spiral(duration):
-    # Espiral en coordenadas polares
     """
-
+    Generate a robot path for tracking a growing circle. This shape is a spiral.
     :param duration:
     :return: an array of elements [x,y, theta, sensor, time]
     """
@@ -23,6 +22,5 @@ def generate_spiral(duration):
     path_tracking = np.vstack((path_tracking, np.ones(len(time))))  # sensor
     path_tracking = np.vstack((path_tracking, range(len(time))))  # time
     path_tracking = path_tracking.T
-
 
     return path_tracking

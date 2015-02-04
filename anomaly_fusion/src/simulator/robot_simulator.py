@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from simulator.spiral_generator import generate_spiral
 from matplotlib import animation
 
+ROBOT_RADIO = 1.5
+
 
 class RobotSpiralSimulator(object):
     """
@@ -15,7 +17,8 @@ class RobotSpiralSimulator(object):
     :param y_lim:
     """
 
-    def __init__(self, duration, start_time=40, x_lim=(-40, 40), y_lim=(-40, 40)):
+    def __init__(self, duration, start_time=40, x_lim=(-40, 40), y_lim=(-40, 40),
+                 show_robot=True, show_path=True, show_anomaly=True):
         ## parameter
         self.start_time = start_time
 
@@ -32,6 +35,16 @@ class RobotSpiralSimulator(object):
         # anomaly circle
         self.anomaly_circle = plt.Circle((0, 0), 20, color='#ffd5d5', )
         self.ax.add_patch(self.anomaly_circle)
+        # graphic robot
+        self.g_robot = plt.Circle((0, 0), ROBOT_RADIO, color='black', )
+        self.ax.add_patch(self.g_robot)
+        self.g_robot_theta = plt.Line2D([], [], color='y', linewidth=2)
+        self.ax.add_patch(self.g_robot_theta)
+
+        # show graphic elements
+        self.show_anomaly = show_anomaly
+        self.show_robot = show_robot
+        self.show_path = show_path
 
     def _animate(self, t):
         """
@@ -90,32 +103,50 @@ class RobotSpiralSimulator(object):
         estimated_pol = None
         if estimated_polygon:
             estimated_polygon = np.array(estimated_polygon)
-            estimated_pol = self.ax.plot(estimated_polygon[:, 0], estimated_polygon[:, 1], 'bo-')
+            estimated_pol = self.ax.plot(estimated_polygon[:, 0], estimated_polygon[:, 1], 'b.-')
+
+        ## Draw robot
+        self.g_robot.center = (p[0], p[1])
+        # self.g_robot_theta.set_data([0, p[0]], [0, p[1]])
+        self.g_robot_theta.set_data([p[0],
+                                     p[0] + ROBOT_RADIO * math.cos(p[2])],
+                                    [p[1],
+                                     p[1] + ROBOT_RADIO * math.sin(p[2])])
+        robot_patches = [self.g_robot, self.g_robot_theta]
+
+        drawings = []
+        if self.show_anomaly:
+            drawings += [self.anomaly_circle]
+        if self.show_path:
+                drawings += path_line
+
+        drawings += polygon_line
 
         ## paths
         measurement = (p[0], p[1], anomaly_time)
         if measurement in self.ap.estimator.vertex_path:
-            # print ap.vertex_path[(p[0], p[1])]
             last_path = np.array(self.ap.estimator.vertex_path[measurement])
             track_line = self.ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
 
-            drawings = [self.anomaly_circle] + path_line + polygon_line + track_line
+            drawings += track_line
 
-            if estimated_pol is None:
-                return drawings
-            else:
-                return drawings + estimated_pol
 
-        else:
-            return path_line + polygon_line
+
+
+        if estimated_pol is not None:
+                drawings += estimated_pol
+        if self.show_robot:
+            drawings += robot_patches
+
+        return drawings
 
     def _get_animation(self, interval=10):
         n_frames = len(self.path_tracking) - 1 - self.start_time
-        anim = animation.FuncAnimation(self.fig, self._animate, frames= n_frames,
+        anim = animation.FuncAnimation(self.fig, self._animate, frames=n_frames,
                                        interval=interval, blit=True)
         return anim
 
-    def show(self, interval=10):
+    def show(self, interval=100):
         """
         Show the simulation.
         :param interval:
