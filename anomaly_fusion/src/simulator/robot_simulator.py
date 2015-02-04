@@ -111,7 +111,8 @@ class RobotSpiralSimulator(object):
 
 
     def _get_animation(self, interval=10):
-        anim = animation.FuncAnimation(self.fig, self._animate, frames=len(self.path_tracking) - 1 - self.start_time,
+        n_frames = len(self.path_tracking) - 1 - self.start_time
+        anim = animation.FuncAnimation(self.fig, self._animate, frames= n_frames,
                                        interval=interval, blit=True)
         return anim
 
@@ -122,6 +123,7 @@ class RobotSpiralSimulator(object):
         """
         self._get_animation(interval=interval)
         plt.show()
+        print "fasd"
 
     def save(self, file_name, interval=100):
         """
