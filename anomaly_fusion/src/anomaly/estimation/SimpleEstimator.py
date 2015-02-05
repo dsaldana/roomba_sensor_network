@@ -1,6 +1,8 @@
 from copy import copy
 from roomba_sensor.geometric.polygon import perpendicular_line_intersection, nearest_vertex
 
+PERPENDICULAR_LINE_LENGTH = 10
+
 
 class SimpleEstimator:
     def __init__(self):
@@ -57,10 +59,18 @@ class SimpleEstimator:
         :param perp_theta:
         :return:
         """
-        intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon)
-        nearest_point = nearest_vertex(intersection_point, self.old_polygon)
+        intersection_point = perpendicular_line_intersection(sensed_location, perp_theta, self.old_polygon,
+                                                             perpendicular_line_length=PERPENDICULAR_LINE_LENGTH)
+        ### Warning: be careful with this method
+        # If there is no a perpendicular intersection then, take the nearest point.
+        if intersection_point is None:
+            print "Warning: perpendicular line length is not enough in SimpleEstimator class."
+            # Nearest point to polygon. The point is the same sample
+            return nearest_vertex(sensed_location, self.old_polygon)
 
-        return nearest_point
+        # Nearest point to polygon. The point is in the intersection with the perpendicular sample.
+        return nearest_vertex(intersection_point, self.old_polygon)
+
 
 
     def estimate_polygon(self, time):
