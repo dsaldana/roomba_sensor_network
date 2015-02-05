@@ -7,7 +7,6 @@ from matplotlib import animation
 
 ROBOT_RADIO = 1.5
 
-
 class RobotSpiralSimulator(object):
     """
     Robot simulator for spiral movement.
@@ -18,7 +17,7 @@ class RobotSpiralSimulator(object):
     """
 
     def __init__(self, duration, start_time=40, x_lim=(-40, 40), y_lim=(-40, 40),
-                 show_robot=True, show_path=True, show_anomaly=True):
+                 show_robot=True, show_path=True, show_anomaly=True, show_prediction=True, show_polyline=True, show_association=True):
         ## parameter
         self.start_time = start_time
 
@@ -30,7 +29,7 @@ class RobotSpiralSimulator(object):
 
         ##### Init for plotting ######################
         # create a simple animation
-        self.fig = plt.figure()
+        self.fig = plt.figure(figsize=(10,10))
         self.ax = plt.axes(xlim=x_lim, ylim=y_lim)
         # anomaly circle
         self.anomaly_circle = plt.Circle((0, 0), 20, color='#ffd5d5', )
@@ -45,6 +44,9 @@ class RobotSpiralSimulator(object):
         self.show_anomaly = show_anomaly
         self.show_robot = show_robot
         self.show_path = show_path
+        self.show_polyline = show_polyline
+        self.show_prediction = show_prediction
+        self.show_association = show_association
 
     def _animate(self, t):
         """
@@ -118,23 +120,20 @@ class RobotSpiralSimulator(object):
         if self.show_anomaly:
             drawings += [self.anomaly_circle]
         if self.show_path:
-                drawings += path_line
-
-        drawings += polygon_line
+            drawings += path_line
+        if self.show_polyline:
+            drawings += polygon_line
 
         ## paths
         measurement = (p[0], p[1], anomaly_time)
         if measurement in self.ap.estimator.vertex_path:
             last_path = np.array(self.ap.estimator.vertex_path[measurement])
             track_line = self.ax.plot(last_path[:, 0], last_path[:, 1], 'ro--')
+            if self.show_association:
+                drawings += track_line
 
-            drawings += track_line
-
-
-
-
-        if estimated_pol is not None:
-                drawings += estimated_pol
+        if estimated_pol is not None and self.show_prediction:
+            drawings += estimated_pol
         if self.show_robot:
             drawings += robot_patches
 
