@@ -133,8 +133,6 @@ class AnomalyPredictor(object):
         Modify the polygon of the anomaly.
         1. if it has its own polygon, modify it adding the new point.
         2. else, find a polygon near by other robot, own it, and modify with (1).
-        :param measure_time: in for put by deafualt rospy.get_rostime()
-        :param sensed_location: new sensed location
 
         :return True if the data gives a polygon.
         """

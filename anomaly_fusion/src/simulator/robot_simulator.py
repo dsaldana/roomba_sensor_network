@@ -73,7 +73,8 @@ class RobotSpiralSimulator(object):
 
         self.ap.add_local_sensed_point(p[:2], anomaly_time, p[3])  # add
         # adapt polygon to the new information
-        self.ap.modify_polygon(anomaly_time, ddd=20)
+        perpendicular_theta = p[2] + math.pi /2
+        self.ap.modify_polygon(perpendicular_theta, ddd=20)
 
         # Estimated polygon
         estimated_polygon = self.ap.estimator.estimate_polygon(anomaly_time)

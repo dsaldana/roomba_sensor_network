@@ -15,7 +15,7 @@ def generate_spiral(duration):
     y = np.sin(time) * time ** (1. / n)
     theta = np.arctan2(y, x) + math.pi / 2
 
-    theta += 0.3
+    # theta += -0.3
     ############### as log data ############3
     ## Only the path for tracking
     path_tracking = np.vstack((x, y))  # x,y
