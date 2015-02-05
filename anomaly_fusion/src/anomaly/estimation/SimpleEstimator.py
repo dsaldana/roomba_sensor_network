@@ -8,7 +8,7 @@ class SimpleEstimator:
         # path for each vertex
 
         # A path associated to each vertex
-        # {point: path}, where a point is (x,y) and path is a set of points.
+        # {point: path}, where a point is (x,y,time) and path is a set of points.
         self.vertex_path = {}
 
         # Speed for each vertex
@@ -90,8 +90,8 @@ class SimpleEstimator:
             vy = (y - last_point[1]) / (t - last_point[2])  # v = x/t
 
             # estimate the new place.
-            new_x = x + vx * (time - t) # *0.15
-            new_y = y + vy * (time - t) #*0.15
+            new_x = x + vx * (time - t)
+            new_y = y + vy * (time - t)
 
             # new_x = x +10
             # new_y = y

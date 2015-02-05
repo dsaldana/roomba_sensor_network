@@ -53,13 +53,12 @@ class AnomalyPredictor(object):
         self.estimator = SimpleEstimator()
 
 
-
-
-    def add_local_sensed_point(self, sensed_value, sensed_position, measure_time):
+    def add_local_sensed_point(self, sensed_position, measure_time, sensed_value):
         """
         register the last sensed point for our robot.
-        :param sensed_value: value between 0 and 1.
-        :param sensed_position: (x, y)
+        :param sensed_value: output value of the sensor, a value between 0 and 1.
+        :param measure_time: time of the sample
+        :param sensed_position: position where the sample was made.
         """
         # Wrong polygon? and update the timeout.
         self._process_sensed_value(sensed_value, sensed_position, measure_time)
@@ -129,7 +128,7 @@ class AnomalyPredictor(object):
                 self.clear_detections()
                 # print "Timeout, polygon lost."
 
-    def modify_polygon(self, measure_time, ddd=MIN_DISTANCE_POLYGON):
+    def modify_polygon(self, perp_theta, ddd=MIN_DISTANCE_POLYGON):
         """
         Modify the polygon of the anomaly.
         1. if it has its own polygon, modify it adding the new point.
@@ -141,10 +140,7 @@ class AnomalyPredictor(object):
         """
         ### last sensed location
         sensed_location = self.polyline[-1]
-
-        #### FIXME perpendicular angle of the last point.
-        ## temporal
-        perp_theta = math.atan2(sensed_location[1], sensed_location[0])
+        measure_time = sensed_location[2]
 
         # # Check if main_line closes
         nearest_vertex_idx = polygon.polyline_closes_perpend(perp_theta, self.polyline, ddd=ddd)

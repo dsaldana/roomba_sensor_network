@@ -61,7 +61,7 @@ class RobotSpiralSimulator(object):
             for i in range(self.start_time):
                 p = self.path_tracking[i]
                 anomaly_time = math.hypot(p[0], p[1])  # time is proportional to the radio.
-                self.ap.add_local_sensed_point(p[3], p, anomaly_time)
+                self.ap.add_local_sensed_point(p[:2], anomaly_time, p[3])
 
         # increase the time
         t += self.start_time
@@ -71,7 +71,7 @@ class RobotSpiralSimulator(object):
         anomaly_radio = math.hypot(p[0], p[1])
         anomaly_time = anomaly_radio
 
-        self.ap.add_local_sensed_point(p[3], p, anomaly_time)  # add
+        self.ap.add_local_sensed_point(p[:2], anomaly_time, p[3])  # add
         # adapt polygon to the new information
         self.ap.modify_polygon(anomaly_time, ddd=20)
 
